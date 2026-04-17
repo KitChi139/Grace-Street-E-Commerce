@@ -1,7 +1,6 @@
 <?php
 
 include('./components/connect.php');
-include('./components/mailerFP.php');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,27 +10,45 @@ if (empty($email)) {
     exit();
 }
 
-if(isset($_POST['submit'])){
-    $email = mysqli_real_escape_string($con, $_POST['email']);
-    $pass = $_POST['pass'];
+if(isset($_POST['reset_password'])){
+    $pass = trim($_POST['pass'] ?? '');
+    $confirm_pass = trim($_POST['confirm_pass'] ?? '');
+
+    if ($pass !== $confirm_pass) {
+        echo "<script>alert('Passwords do not match. Please try again.');</script>";
+    }
+    if (strlen($pass) < 12) {
+        echo "<script>alert('Password must be at least 12 characters long.');</script>";
+    }
+    if (!preg_match('/[A-Z]/', $pass)) {
+        echo "<script>alert('Password must contain at least one uppercase letter.');</script>";
+    }
+    if (!preg_match('/[a-z]/', $pass)) {
+        echo "<script>alert('Password must contain at least one lowercase letter.');</script>";
+    }
+    if (!preg_match('/[0-9]/', $pass)) {
+        echo "<script>alert('Password must contain at least one number.');</script>";
+    }
+    if (!preg_match('/[\W_]/', $pass)) {
+        echo "<script>alert('Password must contain at least one special character.');</script>";
+    }
 
     $select = mysqli_query($con, "SELECT * FROM grace_user WHERE email = '$email'") or die('query failed');
     if(mysqli_num_rows($select) > 0){
-        $row = mysqli_fetch_assoc($select);
-    
-        if (password_verify($pass, $row['password']) || sha1($pass) === $row['password']) {
-            $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
-            mysqli_query($con, "UPDATE grace_user SET password = '$hashed_password' WHERE email = '$email'") or die('query failed');
+        $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
+        $update = mysqli_query($con, "UPDATE grace_user SET password ='$hashed_password' WHERE email = '$email'") or die('query failed');
+        if ($update) {
+            echo "<script>alert('Password has been reset successfully. You can now log in with your new password.');</script>";
             unset($_SESSION['reset_email']);
-            echo "<script>alert('Password reset successful. Please login with your new password.'); window.location.href='login.php';</script>";
+            header("Location: login.php");
+            exit();
         } else {
-            echo "<script>alert('Password reset failed. Please try again.');</script>";
+            echo "<script>alert('Failed to reset password. Please try again.');</script>";
         }
-    }else{
-        echo "<script>alert('Incorrect password or email');</script>";
+    } else {
+        echo "<script>alert('Failed to reset password. Please try again.');</script>";
     }
 }
-
 ?>
 
 
@@ -45,8 +62,28 @@ if(isset($_POST['submit'])){
     <!-- css connection -->
     <link rel="stylesheet" href="Css/style.css">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <!-- jQuery UI CSS -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+        }  
+        .password-container .box {
+            padding-right: 40px;
+            width: 90%;
+        }
+    </style>
 </head>
 <body>
     <?php include 'additional/loginheader.php'; ?>
@@ -55,15 +92,47 @@ if(isset($_POST['submit'])){
             <form action="" method="post">
                 <h1 style="text-align: center;">Reset Password</h1>
                 
-                <label for="password">New Password:</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your new password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-                <label for="confirm_password">Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your new password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                <p style="text-align:center; margin-bottom:20px;">
+                    For email: <strong><?= htmlspecialchars($email) ?></strong>
+                </p>
+
+                <div class="password-container">
+                    <label for="password">New Password:</label><br>
+                    <input type="password" id="password" name="pass" 
+                           required placeholder="Enter new password" maxlength="20" class="box">
+                    <i class="fas fa-eye-slash toggle-password" id="togglePassword"></i>
+                </div>
+
+                <div class="password-container">
+                    <label for="confirm_password">Confirm New Password:</label><br>
+                    <input type="password" id="confirm_password" name="confirm_pass" 
+                           required placeholder="Confirm new password" maxlength="20" class="box">
+
+                    <i class="fas fa-eye-slash toggle-password" id="toggleConfirmPassword"></i>
+                </div>
+
                 <input type="submit" value="Reset Password" class="btn" name="reset_password">
             </form>
-
         </div>
     </section>
     <?php include 'additional/footer.php'; ?>
+    <script>
+        // Toggle password visibility for both fields
+        document.querySelectorAll('.toggle-password').forEach(toggle => {
+            toggle.addEventListener('click', function () {
+                const input = this.previousElementSibling;   // Get the input field before the icon
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
