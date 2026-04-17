@@ -57,6 +57,7 @@ if(isset($_POST['search'])) {
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
     .discount_price{
@@ -77,9 +78,9 @@ if(isset($_POST['search'])) {
         <div class="products-container">
             <div class="filter">
                 <div style="margin: 5vh 0;">
-                    <form method="POST" action="">
+                    <form method="POST" action="" onsubmit="return false;">
                         <p style="margin:0 5px;">Search:</p>
-                        <input type="text" placeholder="Type Item Name" name="search" style="padding: 10px; font-size: 13px; width: 28vh; border: none; background-color: #e8e8e8;">
+                        <input type="text" id="searchInput" placeholder="Type Item Name" name="search" style="padding: 10px; font-size: 13px; width: 28vh; border: none; background-color: #e8e8e8;">
                         <button type="submit" style="display: none;"></button>
                     </form>
                 </div>
@@ -116,8 +117,8 @@ if(isset($_POST['search'])) {
                                             <a href="quick_view.php?pid=<?= $fetch_product['id']; ?>" class="fas fa-eye"></a>
                                             <a href="#" class="fa-solid fa-heart wishlist-btn" 
                                                 data-pid="<?= $fetch_product['id']; ?>" 
-                                                data-product-image="<?= $fetch_product['product_image']; ?>" 
-                                                data-product-name="<?= $fetch_product['product_name']; ?>" 
+                                                data-product-image="<?= htmlspecialchars($fetch_product['product_image']); ?>" 
+                                                data-product-name="<?= htmlspecialchars($fetch_product['product_name']); ?>" 
                                                 data-product-price="<?= $fetch_product['product_price']; ?>" 
                                                 data-discounted-price="<?= $discounted_price; ?>" 
                                                 onclick="addToWishlist(event)"></a>
@@ -142,7 +143,7 @@ if(isset($_POST['search'])) {
                                             <?php endif; ?>
                                         </div>
                                         <div class="itembottom-content">
-                                            <button class="add-btn" <?php echo ($fetch_product['product_stock_s'] > 0) ? '' : 'disabled'; ?> onclick="addToCart(<?php echo $fetch_product['id']; ?>, '<?php echo $fetch_product['product_image']; ?>', '<?php echo $fetch_product['product_name']; ?>', '<?php echo $fetch_product['product_price'];  ?>' , '<?php echo $discounted_price  ?>')">Add to cart</button>
+                                            <button type="button" class="add-btn" <?php echo ($fetch_product['product_stock_s'] > 0) ? '' : 'disabled'; ?> onclick="addToCart(<?php echo $fetch_product['id']; ?>, '<?php echo addslashes($fetch_product['product_image']); ?>', '<?php echo addslashes($fetch_product['product_name']); ?>', '<?php echo $fetch_product['product_price'];  ?>' , '<?php echo $discounted_price  ?>')">Add to cart</button>
                                             <span style="margin: 0; color:#8c8989; font-size: 12px;">PHP
                                                 <?php if ($fetch_product['product_discount'] > 0): ?>
                                                     <p class="product-price" style="color: green; font-size: 16px; margin: 0; text-decoration: line-through;">
@@ -204,10 +205,23 @@ if(isset($_POST['search'])) {
                 dataType: 'json',
                 success: function(response) {
                     if (response && response.success) {
-                        alert('Item added successfully!');
-                        window.location.href = "products.php";
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Item added successfully!',
+                            confirmButtonColor: '#000'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "products.php";
+                            }
+                        });
                     } else {
-                        alert('Error adding item to cart: ' + response.error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Error adding item to cart: ' + response.error,
+                            confirmButtonColor: '#000'
+                        });
                     }
                 },
                 error: function(xhr, status, error) {
@@ -237,10 +251,23 @@ if(isset($_POST['search'])) {
         dataType: 'json',
         success: function(response) {
             if (response && response.success) {
-                alert('Item added to wishlist successfully!');
-                window.location.href = "wishlist.php";
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Item added to wishlist successfully!',
+                    confirmButtonColor: '#000'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "wishlist.php";
+                    }
+                });
             } else {
-                alert('Error adding item to wishlist: ' + response.error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Error adding item to wishlist: ' + response.error,
+                    confirmButtonColor: '#000'
+                });
             }
         },
         error: function(xhr, status, error) {

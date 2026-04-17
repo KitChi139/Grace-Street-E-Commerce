@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (mysqli_num_rows($res) > 0) {
         $user = mysqli_fetch_assoc($res);
         if ((int)$user['is_active'] === 1) {
-            $info = "This account is already activated. You can login.";
+            $info_msg = "This account is already activated. You can login.";
         } else {
             $token = bin2hex(random_bytes(16));
             $update = "UPDATE grace_user SET activation_token = '$token' WHERE id = " . (int)$user['id'];
@@ -33,17 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if ($sent) {
-                    $info = "Activation email sent. Please check your inbox.";
+                    $success_msg = "Activation email sent. Please check your inbox.";
                 } else {
-                    $info = "Email sending is not available on this server.";
-                    $link = $activation_link;
+                    $error_msg = "Email sending is not available on this server. Your activation link is: $activation_link";
                 }
             } else {
-                $info = "Failed to generate new activation link. Please try again.";
+                $error_msg = "Failed to generate new activation link. Please try again.";
             }
         }
     } else {
-        $info = "No account found with that email.";
+        $error_msg = "No account found with that email.";
     }
 }
 ?>
@@ -55,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Resend Activation</title>
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .resend-container { height:auto; padding:100px 0; background-color: rgba(201,201,201,0.1); }
         .resend-container form { display:flex; flex-direction:column; justify-content:center; border-radius:20px; border:2px solid rgb(201,201,201); padding:40px; width:60vh; margin:0 auto; }
@@ -75,17 +76,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="submit" value="Send" class="btn" name="submit">
                 <p style="text-align:center;">Back to <a href="login.php">Login</a></p>
             </form>
-            <?php if (!empty($info)): ?>
-                <div class="info">
-                    <p><?php echo htmlspecialchars($info); ?></p>
-                    <?php if (!empty($link)): ?>
-                        <p><a href="<?php echo htmlspecialchars($link); ?>"><?php echo htmlspecialchars($link); ?></a></p>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
         </div>
     </section>
     <?php include 'additional/footer.php'; ?>
+    <script>
+        <?php if (isset($success_msg)): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '<?php echo $success_msg; ?>',
+            confirmButtonColor: '#000'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'login.php';
+            }
+        });
+        <?php endif; ?>
+
+        <?php if (isset($error_msg)): ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '<?php echo $error_msg; ?>',
+            confirmButtonColor: '#000'
+        });
+        <?php endif; ?>
+
+        <?php if (isset($info_msg)): ?>
+        Swal.fire({
+            icon: 'info',
+            title: 'Information',
+            text: '<?php echo $info_msg; ?>',
+            confirmButtonColor: '#000'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'login.php';
+            }
+        });
+        <?php endif; ?>
+    </script>
 </body>
 </html>
 
