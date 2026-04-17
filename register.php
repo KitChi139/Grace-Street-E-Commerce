@@ -26,8 +26,8 @@
         $number    = preg_match('@[0-9]@', $pass);
         $specialChars = preg_match('@[^\w]@', $pass);
 
-        if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($pass) < 8) {
-            echo "<script>alert('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');</script>";
+        if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($pass) < 12) {
+            echo "<script>alert('Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');</script>";
         }
 
         elseif ($pass !== $cpass) {
@@ -138,7 +138,14 @@
             <input type="email" id="email" name="email" required placeholder="Enter your email" maxlength="50" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
             
             <label for="password">Password:</label>
-            <input type="password" id="password" name="pass" required placeholder="Enter your password (min. 8 chars, 1 upper, 1 lower, 1 num, 1 special)" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+            <input type="password" id="password" name="pass" required placeholder="Enter your password (min. 12 chars, 1 upper, 1 lower, 1 num, 1 special)" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+            <div id="password-requirements" style="font-size: 14px; margin-bottom: 20px;">
+                <p id="length-req" style="color: red;">❌ At least 12 characters long</p>
+                <p id="upper-req" style="color: red;">❌ At least one uppercase letter</p>
+                <p id="lower-req" style="color: red;">❌ At least one lowercase letter</p>
+                <p id="number-req" style="color: red;">❌ At least one number</p>
+                <p id="special-req" style="color: red;">❌ At least one special character</p>
+            </div>
             
             <label for="confirm_password">Confirm Password:</label>
             <input type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
@@ -156,5 +163,62 @@
         </div>
     </section>
     <?php include 'additional/footer.php'; ?>
+    <script>
+        const passwordInput = document.getElementById('password');
+        const lengthReq = document.getElementById('length-req');
+        const upperReq = document.getElementById('upper-req');
+        const lowerReq = document.getElementById('lower-req');
+        const numberReq = document.getElementById('number-req');
+        const specialReq = document.getElementById('special-req');
+
+        passwordInput.addEventListener('input', () => {
+            const val = passwordInput.value;
+            
+            // Length
+            if (val.length >= 12) {
+                lengthReq.innerHTML = '✅ At least 12 characters long';
+                lengthReq.style.color = 'green';
+            } else {
+                lengthReq.innerHTML = '❌ At least 12 characters long';
+                lengthReq.style.color = 'red';
+            }
+            
+           
+            if (/[A-Z]/.test(val)) {
+                upperReq.innerHTML = '✅ At least one uppercase letter';
+                upperReq.style.color = 'green';
+            } else {
+                upperReq.innerHTML = '❌ At least one uppercase letter';
+                upperReq.style.color = 'red';
+            }
+            
+           
+            if (/[a-z]/.test(val)) {
+                lowerReq.innerHTML = '✅ At least one lowercase letter';
+                lowerReq.style.color = 'green';
+            } else {
+                lowerReq.innerHTML = '❌ At least one lowercase letter';
+                lowerReq.style.color = 'red';
+            }
+            
+        
+            if (/[0-9]/.test(val)) {
+                numberReq.innerHTML = '✅ At least one number';
+                numberReq.style.color = 'green';
+            } else {
+                numberReq.innerHTML = '❌ At least one number';
+                numberReq.style.color = 'red';
+            }
+            
+            // Special character
+            if (/[^A-Za-z0-9]/.test(val)) {
+                specialReq.innerHTML = '✅ At least one special character';
+                specialReq.style.color = 'green';
+            } else {
+                specialReq.innerHTML = '❌ At least one special character';
+                specialReq.style.color = 'red';
+            }
+        });
+    </script>
 </body>
 </html>

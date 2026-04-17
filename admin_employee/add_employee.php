@@ -5,8 +5,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Correcting undefined index error for product_stock
     $name = $_POST['name'];
     $email = $_POST['email'];
-    $password = sha1($_POST['password']);
+    $pass = $_POST['password'];
+    $cpass = $_POST['cpassword'];
     $role = $_POST['role'];
+
+    $uppercase = preg_match('@[A-Z]@', $pass);
+    $lowercase = preg_match('@[a-z]@', $pass);
+    $number    = preg_match('@[0-9]@', $pass);
+    $specialChars = preg_match('@[^\w]@', $pass);
+
+    if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($pass) < 12) {
+        echo "<script>alert('Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'); window.history.back();</script>";
+        exit();
+    }
+
+    if ($pass !== $cpass) {
+        echo "<script>alert('Confirm password does not match!'); window.history.back();</script>";
+        exit();
+    }
+
+    $password = password_hash($pass, PASSWORD_DEFAULT);
    
 
     // Insert the values into the database, including the current date

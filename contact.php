@@ -48,7 +48,7 @@
                     <input type="text" name="name" placeholder="Enter your name" required maxlength="20" class="box">
                     <input type="hidden" name="email" value="' . $_SESSION['user-email'] . '">
                     <input type="number" name="number" min="0" max="9999999999" placeholder="Enter your number" required onkeypress="if(this.value.length == 10) return false;" class="box">
-                    <textarea name="msg" class="box" placeholder="Enter your messagesss" cols="30" rows="10"></textarea>
+                    <textarea name="msg" class="box" placeholder="Enter your message" cols="30" rows="10"></textarea>
                     <input type="submit" value="Send message" name="send" class="btn">
                 </form>';
             }
