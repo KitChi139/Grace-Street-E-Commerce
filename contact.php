@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="css/style.css">
     <!-- jQuery UI CSS -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <?php include 'additional/header.php'; ?>
@@ -18,37 +20,48 @@
         <div class="contact-container">
             <?php
                 include 'components/connect.php';
+                include_once 'components/mailer.php';
 
                 $successMessage = "";
+                $errorMessage = "";
 
 
                 if(isset($_SESSION['user-email']) && isset($_POST['send'])) {
-                    $name = $_POST['name'];
-                    $email = $_POST['email'];
-                    $number = $_POST['number'];
-                    $msg = $_POST['msg'];
+                    $email = mysqli_real_escape_string($con, $_POST['email']);
+                    $msg = mysqli_real_escape_string($con, $_POST['msg']);
 
                     // Save data to the database
-                    $sql = "INSERT INTO contact (name, email, number, message) VALUES ('$name', '$email', '$number', '$msg')";
+                    $sql = "INSERT INTO contact (email, message) VALUES ('$email', '$msg')";
                     if(mysqli_query($con, $sql)) {
-                        $successMessage = "Message sent successfully.";
+                        // Send email using PHPMailer
+                        $to = 'didiaaa666@gmail.com';
+                        $subject = "New Contact Message from $email";
+                        $body = "You have received a new message from your website contact form.<br><br>".
+                                "<b>User Email:</b> $email<br>".
+                                "<b>Message:</b><br>$msg";
+                        
+                        if(sendEmail($to, $subject, $body)) {
+                            $successMessage = "Message sent successfully and email notification sent to admin.";
+                        } else {
+                            $successMessage = "Message saved, but email notification failed.";
+                        }
                     } else {
-                        $successMessage = "Error: " . $sql . "<br>" . mysqli_error($con);
+                        $errorMessage = "Error: " . mysqli_error($con);
                     }
                 }
 
             if(!isset($_SESSION['user-email'])) {
                 echo '<div style="text-align: center;">
-                    <p>Please log in to view your cart.</p>
+                    <p>Please log in to contact us.</p>
                     <a href="login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
                 </div>';
             } else {
                 echo '<form action="" method="post">
                     <h1 style="text-align: center;">Get in touch</h1>
-                    <input type="text" name="name" placeholder="Enter your name" required maxlength="20" class="box">
-                    <input type="hidden" name="email" value="' . $_SESSION['user-email'] . '">
-                    <input type="number" name="number" min="0" max="9999999999" placeholder="Enter your number" required onkeypress="if(this.value.length == 10) return false;" class="box">
-                    <textarea name="msg" class="box" placeholder="Enter your message" cols="30" rows="10"></textarea>
+                    <label for="email">Your Email:</label>
+                    <input type="email" name="email" value="' . $_SESSION['user-email'] . '" class="box" readonly>
+                    <label for="msg">Message:</label>
+                    <textarea name="msg" class="box" placeholder="Enter your message" cols="30" rows="10" required></textarea>
                     <input type="submit" value="Send message" name="send" class="btn">
                 </form>';
             }
@@ -56,11 +69,25 @@
         </div>
     </section>
     <?php include 'additional/footer.php'; ?>
-    <!-- Display success message as an alert -->
-    <?php if (!empty($successMessage)): ?>
-        <script>
-            alert("<?php echo $successMessage; ?>");
-        </script>
-    <?php endif; ?>
+    
+    <script>
+        <?php if (!empty($successMessage)): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Sent!',
+                text: '<?php echo $successMessage; ?>',
+                confirmButtonColor: '#000'
+            });
+        <?php endif; ?>
+
+        <?php if (!empty($errorMessage)): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '<?php echo $errorMessage; ?>',
+                confirmButtonColor: '#000'
+            });
+        <?php endif; ?>
+    </script>
 </body>
 </html>

@@ -53,12 +53,36 @@ if(isset($_POST['submit'])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form</title>
 
-    <!-- css connection -->
+
     <link rel="stylesheet" href="Css/style.css">
 
-    <!-- jQuery UI CSS -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
+<style>
+    .password-container {
+        position: relative;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+    .password-container .box {
+        margin-bottom: 0;
+        padding-right: 40px;
+        width: 89.6%;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #666;
+        z-index: 10;
+    }
+</style>
 <body>
     <?php include 'additional/loginheader.php'; ?>
     <section>
@@ -70,7 +94,10 @@ if(isset($_POST['submit'])){
                 <input type="email" id="email" name="email" required placeholder="Enter your email" maxlength="50" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
                 
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="pass" required placeholder="Enter your password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                <div class="password-container">
+                    <input type="password" id="password" name="pass" required placeholder="Enter your password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                    <i class="fas fa-eye-slash toggle-password" id="togglePassword"></i>
+                </div>
                 
                 <input type="submit" value="Login Now" class="btn" name="submit">
                 <p style="text-align: center;">Forgot your password? <a href="forgot-password-send.php">Reset it here</a></p>
@@ -79,7 +106,21 @@ if(isset($_POST['submit'])){
             </form>
 
         </div>
-    </section>
+    </section>  
     <?php include 'additional/footer.php'; ?>
+    <script>
+        // Toggle Password Visibility
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', function (e) {
+            // toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            // toggle the eye slash icon
+            this.classList.toggle('fa-eye-slash');
+            this.classList.toggle('fa-eye');
+        });
+    </script>
 </body>
 </html>

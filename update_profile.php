@@ -9,10 +9,33 @@
     <!-- css connection -->
     <link rel="stylesheet" href="Css/style.css">
 
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <!-- jQuery UI CSS -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
-
+<style>
+    .password-container {
+        position: relative;
+        margin-bottom: 20px;
+        width: 96.6%;
+    }
+    .password-container .box {
+        margin-bottom: 0;
+        padding-right: 40px;
+        width: 92.6%;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #666;
+        z-index: 10;
+    }
+</style>
 <body>
     <?php include 'additional/header.php'; ?>
 
@@ -88,10 +111,22 @@
                 <input type="hidden" name="prev_pass" value="<?= $fetch_user["password"]; ?>">
 
                 <label for="old_password">Old Password</label>
-                <input type="password" id="old_password" name="old_password" required placeholder="Enter your old password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                <div class="password-container">
+                    <input type="password" id="old_password" name="old_password" required placeholder="Enter your old password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                    <i class="fas fa-eye-slash toggle-password" id="toggleOldPassword"></i>
+                </div>
 
                 <label for="new_password">New Password</label>
-                <input type="password" id="new_password" name="new_pass" required placeholder="Enter your new password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                <div class="password-container">
+                    <input type="password" id="new_password" name="new_pass" required placeholder="Enter your new password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                    <i class="fas fa-eye-slash toggle-password" id="toggleNewPassword"></i>
+                </div>
+
+                <label for="confirm_password">Confirm Password</label>
+                <div class="password-container">
+                    <input type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                    <i class="fas fa-eye-slash toggle-password" id="toggleConfirmPassword"></i>
+                </div>
                 <div id="password-requirements" style="font-size: 14px; margin-bottom: 20px;">
                     <p id="length-req" style="color: red;">❌ At least 12 characters long</p>
                     <p id="upper-req" style="color: red;">❌ At least one uppercase letter</p>
@@ -100,8 +135,7 @@
                     <p id="special-req" style="color: red;">❌ At least one special character</p>
                 </div>
 
-                <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                
 
                 <input type="submit" value="Update Profile" class="btn" name="submit">
 
@@ -111,6 +145,23 @@
     </section>
     <?php include 'additional/footer.php'; ?>
     <script>
+        // Toggle Password Visibility
+        function setupPasswordToggle(toggleId, inputId) {
+            const toggle = document.getElementById(toggleId);
+            const input = document.getElementById(inputId);
+            
+            toggle.addEventListener('click', function() {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        setupPasswordToggle('toggleOldPassword', 'old_password');
+        setupPasswordToggle('toggleNewPassword', 'new_password');
+        setupPasswordToggle('toggleConfirmPassword', 'confirm_password');
+
         const passwordInput = document.getElementById('new_password');
         const lengthReq = document.getElementById('length-req');
         const upperReq = document.getElementById('upper-req');
