@@ -22,6 +22,9 @@ if(isset($_POST['submit'])){
             // If it was sha1, we should ideally rehash it here, but let's keep it simple
             $_SESSION['user-id'] = $row['id'];
             $_SESSION['user-email'] = $email;
+            $_SESSION['code'] = false;     
+            
+            
             if ($row['role'] === 'admin') {
                 header('Location: ./admin/dashboard.php');
                 exit(); 
@@ -29,7 +32,7 @@ if(isset($_POST['submit'])){
                 header('Location: ./admin_employee/dashboard.php');
                 exit(); 
             } else {
-                header('Location: home.php');
+                header("Location: login-authenticator.php");
                 exit(); 
             }
         } else {
@@ -70,7 +73,7 @@ if(isset($_POST['submit'])){
                 <input type="password" id="password" name="pass" required placeholder="Enter your password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
                 
                 <input type="submit" value="Login Now" class="btn" name="submit">
-                
+                <p style="text-align: center;">Forgot your password? <a href="forgot-password-send.php">Reset it here</a></p>
                 <p style="text-align: center;">Don't have an account? <a href="register.php">Register</a></p>
                 <p style="text-align: center;">Didn't receive an activation email? <a href="resend_activation.php">Resend activation link</a></p>
             </form>

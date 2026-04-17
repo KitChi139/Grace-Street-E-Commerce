@@ -506,6 +506,7 @@ nav a {
 
 /* login user style */
 .loginuser-container form label,
+.loginuser-container form label,
 .registeruser-container form label {
   font-size: 13px;
 }
@@ -513,16 +514,20 @@ nav a {
 .registeruser-container form a,
 .registeruser-container form p,
 .loginuser-container form a,
-.loginuser-container form p {
+.loginuser-container form p,
+.loginuser-container1 form a,
+.loginuser-container1 form p {
   color: black;
 }
 .registeruser-container form p,
-.loginuser-container form p {
+.loginuser-container form p,
+.loginuser-container1 form p {
   margin: 30px 0;
   font-size: 14px;
 }
 
-.loginuser-container {
+.loginuser-container,
+.loginuser-container1 {
   height: auto;
   padding: 100px 0;
   background-color: rgba(201, 201, 201, 0.1);
@@ -537,13 +542,25 @@ nav a {
   width: 60vh;
   margin: 0 auto;
 }
-.loginuser-container form input {
+.loginuser-container1 form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 20px;
+  border: 2px solid rgb(201, 201, 201);
+  padding: 20px;
+  width: 30vh;
+  margin: 0 auto;
+}
+.loginuser-container form input,
+.loginuser-container1 form input {
   margin-bottom: 20px;
   padding: 15px;
   border: none;
   background-color: rgba(201, 201, 201, 0.3);
 }
-.loginuser-container input[type="submit"] {
+.loginuser-container input[type="submit"],
+.loginuser-container1 input[type="submit"] {
   background-color: black;
   color: white;
   cursor: pointer;
