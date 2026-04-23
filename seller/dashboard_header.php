@@ -57,6 +57,8 @@ if(isset($_GET['logout'])){
                         Hello, <?= htmlspecialchars($fetch_user['username']); ?>
                     </span>
                     <?php endif; ?>
+                    <a href="wishlist.php"><i class="fas fa-heart"></i><span>(<?php echo getWishListItemCount($user_id, $con); ?>)</span></a>
+                    <a href="cart.php"><i class="fas fa-shopping-cart"></i><span>(<?php echo getCartItemCount($user_id, $con); ?>)</span></a>
                     <img src="./img/user.svg" onclick="togglePopup()" alt="" style="cursor: pointer;">
 
                     <!-- Pop up -->
