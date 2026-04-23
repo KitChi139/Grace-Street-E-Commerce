@@ -29,7 +29,7 @@ if(isset($_POST['submit'])){
                 header('Location: ./admin/dashboard.php');
                 exit(); 
             }else if($row['role'] === 'employee'){
-                header('Location: ./admin_employee/dashboard.php');
+                header('Location: ./seller/dashboard.php');
                 exit(); 
             } else {
                 header("Location: login-authenticator.php");

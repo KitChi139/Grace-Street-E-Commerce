@@ -39,7 +39,7 @@ $placedUsers = $placedRow['total_placed'];
     <title>Dashboard</title>
 </head>
 <body>
-<?php include '../admin_employee/dashboard_header.php'; ?>
+<?php include '../seller/dashboard_header.php'; ?>
    <section class="main_dash_container">
         <div class="main_container">
             <h1 class="main_title">Dashboard</h1>

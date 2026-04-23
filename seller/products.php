@@ -16,14 +16,8 @@ if(isset($_GET['delete_id'])) {
     mysqli_query($con, $delete_sql);
 }
 
-if(isset($_GET['delete_id'])) {
-    $delete_id = $_GET['delete_id'];
-    $delete_sql = "DELETE FROM grace_user WHERE id = $delete_id";
-    mysqli_query($con, $delete_sql);
-}
-
 // Modify the SQL query to include search functionality
-$sql = "SELECT * FROM grace_user WHERE role IN ('admin','employee') ";
+$sql = "SELECT * FROM product_list WHERE product_name LIKE '%$search%' LIMIT $start, $limit";
 $result = mysqli_query($con, $sql);
 ?>
 
@@ -103,23 +97,31 @@ $result = mysqli_query($con, $sql);
     <title>Dashboard</title>
 </head>
 <body>
-<?php include '../admin_employee/dashboard_header.php'; ?>
+<?php include '../seller/dashboard_header.php'; ?>
    <section class="main_dash_container">
         <!-- <div class="product_Added" id="productAdded" style="display: none;">
             Product Added
         </div> -->
         <div class="main_container">
-        <h1 class="main_title">Employees</h1>
+        <h1 class="main_title">Products</h1>
            <div class="search_products">
             <div class="main_products_add" onclick="showProductPopup()">
                     <div>
-                        <h1 class="add_text">Add Employee</h1>
+                        <h1 class="add_text">Add Products</h1>
                     </div>
                     <div>
                         <i class="fa-solid fa-circle-plus"></i>
                     </div>
                 </div>
-                
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <form action="" method="GET">
+                        <div class="search-input-container">
+                            <input type="text" name="search" placeholder="Search..." value="<?php echo $search; ?>">
+                            <button type="submit"><i class="fa-solid fa-search"></i></button>
+                        </div>
+                    </form>
+                </div>
            </div>
             <div class="main_products_box">
             <div class="main_products_table">
@@ -127,25 +129,32 @@ $result = mysqli_query($con, $sql);
                     <table>
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>Email</th>
-                            <th>Actions</th>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Gender</th> <!-- Added Gender column -->
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                    <?php
-                            $count = 0;
+                        <?php
                             while($row = mysqli_fetch_assoc($result)){  
-                                $count++;
                             ?>
                             <tr>
-                                <td><?php echo $count ?></td>
-                                <td><?php echo $row['username']; ?></td>
-                                <td><?php echo $row['role']; ?></td>
-                                <td><?php echo $row['email']; ?></td>
-                                <td><a href="?delete_id=<?php echo $row['id']; ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a></td>
+                                <td><img width="30" src="../uploads/images/<?php echo $row['product_image']; ?>" alt="<?php echo $row['product_name']; ?>"></td>
+                                <td><?php echo $row['product_name']; ?></td>
+                                <td><?php echo $row['product_stock']; ?></td>
+                                <td><?php echo $row['product_price']; ?></td>
+                                <td><?php echo $row['product_status']; ?></td>
+                                <td  style="5px"><?php echo $row['description']; ?></td>
+                                <td><?php echo $row['gender']; ?></td>
+                                <td class='action-buttons'>
+                                    <button onclick='updateItem(<?php echo $row['id']; ?>)'>Update</button>
+                                    <a href="?delete_id=<?php echo $row['id']; ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                                </td>
                             </tr>
                             <?php
                             }
@@ -153,10 +162,25 @@ $result = mysqli_query($con, $sql);
                     </tbody>
                 </table>
                 <?php else: ?>
-                <p class="no-products">No Employee found.</p>
+                <p class="no-products">No products found.</p>
                 <?php endif; ?>
             </div>
-           
+            </div>
+            <!-- Pagination links -->
+            <?php
+                // Count total pages for pagination
+                $sql_count = "SELECT COUNT(*) AS total FROM product_list WHERE product_name LIKE '%$search%'";
+                $result_count = mysqli_query($con, $sql_count);
+                $row_count = mysqli_fetch_assoc($result_count);
+                $total_pages = ceil($row_count['total'] / $limit);
+
+                echo "<div class='pagination'>";
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    echo "<a href='?page=" . $i . "&search=$search'>" . $i . "</a>";
+                }
+                echo "</div>";
+            ?>
+        </div>
    </section>
 
 
@@ -164,7 +188,7 @@ $result = mysqli_query($con, $sql);
         <div class="main_product_bg_add">
             <div class="products_add">
                 <div>
-                    <h1 class="products_add_text">Add New Employee</h1>
+                    <h1 class="products_add_text">ADD NEW PRODUCTS</h1>
                 </div>
                 <div class="procducts_add_icon">
                     <i class="fa-solid fa-circle-xmark" onclick="hideProductPopup()" id="closeProductBtn"></i>
@@ -172,32 +196,39 @@ $result = mysqli_query($con, $sql);
             </div>
 
             <div>
-            <form id="productForm" action="add_employee.php" method="POST" enctype="multipart/form-data">
+            <form id="productForm" action="add_product.php" method="POST" enctype="multipart/form-data">
                 <div class="products_add_info_pad">
                     <div class="products_add_info">
                         <div class="productname">
-                            <label for="product_name">Employee Name</label>
-                            <input type="text" id="name" name="name" required> 
+                            <label for="product_name">Product Name</label>
+                            <input type="text" placeholder="20 Characters Only" id="product_name" name="product_name" required maxlength="20"> 
                         </div>
                         <div class="productname">
-                            <label for="total_stock">Email</label>
-                            <input type="email" id="email" name="email" required>
+                            <label for="total_stock">Total Stock</label>
+                            <input type="number" id="total_stock" name="product_stock" required>
                         </div>
                         <div class="productname">
-                            <label for="product_image">Password</label>
-                            <input type="password" id="password" name="password" required>
+                            <label for="product_image">Product Image</label>
+                            <input type="file" id="product_image" name="product_image" required>
                         </div>
                         <div class="productname">
-                            <label for="product_price">Confirm Password</label>
-                            <input type="password" id="cpassword" name="cpassword" required>
+                            <label for="product_price">Product Price</label>
+                            <input type="number" id="product_price" name="product_price" min="100" max='9999' required>
                         </div>
                         <div class="productname">
-                            <label for="role">Role</label>
-                            <select id="role" name="role" required>
-                                <option value="" selected disabled>Role</option>
-                                <option value="admin">Admin</option>
-                                <option value="employee">Employee</option>
+                            <label for="product_gender">Gender</label>
+                            <select id="product_gender" name="product_gender">
+                                <option value="" selected disabled>Gender</option>
+                                <option value="Mens">Mens</option>
+                                <option value="Womens">Womens</option>
                             </select>
+                        </div>
+                        <div class="productname">
+                            <label for="Description">Description</label>
+                            <input type="text" id="Description" name="Description" maxlength="100"  >
+                        </div>
+                        <div class="productname">
+                            <input type="text" value="Available" name="product_status" hidden>
                         </div>
                     </div>
                     <div class="products_addbtn">
@@ -232,7 +263,7 @@ function updateItem(productId) {
         // Function to handle click event on submit button
         function submitForm() {
             // Show alert
-            alert("Employee Added");
+            alert("Product Added");
         }
 </script>
 

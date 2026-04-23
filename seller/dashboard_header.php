@@ -26,7 +26,7 @@ if(isset($_GET['logout'])) {
         </div>
         <div class="dashboard_menu_box">
             <div class="dashboard_menu">
-               <a href="../admin_employee/dashboard.php" class="home">
+               <a href="../seller/dashboard.php" class="home">
                     <div class="dashboard_sec">
                         <div class="dash_icon">
                             <i class="fa-solid fa-house"></i>
@@ -36,7 +36,7 @@ if(isset($_GET['logout'])) {
                         </div>
                     </div>
                </a>
-                <a href="../admin_employee/products.php" class="products">
+                <a href="../seller/products.php" class="products">
                     <div class="dashboard_sec">
                         <div class="dash_icon">
                             <i class="fa-solid fa-box"></i>
@@ -46,7 +46,7 @@ if(isset($_GET['logout'])) {
                         </div>
                     </div>
                 </a>
-                <a href="../admin_employee/orders.php" class="orders">
+                <a href="../seller/orders.php" class="orders">
                     <div class="dashboard_sec">
                         <div class="dash_icon">
                             <i class="fa-solid fa-clipboard"></i>
@@ -56,7 +56,7 @@ if(isset($_GET['logout'])) {
                         </div>
                     </div>
                 </a>
-                <a href="../admin_employee/notification.php" class="notif">
+                <a href="../seller/notification.php" class="notif">
                     <div class="dashboard_sec">
                         <div class="dash_icon">
                             <i class="fa-solid fa-envelope"></i>
