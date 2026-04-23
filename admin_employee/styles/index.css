@@ -1,0 +1,495 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+.active {
+  background-color: #ececec;
+}
+.dashboard_container {
+  position: fixed;
+  max-width: 280px;
+  min-height: 100vh;
+  background-color: white;
+  -webkit-box-shadow: 1px 3px 14px -8.5px #000000;
+  -moz-box-shadow: 1px 3px 14px -8.5px #000000;
+  box-shadow: 1px 3px 14px -8.5px #000000;
+}
+.dashboard_box {
+  padding: 2rem 2rem;
+}
+.dashboard_logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.logo_text h1 {
+  font-size: 20px;
+}
+.logo_text p {
+  font-size: 10px;
+}
+.dashboard_menu_box {
+  margin-top: 30px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+.dashboard_menu {
+  display: flex;
+  flex-direction: column;
+}
+.dashboard_menu a {
+  text-decoration: none;
+  color: black;
+  animation: ease-in 0.3s;
+}
+.dashboard_menu a:hover {
+  background-color: #ececec;
+}
+.dashboard_sec {
+  display: flex;
+  padding: 0.7rem 3rem;
+  gap: 10px;
+  align-items: center;
+}
+.dash_icon i {
+  width: 20px;
+  height: 20px;
+}
+.dash_text h1 {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ================dashboard style================= */
+.main_dash_container {
+  min-height: 100vh;
+  position: absolute;
+  top: 0;
+  width: 65%;
+  margin-left: 350px;
+}
+.main_container {
+  padding: 4rem 0;
+}
+.main_title {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.main_dash_box {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  width: 100%;
+}
+.main_dash_top {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+.main_dash_bottom {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.main_dash_analytics {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.main_dash_info h3 {
+  font-weight: 500;
+  font-size: 15px;
+}
+.main_dash_info h1 {
+  padding: 20px 0;
+  text-align: center;
+}
+.main_large {
+  font-size: 40px;
+}
+
+/* =================PRODUCTS================= */
+.main_products_table {
+  margin-top: 50px;
+  padding: 0px 0px;
+}
+.main_products_table table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Apply styles to the table headings */
+.main_products_table th {
+  color: #a8a8a8;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px;
+  text-align: left;
+}
+.main_products_table th:nth-child(6) {
+  width: 20vh;
+  text-align: center;
+}
+.main_products_table td:nth-child(6) {
+  overflow-y: auto;
+}
+
+/* Apply alternating row colors to improve readability */
+.main_products_table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Apply styles to the table cells */
+.main_products_table td {
+  padding: 10px;
+  font-size: 13px;
+}
+
+.action-buttons button {
+  background-color: #4caf50; /* Green */
+  border: none;
+  color: white;
+  padding: 5px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Style for the delete button */
+.action-buttons button.delete {
+  background-color: #f44336; /* Red */
+}
+
+.delete-button {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #ff0000; /* Red background */
+  color: #fff; /* White text */
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.delete-button:hover {
+  background-color: #cc0000; /* Darker red on hover */
+}
+.main_products_box {
+  margin-top: 20px;
+  border-radius: 10px;
+  padding: 1px 5px;
+  background-color: white;
+  -webkit-box-shadow: 1px 3px 14px -8.5px #000000;
+  -moz-box-shadow: 1px 3px 14px -8.5px #000000;
+  box-shadow: 1px 3px 14px -8.5px #000000;
+}
+.main_products_add {
+  cursor: pointer;
+  width: 220px;
+  background-color: white;
+  -webkit-box-shadow: 1px 3px 14px -8.5px #000000;
+  -moz-box-shadow: 1px 3px 14px -8.5px #000000;
+  box-shadow: 1px 3px 14px -8.5px #000000;
+  display: flex;
+  padding: 7px 10px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+}
+.add_text {
+  font-size: 15px;
+  font-weight: 600;
+}
+.main_product_bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main_product_bg_add {
+  background-color: white;
+  border-radius: 10px;
+  width: 750px;
+  max-width: calc(100% - 40px); /* Adjust maximum width as needed */
+  margin: auto; /* Center horizontally */
+  padding: 0px; /* Adjust padding as needed */
+  margin-top: 100px;
+}
+
+.products_add {
+  display: flex;
+  padding: 20px 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.products_add_text {
+  font-size: 17px;
+}
+.procducts_add_icon i {
+  font-size: 23px;
+  cursor: pointer;
+}
+.products_add_info_pad {
+  padding: 40px 30px;
+}
+.products_add_info {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px; /* Adjust the gap between columns */
+}
+
+.productname {
+  flex: 1 1 45%; /* Adjust the width of each column */
+}
+
+.productname label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.productname input {
+  width: 100%;
+  padding: 5px;
+  box-sizing: border-box; /* Ensure the padding is included in the width */
+  border: 1px solid #ccc; /* Add a border for visual clarity */
+  border-radius: 4px; /* Add rounded corners */
+}
+.products_addbtn {
+  margin-top: 20px;
+}
+.products_addbtn button {
+  text-align: center;
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: black; /* Button background color */
+  color: white; /* Text color */
+  text-decoration: none;
+  border-radius: 4px;
+  width: 100%;
+  border: none; /* Remove default button border */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.products_addbtn button:hover {
+  background-color: #333; /* Darken button color on hover */
+}
+
+/* ================orders================ */
+.main_orders_container {
+  min-height: 100vh;
+  position: absolute;
+  top: 0;
+  width: 75%;
+  margin-left: 300px;
+}
+
+/* ======================update products========================= */
+.update_product_container {
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.update_product_box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  width: 750px;
+  margin: auto;
+  border-radius: 10px;
+}
+.update_text-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.update_text-box i {
+  font-size: 25px;
+  cursor: pointer;
+}
+.update_text-box h1 {
+  font-size: 18px;
+}
+.update_this_box {
+  padding: 20px 30px;
+}
+.update_btn {
+  margin: 20px 0 10px 0;
+}
+.update_columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.product_update_1 {
+  display: flex;
+  flex-direction: column;
+}
+
+.product_update_1 label {
+  margin-bottom: 5px;
+}
+
+.product_update_1 input[type="text"],
+.product_update_1 input[type="number"],
+.product_update_1 input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#updateButton {
+  grid-column: span 2;
+  width: 100%;
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#updateButton:hover {
+  background-color: #45a049;
+}
+
+/* ================login============== */
+.admin_login_container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin_login_box {
+  border-radius: 10px;
+  width: 500px;
+  background-color: #ffffff;
+  -webkit-box-shadow: 1px 3px 14px -8.5px #000000;
+  -moz-box-shadow: 1px 3px 14px -8.5px #000000;
+  box-shadow: 1px 3px 14px -8.5px #000000;
+  padding: 40px 30px;
+}
+.admin_login_title h1 {
+  font-size: 25px;
+}
+.admin_login_title p {
+  font-size: 15px;
+}
+.admin_login_form {
+  margin-top: 40px;
+}
+
+.admin_login_input {
+  margin-bottom: 20px;
+}
+
+.admin_input {
+  margin-bottom: 10px;
+}
+.admin_text {
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.admin_input input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.adminbtn {
+  text-align: center;
+}
+
+.adminbtn button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.adminbtn {
+  margin-top: 20px;
+}
+.adminbtn button {
+  color: white;
+  background-color: #000000;
+  width: 100%;
+}
+.mains_products_box {
+  margin-top: 30px;
+}
+.notif_products_table {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  text-align: center;
+}
+.notif-box {
+  background-color: white;
+  -webkit-box-shadow: 1px 3px 14px -8.5px #000000;
+  -moz-box-shadow: 1px 3px 14px -8.5px #000000;
+  box-shadow: 1px 3px 14px -8.5px #000000;
+  padding: 40px 30px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+.notif-info h1 {
+  font-size: 15px;
+}
+
+.notif-info p {
+  font-size: 13px;
+}
+.notif-message {
+  width: 220px;
+  padding: 10px 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+  margin: auto;
+}
+.notif-message p {
+  font-size: 13px;
+}
+.notif-mark {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  cursor: pointer;
+  font-size: 20px;
+}

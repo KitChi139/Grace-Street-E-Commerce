@@ -7,10 +7,8 @@ $limit = 10; // Number of rows per page
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $start = ($page - 1) * $limit;
 
-// Check if search, gender, and status parameters are provided
+// Check if search parameter is provided
 $search = isset($_GET['search']) ? $_GET['search'] : '';
-$gender_filter = isset($_GET['gender']) ? $_GET['gender'] : '';
-$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
 
 if(isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
@@ -18,17 +16,8 @@ if(isset($_GET['delete_id'])) {
     mysqli_query($con, $delete_sql);
 }
 
-// Modify the SQL query to include search and filter functionality
-$where_clauses = ["product_name LIKE '%$search%'"];
-if ($gender_filter != '') {
-    $where_clauses[] = "gender = '$gender_filter'";
-}
-if ($status_filter != '') {
-    $where_clauses[] = "product_status = '$status_filter'";
-}
-$where_sql = implode(' AND ', $where_clauses);
-
-$sql = "SELECT * FROM product_list WHERE $where_sql LIMIT $start, $limit";
+// Modify the SQL query to include search functionality
+$sql = "SELECT * FROM product_list WHERE product_name LIKE '%$search%' LIMIT $start, $limit";
 $result = mysqli_query($con, $sql);
 ?>
 
@@ -127,21 +116,8 @@ $result = mysqli_query($con, $sql);
                 <!-- Search Bar -->
                 <div class="search-bar">
                     <form action="" method="GET">
-                        <div class="search-input-container" style="width: auto;">
+                        <div class="search-input-container">
                             <input type="text" name="search" placeholder="Search..." value="<?php echo $search; ?>">
-                            
-                            <select name="gender" style="border: none; outline: none; padding: 5px;">
-                                <option value="">All Genders</option>
-                                <option value="Mens" <?php if($gender_filter == 'Mens') echo 'selected'; ?>>Mens</option>
-                                <option value="Womens" <?php if($gender_filter == 'Womens') echo 'selected'; ?>>Womens</option>
-                            </select>
-
-                            <select name="status" style="border: none; outline: none; padding: 5px;">
-                                <option value="">All Status</option>
-                                <option value="Available" <?php if($status_filter == 'Available') echo 'selected'; ?>>Available</option>
-                                <option value="Unavailable" <?php if($status_filter == 'Unavailable') echo 'selected'; ?>>Unavailable</option>
-                            </select>
-
                             <button type="submit"><i class="fa-solid fa-search"></i></button>
                         </div>
                     </form>
@@ -193,14 +169,14 @@ $result = mysqli_query($con, $sql);
             <!-- Pagination links -->
             <?php
                 // Count total pages for pagination
-                $sql_count = "SELECT COUNT(*) AS total FROM product_list WHERE $where_sql";
+                $sql_count = "SELECT COUNT(*) AS total FROM product_list WHERE product_name LIKE '%$search%'";
                 $result_count = mysqli_query($con, $sql_count);
                 $row_count = mysqli_fetch_assoc($result_count);
                 $total_pages = ceil($row_count['total'] / $limit);
 
                 echo "<div class='pagination'>";
                 for ($i = 1; $i <= $total_pages; $i++) {
-                    echo "<a href='?page=" . $i . "&search=$search&gender=$gender_filter&status=$status_filter'>" . $i . "</a>";
+                    echo "<a href='?page=" . $i . "&search=$search'>" . $i . "</a>";
                 }
                 echo "</div>";
             ?>

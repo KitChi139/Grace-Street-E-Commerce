@@ -110,6 +110,13 @@ if(isset($_POST['reset_password'])){
 
                     <i class="fas fa-eye-slash toggle-password" id="toggleConfirmPassword"></i>
                 </div>
+                <div id="password-requirements" style="font-size: 14px; margin-bottom: 20px; ">
+                    <p id="length-req" style="color: red;">❌ At least 12 characters long</p>
+                    <p id="upper-req" style="color: red;">❌ At least one uppercase letter</p>
+                    <p id="lower-req" style="color: red;">❌ At least one lowercase letter</p>
+                    <p id="number-req" style="color: red;">❌ At least one number</p>
+                    <p id="special-req" style="color: red;">❌ At least one special character</p>
+                </div>
 
                 <input type="submit" value="Reset Password" class="btn" name="reset_password">
             </form>
@@ -132,6 +139,60 @@ if(isset($_POST['reset_password'])){
                     this.classList.add('fa-eye-slash');
                 }
             });
+        });
+
+        const passwordInput = document.getElementById('password');
+        const lengthReq = document.getElementById('length-req');
+        const upperReq = document.getElementById('upper-req');
+        const lowerReq = document.getElementById('lower-req');
+        const numberReq = document.getElementById('number-req');
+        const specialReq = document.getElementById('special-req');
+
+         passwordInput.addEventListener('input', () => {
+            const val = passwordInput.value;
+            
+            // Length
+            if (val.length >= 12) {
+                lengthReq.innerHTML = '✅ At least 12 characters long';
+                lengthReq.style.color = 'green';
+            } else {
+                lengthReq.innerHTML = '❌ At least 12 characters long';
+                lengthReq.style.color = 'red';
+            }
+            
+            if (/[A-Z]/.test(val)) {
+                upperReq.innerHTML = '✅ At least one uppercase letter';
+                upperReq.style.color = 'green';
+            } else {
+                upperReq.innerHTML = '❌ At least one uppercase letter';
+                upperReq.style.color = 'red';
+            }
+            
+           
+            if (/[a-z]/.test(val)) {
+                lowerReq.innerHTML = '✅ At least one lowercase letter';
+                lowerReq.style.color = 'green';
+            } else {
+                lowerReq.innerHTML = '❌ At least one lowercase letter';
+                lowerReq.style.color = 'red';
+            }
+            
+            if (/[0-9]/.test(val)) {
+                numberReq.innerHTML = '✅ At least one number';
+                numberReq.style.color = 'green';
+            } else {
+                numberReq.innerHTML = '❌ At least one number';
+                numberReq.style.color = 'red';
+            }
+            
+           
+            if (/[^A-Za-z0-9]/.test(val)) {
+                specialReq.innerHTML = '✅ At least one special character';
+                specialReq.style.color = 'green';
+            } else {
+                specialReq.innerHTML = '❌ At least one special character';
+                specialReq.style.color = 'red';
+            }
         });
     </script>
 </body>
