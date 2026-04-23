@@ -64,16 +64,91 @@
   font-weight: 500;
 }
 
+/* Pop up style */
+.pop-container {
+  background-color: white;
+  padding: 20px;
+  height: auto;
+  border-radius: 5px;
+  width: auto;
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: 40px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  display: none;
+}
+.pop-container .pop-content {
+  display: flex;
+  flex-direction: column;
+}
+.pop-content button {
+  width: 135px;
+  padding: 15px;
+  margin: 5px 0;
+  border: none;
+  background-color: black;
+  color: white;
+  cursor: pointer;
+}
+
+
+/* Header style */
+.header-container {
+  width: auto;
+  height: auto;
+  padding: 2vh;
+  border-bottom: 2px solid rgb(201, 201, 201);
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+nav a {
+  text-decoration: none;
+  margin: 0 20px;
+  font-size: 15px;
+  color: black;
+}
+
+.login-register-btn {
+  display: flex;
+  width: fit-content;
+  padding: 5px 15px;
+  border-radius: 100px;
+  background-color: black;
+}
+.login-register-btn button {
+  border: none;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+}
+.login-register-btn div {
+  color: white;
+}
+.header-btn {
+  display: flex;
+  align-items: center;
+}
+.header-icons,
+.header-icons a {
+  margin: 0 8px;
+}
+.header-icons {
+  position: relative;
+}
+
 /* ================dashboard style================= */
 .main_dash_container {
-  min-height: 100vh;
-  position: absolute;
-  top: 0;
+
   width: 65%;
   margin-left: 350px;
 }
 .main_container {
-  padding: 4rem 0;
+  padding: 10px;
 }
 .main_title {
   text-align: center;
@@ -299,9 +374,6 @@
 
 /* ================orders================ */
 .main_orders_container {
-  min-height: 100vh;
-  position: absolute;
-  top: 0;
   width: 75%;
   margin-left: 300px;
 }

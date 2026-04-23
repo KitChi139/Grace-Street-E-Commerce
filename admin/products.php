@@ -29,75 +29,12 @@ $result = mysqli_query($con, $sql);
     <link rel="stylesheet" href="styles/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .pagination a {
-            display: inline-block;
-            padding: 10px;
-            margin: 0 5px;
-            border: 1px solid #ccc;
-            text-decoration: none;
-            color: #333;
-            border-radius: 5px;
-        }
-        .pagination a:hover {
-            background-color: #f0f0f0;
-        }
-        .pagination .current {
-            background-color: #333;
-            color: #fff;
-        }
-        .no-products {
-            text-align: center;
-            margin-top: 20px;
-            font-weight: bold;
-            color: red;
-        }
-        .search_products{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .search-bar {
-    margin-top: 20px;
-}
 
-.search-input-container {
-    cursor: pointer;
-    width: 220px;
-    background-color: white;
-    -webkit-box-shadow: 1px 3px 14px -8.5px #000000;
-    -moz-box-shadow: 1px 3px 14px -8.5px #000000;
-    box-shadow: 1px 3px 14px -8.5px #000000;
-    display: flex;
-    padding: 7px 10px;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    border-radius: 10px;
-}
-
-.search-input-container input[type="text"] {
-    border: none;
-    outline: none;
-    flex: 1;
-    padding: 5px;
-}
-
-.search-input-container button {
-    border: none;
-    background: none;
-    cursor: pointer;
-    padding: 5px;
-}
     </style>
     <title>Dashboard</title>
 </head>
 <body>
-<?php include '../admin/dashboard_header.php'; ?>
+<?php include 'dashboard_header.php'; ?>    
    <section class="main_dash_container">
         <!-- <div class="product_Added" id="productAdded" style="display: none;">
             Product Added
