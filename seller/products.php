@@ -99,11 +99,10 @@ $result = mysqli_query($con, $sql);
 <body>
 <?php include '../seller/dashboard_header.php'; ?>
    <section class="main_dash_container">
-        <!-- <div class="product_Added" id="productAdded" style="display: none;">
-            Product Added
-        </div> -->
+
         <div class="main_container">
         <h1 class="main_title">Products</h1>
+        <p class="main_subtitle">Manage Product Inventory</p>
            <div class="search_products">
             <div class="main_products_add" onclick="showProductPopup()">
                     <div>

@@ -151,10 +151,16 @@ nav a {
   padding: 10px;
 }
 .main_title {
-  text-align: center;
+  text-align: left;
   font-size: 40px;
   font-weight: 600;
 }
+
+.main_subtitle {
+  text-align: left;
+  font-size: 15px;
+  color: #a8a8a8;
+} 
 
 .main_dash_box {
   background-color: #ffffff;
@@ -564,4 +570,47 @@ nav a {
   top: 20px;
   cursor: pointer;
   font-size: 20px;
+}
+
+/* Three-column row with boxes for dashboard */
+.col-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 30px;
+}
+.col {
+  flex: 1 1 0;
+  min-width: 200px;
+}
+.col .box {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.col .box h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+.col .box p {
+  color: #666;
+  font-size: 14px;
+}
+.colQuick {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }

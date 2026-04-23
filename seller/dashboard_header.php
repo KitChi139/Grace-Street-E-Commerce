@@ -39,7 +39,7 @@ if(isset($_GET['logout'])){
               <a href="./home.php" class="header-logo"><img src="./img/Logo.png" alt="" width="300px" height="auto" /></a>
               <nav>
                 <a href="./dashboard.php">Home</a>
-                <a href="./products.php">Shop All</a>
+                <a href="./products.php">Products</a>
                 <a href="./orders.php">Order</a>
                 <a href="./notification.php">Notification</a>
               </nav>
@@ -59,7 +59,22 @@ if(isset($_GET['logout'])){
                     <?php endif; ?>
                     <img src="./img/user.svg" onclick="togglePopup()" alt="" style="cursor: pointer;">
 
-
+                    <!-- Pop up -->
+                    <div id="popupForm" class="pop-container">
+                      <?php
+                          if(isset($user_id) && $fetch_user) {
+                              echo '<div class="pop-content" style="text-align: center;">
+                                      <h2>Welcome<br><span>' . $fetch_user['username'] . '</span></h2>
+                                      <a href="./update_profile.php"><button onclick="updateProfile()">Update Profile</button></a>
+                                      <a href="home.php?logout=' . $user_id . '" onclick="return confirm(\'Are you sure you want to logout?\')"><button class="logBtn">Log out</button></a>
+                                    </div>';
+                          } else {
+                              echo '<div class="pop-content" style="text-align: center;">
+                                      
+                                      <a href="./login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
+                                      <a href="./register.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Register</button></a>
+                                    </div>';
+                          }
                       ?>
                     </div>
 

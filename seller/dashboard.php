@@ -42,8 +42,9 @@ $placedUsers = $placedRow['total_placed'];
 <?php include '../seller/dashboard_header.php'; ?>
    <section class="main_dash_container">
         <div class="main_container">
-            <h1 class="main_title">Dashboard</h1>
-            <div class="main_dash_analytics">
+            <h1 class="main_title">Seller Dashboard</h1>
+            <p class="main_subtitle">Welcome to your dashboard, manage your products and orders efficiently.</p>
+            <!-- <div class="main_dash_analytics">
                 <div class="main_dash_top">
                     <div class="main_dash_box wide">
                         <div class="main_dash_info">
@@ -72,6 +73,87 @@ $placedUsers = $placedRow['total_placed'];
                             <h1><?php echo $totalUsers; ?></h1>
                         </div>
                     </div>
+                </div>
+            </div> -->
+            <!-- <div class="col-row">
+                <div class="col">
+                    <div class="box">
+                        <h3>Processed Orders</h3>
+                        <p>View and Analyze all orders.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="box">
+                        <h3>Product Analytics</h3>
+                        <p>View and Analyze your product performance.</p>
+                    </div>
+                </div>
+                 <div class="col">
+                    <div class="box">
+                        <h3>Box 3</h3>
+                        <p>Content or stats go here.</p>
+                    </div>
+                </div> 
+            </div> -->
+            <div class="col-row">
+                <div class="col">
+                    <div class="box">
+                        <h3>My products</h3>
+                        <p>View and manage your products.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="box">
+                        <h3>Total sales</h3>
+                        <p>View your total sales performance.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="box">
+                        <h3>Orders</h3>
+                        <p>View and manage your orders.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="box">
+                        <h3>Conversion</h3>
+                        <p>View your conversion rates.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-row">
+                <div class="col">
+                    <div class="box">
+                        <h3>My Products</h3>
+                        <p>Manage your product inventory.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="box">
+                        <h3>Recent Orders</h3>
+                        <p>Your Latest Sales.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-row">
+                <div class="col">
+                    <div class="box">
+                        <h3>Quick Actions</h3>
+                        <div class=col-row>
+                            <div class="colQuick">
+                                <h3>Update Inventory</h3>
+                            </div>
+                            <div class="colQuick">
+                                <h3>Process Orders</h3>
+                            </div>
+                            <div class="colQuick">
+                                <h3>View Analytics</h3>
+                            </div>
+                            <div class="colQuick">
+                                <h3>View Earning</h3>
+                            </div>
+                    </div>
+                </div>
             </div>
         </div>
    </section>
