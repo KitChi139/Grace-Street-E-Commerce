@@ -169,7 +169,7 @@ if(isset($_POST['approve'])) {
         }
 </style>
 <body>
-<?php include '../admin_employee/dashboard_header.php'; ?>
+<?php include '../seller/dashboard_header.php'; ?>
    <section class="main_orders_container">
         <div class="main_container">
             <h1 class="main_title">Orders</h1>
