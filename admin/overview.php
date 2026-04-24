@@ -27,14 +27,17 @@ if (isset($_POST['approve_quick']) || isset($_POST['reject_quick'])) {
         $app_query = mysqli_query($con, "SELECT * FROM seller_applications WHERE application_id = '$app_id'");
         if ($app_data = mysqli_fetch_assoc($app_query)) {
             $owner_name = $app_data['owner_name'];
+            $username = $app_data['username'];
             $emailID = $app_data['emailID'];
             $password = $app_data['password'];
+            $contact = $app_data['contact_number'];
+            $address = $app_data['address'];
             $role_res = mysqli_query($con, "SELECT roleID FROM roles WHERE role = 'employee'");
             $role_row = mysqli_fetch_assoc($role_res);
             $roleID = $role_row['roleID'] ?? 2;
 
-            $insert_user = $con->prepare("INSERT INTO grace_user (username, emailID, password, is_active, roleID) VALUES (?, ?, ?, 1, ?)");
-            $insert_user->bind_param("sisi", $owner_name, $emailID, $password, $roleID);
+            $insert_user = $con->prepare("INSERT INTO grace_user (username, emailID, password, contact_number, address, is_active, roleID) VALUES (?, ?, ?, ?, ?, 1, ?)");
+            $insert_user->bind_param("sisssi", $username, $emailID, $password, $contact, $address, $roleID);
             if ($insert_user->execute()) {
                 mysqli_query($con, "UPDATE seller_applications SET status = 'approved' WHERE application_id = '$app_id'");
             }

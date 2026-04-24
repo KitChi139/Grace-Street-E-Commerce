@@ -30,8 +30,11 @@ if (isset($_POST['approve'])) {
     $app_query = mysqli_query($con, "SELECT * FROM seller_applications WHERE application_id = '$app_id'");
     if ($app_data = mysqli_fetch_assoc($app_query)) {
         $owner_name = $app_data['owner_name'];
+        $username = $app_data['username'];
         $emailID = $app_data['emailID'];
         $password = $app_data['password'];
+        $contact = $app_data['contact_number'];
+        $address = $app_data['address'];
 
         // Get roleID for 'employee' (as per current system's seller/employee role)
         // Check if role 'seller' exists, otherwise use 'employee'
@@ -40,8 +43,8 @@ if (isset($_POST['approve'])) {
         $roleID = $role_row['roleID'] ?? 2; // Default to 2 if not found
 
         // Move to grace_user
-        $insert_user = $con->prepare("INSERT INTO grace_user (username, emailID, password, is_active, roleID) VALUES (?, ?, ?, 1, ?)");
-        $insert_user->bind_param("sisi", $owner_name, $emailID, $password, $roleID);
+        $insert_user = $con->prepare("INSERT INTO grace_user (username, emailID, password, contact_number, address, is_active, roleID) VALUES (?, ?, ?, ?, ?, 1, ?)");
+        $insert_user->bind_param("sisssi", $username, $emailID, $password, $contact, $address, $roleID);
         
         if ($insert_user->execute()) {
             // Update status in seller_applications

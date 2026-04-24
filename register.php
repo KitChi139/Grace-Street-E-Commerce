@@ -24,6 +24,8 @@
         $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
         $username = mysqli_real_escape_string($con, $_POST['name']);
         $email = mysqli_real_escape_string($con, $_POST['email']);
+        $contact = mysqli_real_escape_string($con, $_POST['contact']);
+        $address = mysqli_real_escape_string($con, $_POST['address']);
         $pass = $_POST['pass'];
         $cpass = $_POST['cpass'];
         $captcha = $_POST['captcha'];
@@ -68,8 +70,8 @@
 
                 $activation_token = bin2hex(random_bytes(16));
                 
-                $insert_query = "INSERT INTO grace_user (username, emailID, password, is_active, activation_token, roleID) 
-                                 VALUES ('$username', '$emailID', '$hashed_pass', 0, '$activation_token', 3)"; // Assuming 3 is 'user' role
+                $insert_query = "INSERT INTO grace_user (username, emailID, password, contact_number, address, is_active, activation_token, roleID) 
+                                 VALUES ('$username', '$emailID', '$hashed_pass', '$contact', '$address', 0, '$activation_token', 3)"; // Assuming 3 is 'user' role
                 
                 if(mysqli_query($con, $insert_query)){
                     
@@ -130,15 +132,40 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
+    .registeruser-container {
+        max-width: 700px; /* Increased width to accommodate grid */
+        margin: 50px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+    .form-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group.full-width {
+        width: 100%;
+    }
+    .registeruser-container label {
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 14px;
+    }
     .password-container {
         position: relative;
-        margin-bottom: 20px;
-        width: 99.6%;
+        width: 100%;
     }
     .password-container .box {
         margin-bottom: 0;
         padding-right: 40px;
-        width: 89.6%;
+        width: 100%;
     }
     .toggle-password {
         position: absolute;
@@ -153,13 +180,6 @@
         display: flex;
         align-items: center;
         margin-bottom: 20px;
-    }
-    .captcha-question {
-        background: #f0f0f0;
-        padding: 10px;
-        border-radius: 5px;
-        margin-right: 10px;
-        font-weight: bold;
     }
     .tos-container {
         display: flex;
@@ -177,37 +197,83 @@
         background-color: #7e7e7eff !important;
         cursor: not-allowed;
     }
+    .box {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
 </style>
 <body>
     <?php include 'additional/loginheader.php'; ?>
     <section>
         <div class="registeruser-container">
         <form action="" method="post">
-            <h1 style="text-align: center;">Register now</h1>
+            <h1 style="text-align: center; margin-bottom: 30px;">Register now</h1>
             
-            <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" required placeholder="Enter your first name" maxlength="50" class="box">
-
-            <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" required placeholder="Enter your last name" maxlength="50" class="box">
-
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="name" required placeholder="Enter your username" maxlength="20" class="box">
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required placeholder="Enter your email" maxlength="50" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-            
-            <label for="password">Password:</label>
-            <div class="password-container">
-                <input type="password" id="password" name="pass" required placeholder="Enter your password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-                <i class="fas fa-eye-slash toggle-password" id="togglePassword"></i>
+            <!-- Row 1: First name | Last name -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required placeholder="Enter your first name" maxlength="50" class="box">
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required placeholder="Enter your last name" maxlength="50" class="box">
+                </div>
             </div>
 
-            <label for="confirm_password">Confirm Password:</label>
-            <div class="password-container">
-                <input type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-                <i class="fas fa-eye-slash toggle-password" id="toggleConfirmPassword"></i>
+            <!-- Row 2: Username -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="name" required placeholder="Enter your username" maxlength="20" class="box">
+                </div>
             </div>
+            
+            <!-- Row 3: Email | Contact Number -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email" maxlength="50" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                </div>
+                <div class="form-group">
+                    <label for="contact">Contact Number:</label>
+                    <input type="text" id="contact" name="contact" required placeholder="Enter your contact number" maxlength="20" class="box">
+                </div>
+            </div>
+
+            <!-- Row 4: Address -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="address">Address:</label>
+                    <textarea id="address" name="address" required placeholder="Enter your complete address" class="box" style="height: 100px;"></textarea>
+                </div>
+            </div>
+
+            <!-- Row 5: Password -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="password">Password:</label>
+                    <div class="password-container">
+                        <input type="password" id="password" name="pass" required placeholder="Enter your password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                        <i class="fas fa-eye-slash toggle-password" id="togglePassword"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 6: Confirm Password -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="confirm_password">Confirm Password:</label>
+                    <div class="password-container">
+                        <input type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+                        <i class="fas fa-eye-slash toggle-password" id="toggleConfirmPassword"></i>
+                    </div>
+                </div>
+            </div>
+
             <div id="password-requirements" style="font-size: 14px; margin-bottom: 20px; ">
                 <p id="length-req" style="color: red; <?php echo ($min_length == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_length; ?> characters long</p>
                 <p id="upper-req" style="color: red; <?php echo ($min_upper == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_upper; ?> CAPITAL letter<?php echo ($min_upper > 1) ? 's' : ''; ?></p>

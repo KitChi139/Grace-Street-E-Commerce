@@ -22,8 +22,13 @@ $message = "";
 $status = "";
 
 if (isset($_POST['submit'])) {
-    $owner_name = mysqli_real_escape_string($con, $_POST['owner_name']);
+    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
+    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
+    $owner_name = $first_name . ' ' . $last_name;
+    $username = mysqli_real_escape_string($con, $_POST['username']);
     $email = mysqli_real_escape_string($con, $_POST['email']);
+    $contact = mysqli_real_escape_string($con, $_POST['contact']);
+    $address = mysqli_real_escape_string($con, $_POST['address']);
     $pass = $_POST['pass'];
     $cpass = $_POST['cpass'];
     $captcha = $_POST['captcha'];
@@ -90,8 +95,8 @@ if (isset($_POST['submit'])) {
                             $emailID = mysqli_insert_id($con);
 
                             // Insert into seller_applications
-                            $stmt = $con->prepare("INSERT INTO seller_applications (owner_name, emailID, password, document_path) VALUES (?, ?, ?, ?)");
-                            $stmt->bind_param("siss", $owner_name, $emailID, $hashed_pass, $target_path);
+                            $stmt = $con->prepare("INSERT INTO seller_applications (owner_name, username, emailID, password, contact_number, address, document_path) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                            $stmt->bind_param("ssissss", $owner_name, $username, $emailID, $hashed_pass, $contact, $address, $target_path);
                             
                             if ($stmt->execute()) {
                                 $message = "Application submitted successfully! Please wait for admin approval.";
@@ -133,22 +138,35 @@ if (isset($_POST['submit'])) {
 </head>
 <style>
     .seller-reg-container {
-        max-width: 500px;
+        max-width: 700px;
         margin: 50px auto;
         background: #fff;
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
-    .seller-reg-container h1 {
-        text-align: center;
-        margin-bottom: 30px;
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+    .form-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group.full-width {
+        width: 100%;
+    }
+    .seller-reg-container label {
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 14px;
         color: #333;
     }
     .box {
         width: 100%;
         padding: 12px;
-        margin-bottom: 15px;
         border: 1px solid #ddd;
         border-radius: 5px;
         box-sizing: border-box;
@@ -194,19 +212,63 @@ if (isset($_POST['submit'])) {
     <section>
         <div class="seller-reg-container">
             <form action="" method="post" enctype="multipart/form-data">
-                <h1>Apply as Seller</h1>
+                <h1 style="text-align: center; margin-bottom: 30px;">Apply as Seller</h1>
                 
-                <label>Owner Full Name:</label>
-                <input type="text" name="owner_name" required placeholder="Enter your full name" class="box">
+                <!-- Row 1: First name | Last name -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name:</label>
+                        <input type="text" id="first_name" name="first_name" required placeholder="Enter your first name" class="box">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name:</label>
+                        <input type="text" id="last_name" name="last_name" required placeholder="Enter your last name" class="box">
+                    </div>
+                </div>
 
-                <label>Email Address:</label>
-                <input type="email" name="email" required placeholder="Enter your email" class="box">
+                <!-- Row 2: Username -->
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required placeholder="Enter your username" class="box">
+                    </div>
+                </div>
 
-                <label>Password:</label>
-                <input type="password" name="pass" required placeholder="Create a password" class="box">
+                <!-- Row 3: Email | Contact Number -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email Address:</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter your email" class="box">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">Contact Number:</label>
+                        <input type="text" id="contact" name="contact" required placeholder="Enter your contact number" class="box">
+                    </div>
+                </div>
 
-                <label>Confirm Password:</label>
-                <input type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box">
+                <!-- Row 4: Address -->
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="address">Address:</label>
+                        <textarea id="address" name="address" required placeholder="Enter your complete address" class="box" style="height: 100px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Row 5: Password -->
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="pass" required placeholder="Create a password" class="box">
+                    </div>
+                </div>
+
+                <!-- Row 6: Confirm Password -->
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="confirm_password">Confirm Password:</label>
+                        <input type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box">
+                    </div>
+                </div>
 
                 <div id="password-requirements" style="font-size: 14px; margin-bottom: 20px; ">
                     <p id="length-req" style="color: red; <?php echo ($min_length == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_length; ?> characters long</p>
