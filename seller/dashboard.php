@@ -1,32 +1,48 @@
 <?php
 
 include('../components/connect.php');
-$sql = "SELECT COUNT(*) AS total_products FROM product"; // Query to get the total count of records
-$result = mysqli_query($con, $sql);
 
-$row = mysqli_fetch_assoc($result);
-$totalProducts = $row['total_products']; // Total number of products
+// Total Products for this seller
+$stmt = $con->prepare("SELECT COUNT(*) AS total_products FROM product WHERE sellerID = ?");
+$stmt->bind_param("i", $_SESSION['user-id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$totalProducts = $row['total_products'];
+
+// Total Orders for this seller
+$stmt = $con->prepare("SELECT COUNT(*) AS total_orders FROM orders WHERE sellerID = ?");
+$stmt->bind_param("i", $_SESSION['user-id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$totalOrders = $row['total_orders'];
+
+// Pending Orders Value for this seller
+$stmt = $con->prepare("SELECT SUM(price) AS total_pending FROM orders WHERE status = 'Pending' AND sellerID = ?");
+$stmt->bind_param("i", $_SESSION['user-id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$totalPending = $row['total_pending'] ?? 0;
+
+// Approved Sales for this seller
+$stmt = $con->prepare("SELECT SUM(price) AS total_approved FROM orders WHERE status IN ('Shipped', 'Paid', 'Completed') AND sellerID = ?");
+$stmt->bind_param("i", $_SESSION['user-id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$totalApproved = $row['total_approved'] ?? 0;
+
+// Total Customers for this seller
+$stmt = $con->prepare("SELECT COUNT(DISTINCT userID) AS total_customers FROM orders WHERE sellerID = ?");
+$stmt->bind_param("i", $_SESSION['user-id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$totalCustomers = $row['total_customers'];
 
 
-$userSql = "SELECT COUNT(*) AS total_users FROM grace_user";
-$userResult = mysqli_query($con, $userSql);
-$userRow = mysqli_fetch_assoc($userResult);
-$totalUsers = $userRow['total_users'];
-
-$totalSql = "SELECT SUM(price) AS total_price FROM orders WHERE status = 'Pending'";
-$totalResult = mysqli_query($con, $totalSql);
-$totalRow = mysqli_fetch_assoc($totalResult);
-$totalprice = $totalRow['total_price'];
-
-$approveSql = "SELECT SUM(price) AS total_approve FROM orders WHERE status IN ('Shipped', 'Completed', 'Paid')";
-$approveResult = mysqli_query($con, $approveSql);
-$approveRow = mysqli_fetch_assoc($approveResult);
-$approveUsers = $approveRow['total_approve'];
-
-$placedSql = "SELECT COUNT(*) AS total_placed FROM orders WHERE status = 'Pending'";
-$placedResult = mysqli_query($con, $placedSql);
-$placedRow = mysqli_fetch_assoc($placedResult);
-$placedUsers = $placedRow['total_placed'];
 
 ?>
 <!DOCTYPE html>
@@ -44,20 +60,20 @@ $placedUsers = $placedRow['total_placed'];
         <div class="main_container">
             <h1 class="main_title">Seller Dashboard</h1>
             <p class="main_subtitle">Welcome to your dashboard, manage your products and orders efficiently.</p>
-            <!-- <div class="main_dash_analytics">
+            <div class="main_dash_analytics">
                 <div class="main_dash_top">
                     <div class="main_dash_box wide">
                         <div class="main_dash_info">
-                            <h3>Total Pendings</h3>
-                            <h1 class="main_large">₱ <?php echo number_format(($totalprice > 0) ? $totalprice : 0, 0, '.', ','); ?>.00</h1>
+                            <h3>Total Sales</h3>
+                            <h1 class="main_large">₱ <?php echo number_format($totalApproved, 2); ?></h1>
                         </div>
                     </div>
                 </div>
                 <div class="main_dash_bottom"> 
                     <div class="main_dash_box">
                         <div class="main_dash_info">
-                            <h3>Order Placed</h3>
-                            <h1 class="">₱ <?php echo ($placedUsers > 0) ? $placedUsers : 0; ?></h1>
+                            <h3>Pending Orders</h3>
+                            <h1>₱ <?php echo number_format($totalPending, 2); ?></h1>
                         </div>
                     </div>
                     
@@ -69,12 +85,18 @@ $placedUsers = $placedRow['total_placed'];
                     </div>
                     <div class="main_dash_box">
                         <div class="main_dash_info">
-                            <h3>Total Users</h3>
-                            <h1><?php echo $totalUsers; ?></h1>
+                            <h3>Total Orders</h3>
+                            <h1><?php echo $totalOrders; ?></h1>
+                        </div>
+                    </div>
+                    <div class="main_dash_box">
+                        <div class="main_dash_info">
+                            <h3>Total Customers</h3>
+                            <h1><?php echo $totalCustomers; ?></h1>
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
             <!-- <div class="col-row">
                 <div class="col">
                     <div class="box">
@@ -95,7 +117,7 @@ $placedUsers = $placedRow['total_placed'];
                     </div>
                 </div> 
             </div> -->
-            <div class="col-row">
+            <!-- <div class="col-row">
                 <div class="col">
                     <div class="box">
                         <h3>My products</h3>
@@ -120,13 +142,13 @@ $placedUsers = $placedRow['total_placed'];
                         <p>View your conversion rates.</p>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="col-row">
                 <!-- Latest-updated products summary -->
                 <div class="main_dash_box" style="margin-top:20px;">
                     <h3 style="margin-bottom:12px;">Latest Updated Stock</h3>
                     <?php
-                        $latestSql = "SELECT 
+                        $stmt = $con->prepare("SELECT 
                                         p.name, 
                                         MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS stock_s,
                                         MAX(CASE WHEN s.sizes = 'M' THEN i.stock ELSE 0 END) AS stock_m,
@@ -136,10 +158,29 @@ $placedUsers = $placedRow['total_placed'];
                                     FROM product p
                                     LEFT JOIN inventory i ON p.proID = i.proID
                                     LEFT JOIN sizes s ON i.sizeID = s.sizeID
+                                    WHERE p.sellerID = ?
                                     GROUP BY p.proID, p.name
                                     ORDER BY p.proID DESC 
-                                    LIMIT 5";
-                        $latestRes = mysqli_query($con, $latestSql);
+                                    LIMIT 5");
+                        $stmt->bind_param("i", $_SESSION['user-id']);
+                        $stmt->execute();
+                        $latestRes = $stmt->get_result();
+                        // $latestSql = "SELECT
+                        // $latestSql = "SELECT 
+                        //                 p.name, 
+                        //                 MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS stock_s,
+                        //                 MAX(CASE WHEN s.sizes = 'M' THEN i.stock ELSE 0 END) AS stock_m,
+                        //                 MAX(CASE WHEN s.sizes = 'L' THEN i.stock ELSE 0 END) AS stock_l,
+                        //                 MAX(CASE WHEN s.sizes = 'XL' THEN i.stock ELSE 0 END) AS stock_xl,
+                        //                 MAX(CASE WHEN s.sizes = 'XXL' THEN i.stock ELSE 0 END) AS stock_xxl
+                        //             FROM product p
+                        //             WHERE p.sellerID = ?
+                        //             LEFT JOIN inventory i ON p.proID = i.proID
+                        //             LEFT JOIN sizes s ON i.sizeID = s.sizeID
+                        //             GROUP BY p.proID, p.name
+                        //             ORDER BY p.proID DESC 
+                        //             LIMIT 5";
+                        // $latestRes = mysqli_query($con, $latestSql);
                         if($latestRes && mysqli_num_rows($latestRes) > 0):
                     ?>
                         <table style="width:100%; border-collapse:collapse;">
@@ -174,12 +215,15 @@ $placedUsers = $placedRow['total_placed'];
                     <div class="main_dash_box">
                         <h3 style="margin-bottom:12px;">Recent Orders</h3>
                         <?php
-                            $ordersSql = "SELECT o.orderID AS ID, o.time_ordered AS Placed_on, u.username AS Name, o.price AS Total_Price, o.status AS Order_Status 
+                            $stmt = $con->prepare("SELECT o.orderID AS ID, o.time_ordered AS Placed_on, u.username AS Name, o.price AS Total_Price, o.status AS Order_Status 
                                           FROM orders o 
                                           JOIN grace_user u ON o.userID = u.userID 
+                                          WHERE o.sellerID = ?
                                           ORDER BY o.time_ordered DESC 
-                                          LIMIT 5";
-                            $ordersRes = mysqli_query($con, $ordersSql);
+                                          LIMIT 5");
+                            $stmt->bind_param("i", $_SESSION['user-id']);
+                            $stmt->execute();
+                            $ordersRes = $stmt->get_result();
                             if($ordersRes && mysqli_num_rows($ordersRes) > 0):
                         ?>
                         <table style="width:100%; border-collapse:collapse;">
@@ -220,7 +264,7 @@ $placedUsers = $placedRow['total_placed'];
                     </div>
                 </div>
             </row>
-            <div class="col-row">
+            <!-- <div class="col-row">
                 <div class="col">
                     <div class="box">
                         <h3>Quick Actions</h3>
@@ -239,7 +283,7 @@ $placedUsers = $placedRow['total_placed'];
                             </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
    </section>
 </body>

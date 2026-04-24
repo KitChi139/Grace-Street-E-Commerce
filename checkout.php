@@ -128,7 +128,7 @@
                 $con->begin_transaction();
 
                 // 1. Get cart items
-                $stmt = $con->prepare("SELECT cart.*, product.price, inventory.inventoryID 
+                $stmt = $con->prepare("SELECT cart.*, product.price, inventory.inventoryID, product.sellerID
                                     FROM cart 
                                     JOIN inventory ON cart.inventoryID = inventory.inventoryID 
                                     JOIN product ON inventory.proID = product.proID 
@@ -137,40 +137,62 @@
                 $stmt->execute();
                 $result = $stmt->get_result();
 
-                $cartItems = [];
-                $totalSubtotal = 0;
+                $sellerGroups = [];
 
                 while ($row = $result->fetch_assoc()) {
+
+                    $sellerID = $row['sellerID']; // must come from inventory join
+
                     $subtotal = $row['price'] * $row['quantity'];
-                    $totalSubtotal += $subtotal;
-                    $cartItems[] = $row;
+
+                    $sellerGroups[$sellerID]['items'][] = $row;
+                    $sellerGroups[$sellerID]['total'] =
+                        ($sellerGroups[$sellerID]['total'] ?? 0) + $subtotal;
+                }
+                $totalSubtotal = 0;
+
+                foreach ($sellerGroups as $group) {
+                    $totalSubtotal += $group['total'];
                 }
                 $_SESSION['checkout_total'] = $totalSubtotal;
-                if (empty($cartItems)) {
+                if (empty($sellerGroups)) {
                     throw new Exception("Cart is empty");
                 }
 
                 // 2. Insert ONE order
-                $stmt = $con->prepare("INSERT INTO orders (userID, status, price, time_ordered) 
-                                    VALUES (?, ?, ?, NOW())");
-                $stmt->bind_param("isd", $userId, $status, $totalSubtotal);
-                $stmt->execute();
+                $orderIDs = [];
 
-                $orderID = $stmt->insert_id;
+                foreach ($sellerGroups as $sellerID => $group) {
+
+                    $stmt = $con->prepare("
+                        INSERT INTO orders (userID, sellerID, status, price, time_ordered)
+                        VALUES (?, ?, ?, ?, NOW())
+                    ");
+
+                    $stmt->bind_param("iisd", $userId, $sellerID, $status, $group['total']);
+                    $stmt->execute();
+
+                    $orderIDs[$sellerID] = $stmt->insert_id;
+                }
 
                 // 3. Insert order_items
                 $stmt = $con->prepare("INSERT INTO order_items (orderID, inventoryID, quantity, price) 
                                     VALUES (?, ?, ?, ?)");
 
-                foreach ($cartItems as $item) {
-                    $stmt->bind_param(
-                        "iiid",
-                        $orderID,
-                        $item['inventoryID'],
-                        $item['quantity'],
-                        $item['price']
-                    );
-                    $stmt->execute();
+                foreach ($sellerGroups as $sellerID => $group) {
+
+                    $orderID = $orderIDs[$sellerID];
+
+                    foreach ($group['items'] as $item) {
+                        $stmt->bind_param(
+                            "iiid",
+                            $orderID,
+                            $item['inventoryID'],
+                            $item['quantity'],
+                            $item['price']
+                        );
+                        $stmt->execute();
+                    }
                 }
 
                 if ($paymentMethod == "paymongo") {
