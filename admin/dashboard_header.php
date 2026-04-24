@@ -3,7 +3,7 @@ include('./components/connect.php');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-$user_id = isset($_SESSION['user-id']) ? $_SESSION['user-id'] : null;
+$user_id = $_SESSION['user-id'] ?? $_SESSION['user_id'] ?? null;
 
 $fetch_user = null;
 if($user_id) {
@@ -47,11 +47,11 @@ if(isset($_GET['logout'])){
                 <a href="./settings.php">Settings</a>
               </nav>
               <div class="header-btn">
-                <?php if (!isset($user_id)): ?>
+                <?php if (!$user_id): ?>
                 <div class="login-register-btn">
-                    <a href="./login.php"><button>Login</button></a>
+                    <a href="../login.php"><button>Login</button></a>
                     <div>|</div>
-                    <a href="./register.php"><button>Register</button></a>
+                    <a href="../register.php"><button>Register</button></a>
                 </div>
                 <?php endif; ?>
                 <div class="header-icons">
@@ -65,17 +65,17 @@ if(isset($_GET['logout'])){
                     <!-- Pop up -->
                     <div id="popupForm" class="pop-container">
                       <?php
-                          if(isset($user_id) && $fetch_user) {
+                          if($user_id && $fetch_user) {
                               echo '<div class="pop-content" style="text-align: center;">
-                                      <h2>Welcome<br><span>' . $fetch_user['username'] . '</span></h2>
+                                      <h2>Welcome<br><span>' . htmlspecialchars($fetch_user['username']) . '</span></h2>
                                       <a href="./update_profile.php"><button onclick="updateProfile()">Update Profile</button></a>
                                       <a href="overview.php?logout=' . $user_id . '" onclick="return confirm(\'Are you sure you want to logout?\')"><button class="logBtn">Log out</button></a>
                                     </div>';
                           } else {
                               echo '<div class="pop-content" style="text-align: center;">
                                       
-                                      <a href="./login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
-                                      <a href="./register.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Register</button></a>
+                                      <a href="../login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
+                                      <a href="../register.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Register</button></a>
                                     </div>';
                           }
                       ?>

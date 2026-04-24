@@ -43,6 +43,7 @@ if(isset($_GET['logout'])){
                 <a href="./order.php">Order</a>
                 <a href="./contact.php">Contact</a>
                 <a href="./reviews.php">Reviews</a>
+                <a href="./seller_register.php" style="color: #d35400; font-weight: bold;">Sell on Grace Street</a>
               </nav>
               <div class="header-btn">
                 <?php if (!isset($user_id)): ?>

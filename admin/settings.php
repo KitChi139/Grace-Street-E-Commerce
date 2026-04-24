@@ -6,17 +6,16 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Check admin role
 $user_id = $_SESSION['user-id'] ?? $_SESSION['user_id'] ?? null;
-
 if (!$user_id) {
     header('Location: ../login.php');
     exit();
 }
 
-// Fetch user and their role
-$role_check = mysqli_query($con, "SELECT r.role FROM grace_user u JOIN roles r ON u.roleID = r.roleID WHERE u.userID = '$user_id'");
-$role_row = mysqli_fetch_assoc($role_check);
+// Fetch user and their role using a more reliable query
+$user_query = mysqli_query($con, "SELECT u.*, r.role FROM grace_user u JOIN roles r ON u.roleID = r.roleID WHERE u.userID = '$user_id'");
+$user_data = mysqli_fetch_assoc($user_query);
 
-if (!$role_row || strtolower($role_row['role']) !== 'admin') {
+if (!$user_data || strtolower(trim($user_data['role'])) !== 'admin') {
     header('Location: ../login.php');
     exit();
 }

@@ -126,6 +126,7 @@ if(isset($_POST['submit'])){
                 <input type="submit" value="Login Now" class="btn" name="submit">
                 <p style="text-align: center;">Forgot your password? <a href="forgot-password-send.php">Reset it here</a></p>
                 <p style="text-align: center;">Don't have an account? <a href="register.php">Register</a></p>
+                <p style="text-align: center;"><a href="seller_register.php">Sign in as seller?</a></p>
                 <p style="text-align: center;">Didn't receive an activation email? <a href="resend_activation.php">Resend activation link</a></p>
             </form>
 
