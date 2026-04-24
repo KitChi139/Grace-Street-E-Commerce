@@ -178,37 +178,7 @@ if(isset($_POST['approve'])) {
             padding: 0 10px;
             gap: 15px;
             flex-wrap: wrap;
-        }
-        .search_box {
-            position: relative;
-            flex: 1;
-            min-width: 200px;
-        }
-        .search_box input {
-            width: 100%;
-            padding: 12px 15px 12px 40px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-            outline: none;
-            font-size: 16px;
-        }
-        .search_box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
-            font-size: 18px;
-        }
-        .filter_box select {
-            padding: 10px 20px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-            outline: none;
-            font-size: 16px;
-            cursor: pointer;
-            background: white;
-        }
+        }  
         .view_toggle {
             display: flex;
             gap: 10px;

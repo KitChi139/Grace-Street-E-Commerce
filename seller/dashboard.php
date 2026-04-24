@@ -122,19 +122,90 @@ $placedUsers = $placedRow['total_placed'];
                 </div>
             </div>
             <div class="col-row">
-                <div class="col">
-                    <div class="box">
-                        <h3>My Products</h3>
-                        <p>Manage your product inventory.</p>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="box">
-                        <h3>Recent Orders</h3>
-                        <p>Your Latest Sales.</p>
-                    </div>
-                </div>
+                <!-- Latest-updated products summary -->
+                <div class="main_dash_box" style="margin-top:20px;">
+                    <h3 style="margin-bottom:12px;">Latest Updated Stock</h3>
+                    <?php
+                        $latestSql = "SELECT product_name, product_stock_s, product_stock_m, product_stock_l, product_stock_xl, product_stock_xxl, Date FROM product_list ORDER BY Date DESC LIMIT 5";
+                        $latestRes = mysqli_query($con, $latestSql);
+                        if($latestRes && mysqli_num_rows($latestRes) > 0):
+                    ?>
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Product</th>
+                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Stock (S/M/L/XL/XXL)</th>
+                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php while($p = mysqli_fetch_assoc($latestRes)): 
+                                $s = isset($p['product_stock_s']) ? $p['product_stock_s'] : 0;
+                                $m = isset($p['product_stock_m']) ? $p['product_stock_m'] : 0;
+                                $l = isset($p['product_stock_l']) ? $p['product_stock_l'] : 0;
+                                $xl = isset($p['product_stock_xl']) ? $p['product_stock_xl'] : 0;
+                                $xxl = isset($p['product_stock_xxl']) ? $p['product_stock_xxl'] : 0;
+                            ?>
+                                <tr>
+                                    <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo htmlspecialchars($p['product_name']); ?></td>
+                                    <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo 'S:'.$s.' / M:'.$m.' / L:'.$l.' / XL:'.$xl.' / XXL:'.$xxl; ?></td>
+                                    <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo date('Y-m-d', strtotime($p['Date'])); ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p style="color:#777;">No recent product updates.</p>
+                    <?php endif; ?>
+                </div> 
             </div>
+            <row class="col-row">
+                <div class="col" style="flex:1 1 0;">
+                    <div class="main_dash_box">
+                        <h3 style="margin-bottom:12px;">Recent Orders</h3>
+                        <?php
+                            $ordersSql = "SELECT ID, Placed_on, Name, Total_Price, Order_Status FROM orders ORDER BY Placed_on DESC LIMIT 5";
+                            $ordersRes = mysqli_query($con, $ordersSql);
+                            if($ordersRes && mysqli_num_rows($ordersRes) > 0):
+                        ?>
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Order #</th>
+                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Placed</th>
+                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Customer</th>
+                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Total</th>
+                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while($o = mysqli_fetch_assoc($ordersRes)): ?>
+                                    <tr>
+                                        <td style="padding:8px; border-bottom:1px solid #f6f6f6;">#<?php echo $o['ID']; ?></td>
+                                        <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo date('Y-m-d', strtotime($o['Placed_on'])); ?></td>
+                                        <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo htmlspecialchars($o['Name']); ?></td>
+                                        <td style="padding:8px; border-bottom:1px solid #f6f6f6;">₱ <?php echo number_format($o['Total_Price'], 2); ?></td>
+                                        <td style="padding:8px; border-bottom:1px solid #f6f6f6; color:"><?php
+                                            if ($o['Order_Status'] == 0) {
+                                                echo 'Pending';
+                                            } elseif ($o['Order_Status'] == 1) {
+                                                echo 'Approved';
+                                            } elseif ($o['Order_Status'] === 'Received' || $o['Order_Status'] == 'Received') {
+                                                echo 'Received';
+                                            } else {
+                                                echo htmlspecialchars($o['Order_Status']);
+                                            }
+                                        ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                        <?php else: ?>
+                            <p style="color:#777;">No recent orders.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </row>
             <div class="col-row">
                 <div class="col">
                     <div class="box">

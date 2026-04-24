@@ -1,0 +1,18 @@
+<?php
+include('../components/connect.php'); // Assuming connect.php is in the same directory
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['unlock_user'])) {
+    $username = $_POST['unlock_user'];
+
+    $stmt = prepare("UPDATE grace_users SET is_active = 1 WHERE name = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+
+    // Optional: refresh page
+    header("Location: admin.php");
+    exit();
+}
+?>

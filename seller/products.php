@@ -12,13 +12,21 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
 
 if(isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
-    $delete_sql = "DELETE FROM product_list WHERE id = $delete_id";
-    mysqli_query($con, $delete_sql);
+    $stmt = $con->prepare("DELETE FROM product_list WHERE id = ?");
+    $stmt->bind_param("i", $delete_id);
+    $stmt->execute();
+    header("Location: products.php");
+    $stmt->close();
+    exit();
 }
 
 // Modify the SQL query to include search functionality
-$sql = "SELECT * FROM product_list WHERE product_name LIKE '%$search%' LIMIT $start, $limit";
-$result = mysqli_query($con, $sql);
+$stmt = $con->prepare("SELECT * FROM product_list WHERE product_name LIKE ? LIMIT ?, ?");
+$search_param = '%' . $search . '%';
+$stmt->bind_param("sii", $search_param, $start, $limit);
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -104,7 +112,7 @@ $result = mysqli_query($con, $sql);
         <h1 class="main_title">Products</h1>
         <p class="main_subtitle">Manage Product Inventory</p>
            <div class="search_products">
-            <div class="main_products_add" onclick="showProductPopup()">
+                <div class="main_products_add" onclick="showProductPopup()">
                     <div>
                         <h1 class="add_text">Add Products</h1>
                     </div>
@@ -112,14 +120,24 @@ $result = mysqli_query($con, $sql);
                         <i class="fa-solid fa-circle-plus"></i>
                     </div>
                 </div>
-                <!-- Search Bar -->
-                <div class="search-bar">
-                    <form action="" method="GET">
-                        <div class="search-input-container">
-                            <input type="text" name="search" placeholder="Search..." value="<?php echo $search; ?>">
-                            <button type="submit"><i class="fa-solid fa-search"></i></button>
-                        </div>
-                    </form>
+                <!-- Search Bar and Filters -->
+                <div class="search_box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="productSearch" placeholder="Search products by name, id, or description..." value="<?php echo htmlspecialchars($search); ?>">
+                </div>
+                <div class="filter_box">
+                    <select id="productStatusFilter">
+                        <option value="all">All Statuses</option>
+                        <option value="available">Available</option>
+                        <option value="unavailable">Unavailable</option>
+                    </select>
+                </div>
+                <div class="filter_box">
+                    <select id="productGenderFilter">
+                        <option value="all">All Genders</option>
+                        <option value="mens">Mens</option>
+                        <option value="womens">Womens</option>
+                    </select>
                 </div>
            </div>
             <div class="main_products_box">
@@ -130,22 +148,31 @@ $result = mysqli_query($con, $sql);
                         <tr>
                             <th>Image</th>
                             <th>Product Name</th>
-                            <th>Stock</th>
+                            <th>Stock (S/M/L/XL/XXL)</th>
                             <th>Price</th>
                             <th>Status</th>
                             <th>Description</th>
-                            <th>Gender</th> <!-- Added Gender column -->
+                            <th>Gender</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="productTableBody">
                         <?php
                             while($row = mysqli_fetch_assoc($result)){  
                             ?>
-                            <tr>
+                            <tr data-name="<?php echo htmlspecialchars($row['product_name']); ?>" data-desc="<?php echo htmlspecialchars($row['description']); ?>" data-status="<?php echo strtolower($row['product_status']); ?>" data-gender="<?php echo strtolower($row['gender']); ?>" data-id="<?php echo $row['id']; ?>">
                                 <td><img width="30" src="../uploads/images/<?php echo $row['product_image']; ?>" alt="<?php echo $row['product_name']; ?>"></td>
                                 <td><?php echo $row['product_name']; ?></td>
-                                <td><?php echo $row['product_stock']; ?></td>
+                                <td>
+                                    <?php
+                                        $s = isset($row['product_stock_s']) ? $row['product_stock_s'] : 0;
+                                        $m = isset($row['product_stock_m']) ? $row['product_stock_m'] : 0;
+                                        $l = isset($row['product_stock_l']) ? $row['product_stock_l'] : 0;
+                                        $xl = isset($row['product_stock_xl']) ? $row['product_stock_xl'] : 0;
+                                        $xxl = isset($row['product_stock_xxl']) ? $row['product_stock_xxl'] : 0;
+                                        echo 'S: ' . $s . ' / M: ' . $m . ' / L: ' . $l . ' / XL: ' . $xl . ' / XXL: ' . $xxl;
+                                    ?>
+                                </td>
                                 <td><?php echo $row['product_price']; ?></td>
                                 <td><?php echo $row['product_status']; ?></td>
                                 <td  style="5px"><?php echo $row['description']; ?></td>
@@ -167,11 +194,14 @@ $result = mysqli_query($con, $sql);
             </div>
             <!-- Pagination links -->
             <?php
-                // Count total pages for pagination
-                $sql_count = "SELECT COUNT(*) AS total FROM product_list WHERE product_name LIKE '%$search%'";
-                $result_count = mysqli_query($con, $sql_count);
-                $row_count = mysqli_fetch_assoc($result_count);
+                // Count total pages for pagination'
+                $stmt = $con->prepare("SELECT COUNT(*) AS total FROM product_list WHERE product_name LIKE ?");
+                $stmt->bind_param("s", $search_param);
+                $stmt->execute();
+                $result_count = $stmt->get_result();
+                $row_count = $result_count->fetch_assoc(); 
                 $total_pages = ceil($row_count['total'] / $limit);
+                $stmt->close();
 
                 echo "<div class='pagination'>";
                 for ($i = 1; $i <= $total_pages; $i++) {
@@ -202,9 +232,25 @@ $result = mysqli_query($con, $sql);
                             <label for="product_name">Product Name</label>
                             <input type="text" placeholder="20 Characters Only" id="product_name" name="product_name" required maxlength="20"> 
                         </div>
-                        <div class="productname">
-                            <label for="total_stock">Total Stock</label>
-                            <input type="number" id="total_stock" name="product_stock" required>
+                        <div class="productname-short">
+                            <label for="small_stock">Small Stocks</label>
+                            <input type="number" id="small_stock" name="small_stock" required>
+                        </div>
+                        <div class="productname-short">
+                            <label for="medium_stock">Medium Stocks</label>
+                            <input type="number" id="medium_stock" name="medium_stock" required>
+                        </div>
+                        <div class="productname-short">
+                            <label for="large_stock">Large Stocks</label>
+                            <input type="number" id="large_stock" name="large_stock" required>
+                        </div>
+                        <div class="productname-short">
+                            <label for="xlarge_stock">XLarge Stock</label>
+                            <input type="number" id="xlarge_stock" name="xlarge_stock" required>
+                        </div>
+                        <div class="productname-short">
+                            <label for="xxlarge_stock">XXLarge Stock</label>
+                            <input type="number" id="xxlarge_stock" name="xxlarge_stock" required>
                         </div>
                         <div class="productname">
                             <label for="product_image">Product Image</label>
@@ -256,14 +302,47 @@ function updateItem(productId) {
     window.location.href = "update_product.php?id=" + productId;
 }
 
-</script>
 
-<script>
         // Function to handle click event on submit button
         function submitForm() {
             // Show alert
             alert("Product Added");
         }
+
+        const productSearch = document.getElementById('productSearch');
+        const statusFilter = document.getElementById('productStatusFilter');
+        const genderFilter = document.getElementById('productGenderFilter');
+
+        // Search and Filter Logic for products
+        function filterProducts() {
+            const searchTerm = (productSearch ? productSearch.value : '').toLowerCase();
+            const filterStatus = (statusFilter ? statusFilter.value : 'all').toLowerCase();
+            const filterGender = (genderFilter ? genderFilter.value : 'all').toLowerCase();
+
+            const rows = document.querySelectorAll('#productTableBody tr');
+            rows.forEach(row => {
+                const name = (row.getAttribute('data-name') || '').toLowerCase();
+                const desc = (row.getAttribute('data-desc') || '').toLowerCase();
+                const status = (row.getAttribute('data-status') || '').toLowerCase();
+                const gender = (row.getAttribute('data-gender') || '').toLowerCase();
+                const id = (row.getAttribute('data-id') || '').toLowerCase();
+
+                const matchesSearch = name.includes(searchTerm) || desc.includes(searchTerm) || id.includes(searchTerm);
+                const matchesStatus = filterStatus === 'all' || (filterStatus === 'available' && status === 'available') || (filterStatus === 'unavailable' && status !== 'available');
+                const matchesGender = filterGender === 'all' || gender === filterGender;
+
+                if (matchesSearch && matchesStatus && matchesGender) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        if (productSearch) productSearch.addEventListener('input', filterProducts);
+        if (statusFilter) statusFilter.addEventListener('change', filterProducts);
+        if (genderFilter) genderFilter.addEventListener('change', filterProducts);
+
 </script>
 
 </body>

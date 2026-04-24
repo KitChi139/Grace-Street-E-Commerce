@@ -1,98 +1,101 @@
 <?php
+include('./components/connect.php');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$user_id = isset($_SESSION['user-id']) ? $_SESSION['user-id'] : null;
 
+$fetch_user = null;
+if($user_id) {
+    $select_user = mysqli_query($con, "SELECT * FROM grace_user WHERE id = '$user_id'") or die("query failed");
+    if(mysqli_num_rows($select_user) > 0){
+        $fetch_user = mysqli_fetch_assoc($select_user);
+    }
+}
 
-// Check if the user clicks on the sign out link
-if(isset($_GET['logout'])) {
-    // Destroy all session data
+function getCartItemCount($user_id, $con) {
+    $count_query = mysqli_query($con, "SELECT COUNT(*) AS count FROM cart WHERE user_id = '$user_id'");
+    $count_row = mysqli_fetch_assoc($count_query);
+    return $count_row['count'];
+}
+function getWishListItemCount($user_id, $con) {
+    $count_query = mysqli_query($con, "SELECT COUNT(*) AS count FROM wishlist WHERE user_id = '$user_id'");
+    $count_row = mysqli_fetch_assoc($count_query);
+    return $count_row['count'];
+}
+
+if(isset($_GET['logout'])){
+    unset($_SESSION['user-id']); 
     session_destroy();
-    // Redirect to the login page
-    header('Location: ../login.php');
-    exit;
+    header('location:login.php');
 }
 ?>
 
-<header>
-    <section class="dashboard_container">
-        <div class="dashboard_box">
-            <div class="dashboard_logo">
-                <div class="logo">
-                    <img src="assets/grace_logo.jpg" alt="" width="50px">
-                </div>
-                <div class="logo_text">
-                    <h1>GRACE STREET</h1>
-                    <p>CLOTHE YOURSELF WITH TRUTH</p>
-                </div>
-            </div>
-        </div>
-        <div class="dashboard_menu_box">
-            <div class="dashboard_menu">
-               <a href="../admin/dashboard.php" class="home">
-                    <div class="dashboard_sec">
-                        <div class="dash_icon">
-                            <i class="fa-solid fa-house"></i>
-                        </div>
-                        <div class="dash_text">
-                            <h1>Dashboard</h1>
-                        </div>
-                    </div>
-               </a>
-                <a href="../admin/products.php" class="products">
-                    <div class="dashboard_sec">
-                        <div class="dash_icon">
-                            <i class="fa-solid fa-box"></i>
-                        </div>
-                        <div class="dash_text">
-                            <h1>Products</h1>
-                        </div>
-                    </div>
-                </a>
-                <a href="orders.php" class="orders">
-                    <div class="dashboard_sec">
-                        <div class="dash_icon">
-                            <i class="fa-solid fa-clipboard"></i>
-                        </div>
-                        <div class="dash_text">
-                            <h1>Orders</h1>
-                        </div>
-                    </div>
-                </a>
-                <a href="notification.php" class="notif">
-                    <div class="dashboard_sec">
-                        <div class="dash_icon">
-                            <i class="fa-solid fa-envelope"></i>
-                        </div>
-                        <div class="dash_text">
-                            <h1>Notification</h1>
-                        </div>
-                    </div>
-                </a>
-                <a href="employee.php" class="notif">
-                    <div class="dashboard_sec">
-                        <div class="dash_icon">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <div class="dash_text">
-                            <h1>Employee</h1>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
 
-        <div class="dashboard_logout_box">
-            <div class="dashboard_menu">
-            <a href="?logout" class="home" onclick="return confirm('Are you sure you want to log out?');">
-                    <div class="dashboard_sec">
-                        <div class="dash_icon">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        </div>
-                        <div class="dash_text">
-                            <h1>Sign Out</h1>
-                        </div>
+<header>
+  <section class="flex">
+          <div class="header-container">
+            <div class="header-content">
+              <a href="./overview.php" class="header-logo"><img src="./img/Logo.png" alt="" width="300px" height="auto" /></a>
+              <nav>
+                <a href="./overview.php">Home</a>
+                <a href="./user_management.php">User Management</a>
+                <a href="./supplier_management.php">Supplier Management</a>
+                <a href="./audit_trail.php">Audit Trail</a>
+                <a href="./edit_profile.php">Settings</a>
+              </nav>
+              <div class="header-btn">
+                <?php if (!isset($user_id)): ?>
+                <div class="login-register-btn">
+                    <a href="./login.php"><button>Login</button></a>
+                    <div>|</div>
+                    <a href="./register.php"><button>Register</button></a>
+                </div>
+                <?php endif; ?>
+                <div class="header-icons">
+                    <?php if ($fetch_user): ?>
+                    <span class="user-display-name" style="font-size: 18px; font-weight: 600; margin-right: 15px; color: #333;">
+                        Hello, <?= htmlspecialchars($fetch_user['username']); ?>
+                    </span>
+                    <?php endif; ?>
+                    <a href="wishlist.php"><i class="fas fa-heart"></i><span>(<?php echo getWishListItemCount($user_id, $con); ?>)</span></a>
+                    <a href="cart.php"><i class="fas fa-shopping-cart"></i><span>(<?php echo getCartItemCount($user_id, $con); ?>)</span></a>
+                    <img src="./img/user.svg" onclick="togglePopup()" alt="" style="cursor: pointer;">
+
+                    <!-- Pop up -->
+                    <div id="popupForm" class="pop-container">
+                      <?php
+                          if(isset($user_id) && $fetch_user) {
+                              echo '<div class="pop-content" style="text-align: center;">
+                                      <h2>Welcome<br><span>' . $fetch_user['username'] . '</span></h2>
+                                      <a href="./update_profile.php"><button onclick="updateProfile()">Update Profile</button></a>
+                                      <a href="overview.php?logout=' . $user_id . '" onclick="return confirm(\'Are you sure you want to logout?\')"><button class="logBtn">Log out</button></a>
+                                    </div>';
+                          } else {
+                              echo '<div class="pop-content" style="text-align: center;">
+                                      
+                                      <a href="./login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
+                                      <a href="./register.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Register</button></a>
+                                    </div>';
+                          }
+                      ?>
                     </div>
-                </a>
+
+                </div>
+              </div>
             </div>
-        </div>
-       
-    </section>
+          </div>
+        </section>
+
+  <script>
+    function togglePopup() {
+      var popup = document.getElementById("popupForm");
+      if (popup.style.display === "none" || popup.style.display === "") {
+        popup.style.display = "block";
+      } else {
+        popup.style.display = "none";
+      }
+    }
+  </script>
+  <script src="../js/script.js"></script>
 </header>

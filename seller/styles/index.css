@@ -277,20 +277,7 @@ nav a {
   -moz-box-shadow: 1px 3px 14px -8.5px #000000;
   box-shadow: 1px 3px 14px -8.5px #000000;
 }
-.main_products_add {
-  cursor: pointer;
-  width: 220px;
-  background-color: white;
-  -webkit-box-shadow: 1px 3px 14px -8.5px #000000;
-  -moz-box-shadow: 1px 3px 14px -8.5px #000000;
-  box-shadow: 1px 3px 14px -8.5px #000000;
-  display: flex;
-  padding: 7px 10px;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  border-radius: 10px;
-}
+
 .add_text {
   font-size: 15px;
   font-weight: 600;
@@ -357,6 +344,9 @@ nav a {
   box-sizing: border-box; /* Ensure the padding is included in the width */
   border: 1px solid #ccc; /* Add a border for visual clarity */
   border-radius: 4px; /* Add rounded corners */
+}
+.productname-short {
+  flex: 1 1 30%; /* Adjust the width of each column */
 }
 .products_addbtn {
   margin-top: 20px;
@@ -613,4 +603,51 @@ nav a {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.main_products_add {
+  cursor: pointer;
+  width: 220px;
+  background-color: white;
+  -webkit-box-shadow: 1px 3px 14px -8.5px #000000;
+  -moz-box-shadow: 1px 3px 14px -8.5px #000000;
+  box-shadow: 1px 3px 14px -8.5px #000000;
+  display: flex;
+  padding: 12px 15px 12px 40px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-radius: 25px;
+}
+/* Search and Filter Styles */
+.search_box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    margin: 10px;
+}
+.search_box input {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 16px;
+}
+.search_box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 18px;
+}
+.filter_box select {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 16px;
+    cursor: pointer;
+    background: white;
 }

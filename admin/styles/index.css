@@ -91,6 +91,54 @@
   font-weight: 500;
 }
 
+/* Header style */
+.header-container {
+  width: auto;
+  height: auto;
+  padding: 2vh;
+  border-bottom: 2px solid rgb(201, 201, 201);
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+nav a {
+  text-decoration: none;
+  margin: 0 20px;
+  font-size: 15px;
+  color: black;
+}
+
+.login-register-btn {
+  display: flex;
+  width: fit-content;
+  padding: 5px 15px;
+  border-radius: 100px;
+  background-color: black;
+}
+.login-register-btn button {
+  border: none;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+}
+.login-register-btn div {
+  color: white;
+}
+.header-btn {
+  display: flex;
+  align-items: center;
+}
+.header-icons,
+.header-icons a {
+  margin: 0 8px;
+}
+.header-icons {
+  position: relative;
+}
+
 /* ================dashboard style================= */
 .main_dash_container {
   min-height: 100vh;
