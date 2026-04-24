@@ -1,6 +1,13 @@
 <?php
 include('./components/connect.php');
 
+if (!isset($_SESSION['user-id'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user-id'];
+
 $sort_order = "DESC";
 $sort_by = "proID"; 
 $category_label = "Category";
@@ -126,8 +133,13 @@ if(isset($_POST['search'])) {
                     if(mysqli_num_rows($select_product) > 0) {
                         while($fetch_product = mysqli_fetch_assoc($select_product)) {
                             $original_price = $fetch_product['price'];
-                            $discount = $fetch_product['product_discount'];
-                            $discounted_price = $original_price - ($original_price * ($discount / 100));
+                            $discount = (float)($fetch_product['discount'] ?? 0);
+
+                            $discounted_price = $original_price;
+
+                            if ($discount > 0) {
+                                $discounted_price = $original_price - ($original_price * ($discount / 100));
+                            }
                     ?>
                     <form id="productForm<?= $fetch_product['proID']; ?>">
                             <div class="items-product">
@@ -144,7 +156,7 @@ if(isset($_POST['search'])) {
                                                 onclick="addToWishlist(event)"></a>
                                         </div>
                                         <input type="hidden" name="pid" value="<?= $fetch_product['proID']; ?>">
-                                        <div class="images">
+                                        <div class="product_images">
                                             <img src="uploads/images/<?php echo $fetch_product['image'];?>" alt="">
                                         </div>
                                         <h1 style="margin: 0; margin-top: 10px; font-size: 15px;" class="name"><?php echo $fetch_product['name'];?></h1>
@@ -158,14 +170,14 @@ if(isset($_POST['search'])) {
                                                 }
                                                 ?>
                                             </p>
-                                            <?php if ($fetch_product['product_discount'] > 0): ?>
+                                            <?php if ($fetch_product['discount'] > 0): ?>
                                                 <p class="discount"><?php echo $fetch_product['product_discount']; ?>% off</p>
                                             <?php endif; ?>
                                         </div>
                                         <div class="itembottom-content">
                                             <button type="button" class="add-btn" <?php echo ($fetch_product['product_stock_s'] > 0) ? '' : 'disabled'; ?> onclick="addToCart(<?php echo $fetch_product['proID']; ?>, '<?php echo addslashes($fetch_product['image']); ?>', '<?php echo addslashes($fetch_product['name']); ?>', '<?php echo $fetch_product['price'];  ?>' , '<?php echo $discounted_price  ?>')">Add to cart</button>
                                             <span style="margin: 0; color:#8c8989; font-size: 12px;">PHP
-                                                <?php if ($fetch_product['product_discount'] > 0): ?>
+                                                <?php if ($fetch_product['discount'] > 0): ?>
                                                     <p class="product-price" style="color: green; font-size: 16px; margin: 0; text-decoration: line-through;">
                                                         <?php echo $original_price; ?>.00
                                                     </p>

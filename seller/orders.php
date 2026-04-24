@@ -1,32 +1,90 @@
 <?php
 include('../components/connect.php');
 
-$sql = "SELECT orders.*, grace_user.username AS Name, grace_user.address AS Address, grace_user.contact AS Number, orders.price AS Total_Price, orders.time_ordered AS Placed_on, orders.status AS Order_Status, orders.orderID AS ID FROM orders JOIN grace_user ON orders.userID = grace_user.userID";
-$result = mysqli_query($con, $sql);
+if (!isset($_SESSION['user-id'])) {
+    header('Location: ../login.php');
+    exit();
+}
 
-$sqls = "SELECT COUNT(*) as total_rows FROM orders WHERE status = 'Pending'";
-$results = mysqli_query($con, $sqls);
-$row = mysqli_fetch_assoc($results);
-$totalRows = $row['total_rows'];
+$sellerID = $_SESSION['user-id'];
 
-if(isset($_POST['approve'])) {
-    // Get the order ID from the submitted form
-    $orderId = $_POST['appid'];
+$stmt = $con->prepare(
+    "SELECT
+            o.orderID AS ID,
+            o.userID,
+            o.sellerID,
+            o.status AS Order_Status,
+            o.price AS Total_Price,
+            o.time_ordered AS Placed_on,
+            o.time_received,
+            o.method AS Method,
+            u.username AS Name,
+            u.address AS Address,
+            u.contact_number AS Number,
+            COALESCE(
+            GROUP_CONCAT(
+                CONCAT(p.name, ' x ', oi.quantity)
+                SEPARATOR '<br>'
+            ),
+            'No items'
+) AS Total_Products
+        FROM orders o
+        JOIN grace_user u ON o.userID = u.userID
+        LEFT JOIN order_items oi ON o.orderID = oi.orderID
+        LEFT JOIN inventory i ON oi.inventoryID = i.inventoryID
+        LEFT JOIN product p ON i.proID = p.proID
+        WHERE o.sellerID = ?
+        GROUP BY o.orderID
+        ORDER BY o.time_ordered DESC"
+);
+$stmt->bind_param('i', $sellerID);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$stmtc = $con->prepare("SELECT COUNT(*) as total_rows FROM orders WHERE sellerID = ? AND status = 'Pending'");
+$stmtc->bind_param('i', $sellerID);
+$stmtc->execute();
+$resultc = $stmtc->get_result();
+$rowc = $resultc->fetch_assoc();
+$totalRows = $rowc['total_rows'];
+
+// if(isset($_POST['approve'])) {
+//     // Get the order ID from the submitted form
+//     $orderId = intval($_POST['appid']);
     
-    // Update the order status to Shipped (approved)
-    $updateSql = "UPDATE orders SET status = 'Shipped' WHERE orderID = $orderId";
-    $updateQuery = mysqli_query($con, $updateSql);
+//     // Update the order status to Shipped (approved)
+//     $updateStmt = $con->prepare("UPDATE orders SET status = 'Shipped' WHERE orderID = ? AND sellerID = ?");
+//     $updateStmt->bind_param('ii', $orderId, $sellerID);
+//     $updateQuery = $updateStmt->execute();
     
-    // Check if the update was successful
-    if($updateQuery) {
-        // Show alert message
-        echo "<script>alert('Order Approved');</script>";
-        // Redirect after a delay
-        echo "<script>setTimeout(function(){ window.location.href = '{$_SERVER['PHP_SELF']}'; }, 1000);</script>";
+//     // Check if the update was successful
+//     if($updateQuery) {
+//         echo "<script>alert('Order Approved');</script>";
+//         echo "<script>setTimeout(function(){ window.location.href = '{$_SERVER['PHP_SELF']}'; }, 1000);</script>";
+//         exit();
+//     } else {
+//         echo "Error updating order status: " . mysqli_error($con);
+//     }
+
+// }
+
+if(isset($_POST['complete'])) {
+    $orderId = intval($_POST['order_id']);
+
+    $updateStmt = $con->prepare("
+        UPDATE orders 
+        SET status = 'Completed', time_received = NOW()
+        WHERE orderID = ? AND sellerID = ?
+    ");
+    $updateStmt->bind_param('ii', $orderId, $sellerID);
+    $success = $updateStmt->execute();
+
+    if($success) {
+        echo "<script>alert('Order marked as Completed');</script>";
+        echo "<script>setTimeout(function(){ window.location.href = '{$_SERVER['PHP_SELF']}'; }, 800);</script>";
         exit();
     } else {
-        // Handle the error
-        echo "Error updating order status: " . mysqli_error($con);
+        echo "Error updating order: " . $con->error;
     }
 }
 ?>
@@ -156,10 +214,21 @@ if(isset($_POST['approve'])) {
         .printbtn{
             text-decoration: none;
             background-color: darkgreen;
-            padding: 5px 18px;
+            padding: 5px 12px;
             border-radius: 10px;
             color: white;
             font-size: 13px;
+            margin-left: 6px;
+            display: inline-block;
+        }
+        .details-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
         }
         .order-view td{
             font-size: 14px;
@@ -275,18 +344,35 @@ if(isset($_POST['approve'])) {
         .modal_header h2 {
             font-size: 24px;
         }
-        .detail_group {
+       .detail_group {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 15px;
-            font-size: 16px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
+
+        .detail_label,
+        .detail_value {
+            display: flex;
+            justify-content: center;   /* center horizontally */
+            align-items: center;       /* center vertically */
+            text-align: center;
+            font-size: 15px;
+        }
+
+        /* Optional: make labels stand out */
         .detail_label {
             font-weight: 600;
-            color: #555;
+            color: #444;
         }
+
+        /* Optional: improve value appearance */
         .detail_value {
-            color: #333;
+            color: #222;
         }
         .products_list {
             background: #f9f9f9;
@@ -337,15 +423,11 @@ if(isset($_POST['approve'])) {
                     <table>
                         <thead>
                             <tr>
-                                <th>Place on</th>
-                                <th>Customer Name</th>
-                                <th>Address</th>
-                                <th>Number</th>
-                                <th>Total Products</th>
+                                <th>Placed on</th>
+                                <th>Customer</th>
                                 <th>Total Price</th>
-                                <th>Payment Method</th>
-                                <th>Payment Status</th>
-                                <th>Invoice</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="orderTableBody">
@@ -368,18 +450,24 @@ if(isset($_POST['approve'])) {
                             <tr class="order-view" data-status="<?php echo strtolower($status_text); ?>" 
                                 data-name="<?php echo htmlspecialchars($row['Name']); ?>"
                                 data-address="<?php echo htmlspecialchars($row['Address']); ?>"
-                                data-id="<?php echo $row['ID']; ?>">
+                                data-id="<?php echo $row['ID']; ?>"
+                                data-method="<?php echo htmlspecialchars($row['Method']); ?>"
+                                data-total_products="<?php echo htmlspecialchars($row['Total_Products']); ?>"
+                                data-number="<?php echo htmlspecialchars($row['Number']); ?>">
                                 <td><?php echo $row['Placed_on']; ?></td>
                                 <td><?php echo $row['Name']; ?></td>
-                                <td><?php echo $row['Address']; ?></td>
-                                <td><?php echo $row['Number']; ?></td>
-                                <td><?php echo $row['Total_Products']; ?></td>
-                                <td><?php echo $row['Total_Price']; ?></td>
-                                <td><?php echo $row['Method']; ?></td>
+                                <td>₱ <?php echo number_format($row['Total_Price'], 2); ?></td>
                                 <td style="color: <?php echo $status_class; ?>"><?php echo $status_text; ?></td>
-                                <td><a class="printbtn" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_products=<?php echo urlencode($row['Total_Products']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>&method=<?php echo urlencode($row['Method']); ?>">Print</a></td>
+                                <td>
+                                    <button class="details-btn" type="button" onclick='showOrderDetails(<?php echo htmlspecialchars(json_encode($row)); ?>)'>Details</button>
+                                    <a class="printbtn" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_products=<?php echo urlencode($row['Total_Products']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>&method=<?php echo urlencode($row['Method']); ?>">Print</a>
+                                </td>
                             </tr>
                             <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" style="text-align: center; font-weight: bold; padding: 20px;">No Orders</td>
+                            </tr>
                         <?php endif; ?>
                         </tbody>
                     </table>
@@ -422,6 +510,8 @@ if(isset($_POST['approve'])) {
                         <div class="total_price">₱ <?php echo number_format($row['Total_Price'], 2); ?></div>
                     </div>
                     <?php endwhile; ?>
+                    <?php else: ?>
+                        <div style="text-align: center; padding: 50px; font-size: 18px; color: #888; grid-column: 1 / -1;">No Orders</div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -562,12 +652,36 @@ if(isset($_POST['approve'])) {
                    </div>
                    <div class="products_list">
                        <h4>Ordered Products:</h4>
-                       <div class="detail_value">${order.Total_Products.replace(/-/g, '<br>•')}</div>
+                       <div class="detail_value">${order.Total_Products}</div>
                    </div>
                </div>
-               <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
-                   <a href="generate_invoice.php?id=${order.ID}&name=${encodeURIComponent(order.Name)}&address=${encodeURIComponent(order.Address)}&number=${encodeURIComponent(order.Number)}&total_products=${encodeURIComponent(order.Total_Products)}&total_price=${encodeURIComponent(order.Total_Price)}&method=${encodeURIComponent(order.Method)}" class="printbtn">Print Invoice</a>
-               </div>
+                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                    
+                    <!-- Print Button -->
+                    <a href="generate_invoice.php?id=${order.ID}&name=${encodeURIComponent(order.Name)}&address=${encodeURIComponent(order.Address)}&number=${encodeURIComponent(order.Number)}&total_products=${encodeURIComponent(order.Total_Products)}&total_price=${encodeURIComponent(order.Total_Price)}&method=${encodeURIComponent(order.Method)}" 
+                    class="printbtn">
+                    Print Invoice
+                    </a>
+
+                    <!-- Complete Order Button -->
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="order_id" value="${order.ID}">
+                        <button type="submit" name="complete" 
+                            style="
+                                background-color: #28a745;
+                                color: white;
+                                border: none;
+                                padding: 5px 12px;
+                                border-radius: 10px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">
+                            Complete Order
+                        </button>
+                    </form>
+
+                    <button class="details-btn" onclick="closeModal()">Close</button>
+                </div>
            `;
            orderDetailModal.style.display = 'flex';
        }

@@ -1,7 +1,12 @@
 <?php
 session_start();
 include('../components/connect.php');
+if (!isset($_SESSION['user-id'])) {
+    header("Location: ../login.php");
+    exit();
+}
 
+$user_id = $_SESSION['user-id'];
 // Pagination variables
 $limit = 10; // Number of rows per page
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
@@ -9,20 +14,29 @@ $start = ($page - 1) * $limit;
 
 // Check if search parameter is provided
 $search = isset($_GET['search']) ? $_GET['search'] : '';
+try {
+    if(isset($_GET['delete_id'])) {
+        $delete_id = $_GET['delete_id'];
+        $stmt = $con->prepare("DELETE FROM inventory WHERE proID = ?");
+        $stmt->bind_param("i", $delete_id);
+        $stmt->execute();
+        $stmt->close();
+        $stmt = $con->prepare("DELETE FROM product WHERE proID = ?");
+        $stmt->bind_param("i", $delete_id);
+        $stmt->execute();
+        header("Location: products.php");
+        $stmt->close();
+        exit();
+    }
+} catch (Exception $e) {
 
-if(isset($_GET['delete_id'])) {
-    $delete_id = $_GET['delete_id'];
-    $stmt = $con->prepare("DELETE FROM product WHERE proID = ?");
-    $stmt->bind_param("i", $delete_id);
-    $stmt->execute();
-    header("Location: products.php");
-    $stmt->close();
-    exit();
 }
-
 // Modify the SQL query to include search functionality
 $stmt = $con->prepare("SELECT 
                         p.*, 
+                        g.*,
+                        i.*,
+                        gu.*,
                         MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s,
                         MAX(CASE WHEN s.sizes = 'M' THEN i.stock ELSE 0 END) AS product_stock_m,
                         MAX(CASE WHEN s.sizes = 'L' THEN i.stock ELSE 0 END) AS product_stock_l,
@@ -31,11 +45,13 @@ $stmt = $con->prepare("SELECT
                     FROM product p
                     LEFT JOIN inventory i ON p.proID = i.proID
                     LEFT JOIN sizes s ON i.sizeID = s.sizeID
-                    WHERE p.name LIKE ? 
-                    GROUP BY p.proID
+                    LEFT JOIN gender g ON g.genderID = p.genderID
+                    LEFT JOIN grace_user gu ON gu.userID = p.sellerID
+                    WHERE p.name LIKE ? AND p.sellerID = ?
+                    GROUP BY p.proID, g.genderID, gu.userID
                     LIMIT ?, ?");
 $search_param = '%' . $search . '%';
-$stmt->bind_param("sii", $search_param, $start, $limit);
+$stmt->bind_param("siii", $search_param, $user_id, $start, $limit);
 $stmt->execute();
 $result = $stmt->get_result();
 $stmt->close();
@@ -72,9 +88,9 @@ $stmt->close();
         }
         .no-products {
             text-align: center;
-            margin-top: 20px;
             font-weight: bold;
             color: red;
+            padding-bottom: 20px;
         }
         .search_products{
             display: flex;
@@ -147,8 +163,8 @@ $stmt->close();
                 <div class="filter_box">
                     <select id="productGenderFilter">
                         <option value="all">All Genders</option>
-                        <option value="mens">Mens</option>
-                        <option value="womens">Womens</option>
+                        <option value="mens">Male</option>
+                        <option value="womens">Female</option>
                     </select>
                 </div>
            </div>
@@ -172,7 +188,11 @@ $stmt->close();
                         <?php
                             while($row = mysqli_fetch_assoc($result)){  
                             ?>
-                            <tr data-name="<?php echo htmlspecialchars($row['name']); ?>" data-desc="<?php echo htmlspecialchars($row['description']); ?>" data-status="<?php echo strtolower($row['status']); ?>" data-gender="<?php echo strtolower($row['gender']); ?>" data-id="<?php echo $row['proID']; ?>">
+                            <tr data-name="<?php echo htmlspecialchars($row['name']); ?>" 
+                            data-desc="<?php echo htmlspecialchars($row['description']); ?>" 
+                            data-status="<?php echo strtolower($row['status']); ?>"
+                            data-gender="<?php echo strtolower($row['gender']); ?>"
+                            data-id="<?php echo $row['proID']; ?>">
                                 <td><img width="30" src="../uploads/images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>"></td>
                                 <td><?php echo $row['name']; ?></td>
                                 <td>
@@ -270,14 +290,14 @@ $stmt->close();
                         </div>
                         <div class="productname">
                             <label for="price">Product Price</label>
-                            <input type="number" id="price" name="price" min="100" max='9999' required>
+                            <input type="number" id="price" name="price" min="0" max='999999' step="0.01" required>
                         </div>
                         <div class="productname">
                             <label for="product_gender">Gender</label>
                             <select id="product_gender" name="product_gender">
                                 <option value="" selected disabled>Gender</option>
-                                <option value="Mens">Mens</option>
-                                <option value="Womens">Womens</option>
+                                <option value="1">Male</option>
+                                <option value="2">Female</option>
                             </select>
                         </div>
                         <div class="productname">
@@ -285,7 +305,7 @@ $stmt->close();
                             <input type="text" id="Description" name="Description" maxlength="100"  >
                         </div>
                         <div class="productname">
-                            <input type="text" value="Available" name="status" hidden>
+                            <input type="text" value="In Stock" name="status" hidden>
                         </div>
                     </div>
                     <div class="products_addbtn">
