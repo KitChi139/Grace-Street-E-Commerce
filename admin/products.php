@@ -12,12 +12,24 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
 
 if(isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
-    $delete_sql = "DELETE FROM product_list WHERE id = $delete_id";
+    $delete_sql = "DELETE FROM product WHERE id = $delete_id";
     mysqli_query($con, $delete_sql);
 }
 
 // Modify the SQL query to include search functionality
-$sql = "SELECT * FROM product_list WHERE product_name LIKE '%$search%' LIMIT $start, $limit";
+$sql = "SELECT 
+            p.*, 
+            MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s,
+            MAX(CASE WHEN s.sizes = 'M' THEN i.stock ELSE 0 END) AS product_stock_m,
+            MAX(CASE WHEN s.sizes = 'L' THEN i.stock ELSE 0 END) AS product_stock_l,
+            MAX(CASE WHEN s.sizes = 'XL' THEN i.stock ELSE 0 END) AS product_stock_xl,
+            MAX(CASE WHEN s.sizes = 'XXL' THEN i.stock ELSE 0 END) AS product_stock_xxl
+        FROM product p
+        LEFT JOIN inventory i ON p.proID = i.proID
+        LEFT JOIN sizes s ON i.sizeID = s.sizeID
+        WHERE p.name LIKE '%$search%' 
+        GROUP BY p.proID
+        LIMIT $start, $limit";
 $result = mysqli_query($con, $sql);
 ?>
 
@@ -86,21 +98,21 @@ $result = mysqli_query($con, $sql);
                             while($row = mysqli_fetch_assoc($result)){  
                             ?>
                             <tr>
-                                <td><img width="30" src="../uploads/images/<?php echo $row['product_image']; ?>" alt="<?php echo $row['product_name']; ?>"></td>
-                                <td><?php echo $row['product_name']; ?></td>
+                                <td><img width="30" src="../uploads/images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>"></td>
+                                <td><?php echo $row['name']; ?></td>
                                 <td><?php echo $row['product_stock_s']; ?></td>
                                 <td><?php echo $row['product_stock_m']; ?></td>
                                 <td><?php echo $row['product_stock_l']; ?></td>
                                 <td><?php echo $row['product_stock_xl']; ?></td>
                                 <td><?php echo $row['product_stock_xxl']; ?></td>
-                                <td><?php echo $row['product_price']; ?></td>
+                                <td><?php echo $row['price']; ?></td>
                                 <td><?php echo $row['product_discount']; ?>%</td>
-                                <td><?php echo $row['product_status']; ?></td>
+                                <td><?php echo $row['status']; ?></td>
                                 <td  style="5px"><?php echo $row['description']; ?></td>
                                 <td><?php echo $row['gender']; ?></td>
                                 <td class='action-buttons'>
-                                    <button onclick='updateItem(<?php echo $row['id']; ?>)'>Update</button>
-                                    <a href="?delete_id=<?php echo $row['id']; ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                                    <button onclick='updateItem(<?php echo $row['proID']; ?>)'>Update</button>
+                                    <a href="?delete_id=<?php echo $row['proID']; ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
                                 </td>
                             </tr>
                             <?php
@@ -116,7 +128,7 @@ $result = mysqli_query($con, $sql);
             <!-- Pagination links -->
             <?php
                 // Count total pages for pagination
-                $sql_count = "SELECT COUNT(*) AS total FROM product_list WHERE product_name LIKE '%$search%'";
+                $sql_count = "SELECT COUNT(*) AS total FROM product WHERE name LIKE '%$search%'";
                 $result_count = mysqli_query($con, $sql_count);
                 $row_count = mysqli_fetch_assoc($result_count);
                 $total_pages = ceil($row_count['total'] / $limit);
@@ -147,8 +159,8 @@ $result = mysqli_query($con, $sql);
                 <div class="products_add_info_pad">
                     <div class="products_add_info">
                         <div class="productname">
-                            <label for="product_name">Product Name</label>
-                            <input type="text" placeholder="20 Characters Only" id="product_name" name="product_name" required maxlength="20"> 
+                            <label for="name">Product Name</label>
+                            <input type="text" placeholder="20 Characters Only" id="name" name="name" required maxlength="20"> 
                         </div>
                         <div class="productname">
                             <label for="total_discount">Discount</label>
@@ -186,12 +198,12 @@ $result = mysqli_query($con, $sql);
                             </div>
                        </div>
                         <div class="productname">
-                            <label for="product_image">Product Image</label>
-                            <input type="file" id="product_image" name="product_image" required>
+                            <label for="image">Product Image</label>
+                            <input type="file" id="image" name="image" required>
                         </div>
                         <div class="productname">
-                            <label for="product_price">Product Price</label>
-                            <input type="number" id="product_price" name="product_price" min="100" max='9999' required>
+                            <label for="price">Product Price</label>
+                            <input type="number" id="price" name="price" min="100" max='9999' required>
                         </div>
                         <div class="productname">
                             <label for="product_gender">Gender</label>
@@ -206,7 +218,7 @@ $result = mysqli_query($con, $sql);
                             <input type="text" id="Description" name="Description" maxlength="100"  >
                         </div>
                         <div class="productname">
-                            <input type="text" value="Available" name="product_status" hidden>
+                            <input type="text" value="Available" name="status" hidden>
                         </div>
                     </div>
                     <div class="products_addbtn">

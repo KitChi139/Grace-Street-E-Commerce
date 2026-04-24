@@ -1,7 +1,7 @@
 <?php
 
 include('../components/connect.php');
-$sql = "SELECT COUNT(*) AS total_products FROM product_list"; // Query to get the total count of records
+$sql = "SELECT COUNT(*) AS total_products FROM product"; // Query to get the total count of records
 $result = mysqli_query($con, $sql);
 
 $row = mysqli_fetch_assoc($result);
@@ -13,17 +13,17 @@ $userResult = mysqli_query($con, $userSql);
 $userRow = mysqli_fetch_assoc($userResult);
 $totalUsers = $userRow['total_users'];
 
-$totalSql = "SELECT SUM(Total_Price) AS total_price FROM orders WHERE Order_Status = 0 AND Order_Status != 'Received'";
+$totalSql = "SELECT SUM(price) AS total_price FROM orders WHERE status = 'Pending'";
 $totalResult = mysqli_query($con, $totalSql);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalprice = $totalRow['total_price'];
 
-$approveSql = "SELECT SUM(Total_Price) AS total_approve FROM orders WHERE Order_Status IN (1, 'Received')";
+$approveSql = "SELECT SUM(price) AS total_approve FROM orders WHERE status IN ('Shipped', 'Completed', 'Paid')";
 $approveResult = mysqli_query($con, $approveSql);
 $approveRow = mysqli_fetch_assoc($approveResult);
 $approveUsers = $approveRow['total_approve'];
 
-$placedSql = "SELECT COUNT(*) AS total_placed FROM orders WHERE Order_Status = 0 AND Order_Status != 'Received'";
+$placedSql = "SELECT COUNT(*) AS total_placed FROM orders WHERE status = 'Pending'";
 $placedResult = mysqli_query($con, $placedSql);
 $placedRow = mysqli_fetch_assoc($placedResult);
 $placedUsers = $placedRow['total_placed'];
@@ -126,7 +126,19 @@ $placedUsers = $placedRow['total_placed'];
                 <div class="main_dash_box" style="margin-top:20px;">
                     <h3 style="margin-bottom:12px;">Latest Updated Stock</h3>
                     <?php
-                        $latestSql = "SELECT product_name, product_stock_s, product_stock_m, product_stock_l, product_stock_xl, product_stock_xxl, Date FROM product_list ORDER BY Date DESC LIMIT 5";
+                        $latestSql = "SELECT 
+                                        p.name, 
+                                        MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS stock_s,
+                                        MAX(CASE WHEN s.sizes = 'M' THEN i.stock ELSE 0 END) AS stock_m,
+                                        MAX(CASE WHEN s.sizes = 'L' THEN i.stock ELSE 0 END) AS stock_l,
+                                        MAX(CASE WHEN s.sizes = 'XL' THEN i.stock ELSE 0 END) AS stock_xl,
+                                        MAX(CASE WHEN s.sizes = 'XXL' THEN i.stock ELSE 0 END) AS stock_xxl
+                                    FROM product p
+                                    LEFT JOIN inventory i ON p.proID = i.proID
+                                    LEFT JOIN sizes s ON i.sizeID = s.sizeID
+                                    GROUP BY p.proID, p.name
+                                    ORDER BY p.proID DESC 
+                                    LIMIT 5";
                         $latestRes = mysqli_query($con, $latestSql);
                         if($latestRes && mysqli_num_rows($latestRes) > 0):
                     ?>
@@ -135,21 +147,19 @@ $placedUsers = $placedRow['total_placed'];
                                 <tr>
                                     <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Product</th>
                                     <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Stock (S/M/L/XL/XXL)</th>
-                                    <th style="text-align:left; padding:8px; border-bottom:1px solid #eee;">Updated</th>
                                 </tr>
                             </thead>
                             <tbody>
                             <?php while($p = mysqli_fetch_assoc($latestRes)): 
-                                $s = isset($p['product_stock_s']) ? $p['product_stock_s'] : 0;
-                                $m = isset($p['product_stock_m']) ? $p['product_stock_m'] : 0;
-                                $l = isset($p['product_stock_l']) ? $p['product_stock_l'] : 0;
-                                $xl = isset($p['product_stock_xl']) ? $p['product_stock_xl'] : 0;
-                                $xxl = isset($p['product_stock_xxl']) ? $p['product_stock_xxl'] : 0;
+                                $s = isset($p['stock_s']) ? $p['stock_s'] : 0;
+                                $m = isset($p['stock_m']) ? $p['stock_m'] : 0;
+                                $l = isset($p['stock_l']) ? $p['stock_l'] : 0;
+                                $xl = isset($p['stock_xl']) ? $p['stock_xl'] : 0;
+                                $xxl = isset($p['stock_xxl']) ? $p['stock_xxl'] : 0;
                             ?>
                                 <tr>
-                                    <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo htmlspecialchars($p['product_name']); ?></td>
+                                    <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo htmlspecialchars($p['name']); ?></td>
                                     <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo 'S:'.$s.' / M:'.$m.' / L:'.$l.' / XL:'.$xl.' / XXL:'.$xxl; ?></td>
-                                    <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo date('Y-m-d', strtotime($p['Date'])); ?></td>
                                 </tr>
                             <?php endwhile; ?>
                             </tbody>
@@ -164,7 +174,11 @@ $placedUsers = $placedRow['total_placed'];
                     <div class="main_dash_box">
                         <h3 style="margin-bottom:12px;">Recent Orders</h3>
                         <?php
-                            $ordersSql = "SELECT ID, Placed_on, Name, Total_Price, Order_Status FROM orders ORDER BY Placed_on DESC LIMIT 5";
+                            $ordersSql = "SELECT o.orderID AS ID, o.time_ordered AS Placed_on, u.username AS Name, o.price AS Total_Price, o.status AS Order_Status 
+                                          FROM orders o 
+                                          JOIN grace_user u ON o.userID = u.userID 
+                                          ORDER BY o.time_ordered DESC 
+                                          LIMIT 5";
                             $ordersRes = mysqli_query($con, $ordersSql);
                             if($ordersRes && mysqli_num_rows($ordersRes) > 0):
                         ?>
@@ -186,11 +200,11 @@ $placedUsers = $placedRow['total_placed'];
                                         <td style="padding:8px; border-bottom:1px solid #f6f6f6;"><?php echo htmlspecialchars($o['Name']); ?></td>
                                         <td style="padding:8px; border-bottom:1px solid #f6f6f6;">₱ <?php echo number_format($o['Total_Price'], 2); ?></td>
                                         <td style="padding:8px; border-bottom:1px solid #f6f6f6; color:"><?php
-                                            if ($o['Order_Status'] == 0) {
+                                            if ($o['Order_Status'] == 'Pending') {
                                                 echo 'Pending';
-                                            } elseif ($o['Order_Status'] == 1) {
+                                            } elseif ($o['Order_Status'] == 'Shipped' || $o['Order_Status'] == 'Paid') {
                                                 echo 'Approved';
-                                            } elseif ($o['Order_Status'] === 'Received' || $o['Order_Status'] == 'Received') {
+                                            } elseif ($o['Order_Status'] == 'Completed') {
                                                 echo 'Received';
                                             } else {
                                                 echo htmlspecialchars($o['Order_Status']);

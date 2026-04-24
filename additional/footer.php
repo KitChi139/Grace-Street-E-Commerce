@@ -41,9 +41,9 @@
                         <p>Thanks for submitting!</p>
                     </div>
                     <div class="footer-icons">
-                        <a href=""><img src="./img/facebook.svg" style="filter: invert(100);" alt="facebook"></a>
-                        <a href=""><img src="./img/instagram.svg" style="filter: invert(100);" alt="instagram"></a>
-                        <a href=""><img src="./img/youtube.svg" style="filter: invert(100);" alt="youtube"></a>
+                        <a href=""><i class="fa-brands fa-facebook" style="color: white; font-size: 24px;"></i></a>
+                        <a href=""><i class="fa-brands fa-instagram" style="color: white; font-size: 24px;"></i></a>
+                        <a href=""><i class="fa-brands fa-youtube" style="color: white; font-size: 24px;"></i></a>
                     </div>
                     
                 </div>

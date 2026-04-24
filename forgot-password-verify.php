@@ -17,8 +17,10 @@ if (isset($_POST['verify_otp'])) {
     if (empty($entered_otp)) {
         echo "<script>alert('OTP is required.');</script>";
     } else {
-       $query = mysqli_query($con, "SELECT * FROM grace_user WHERE email = '$email' AND otp = '" . mysqli_real_escape_string($con, $entered_otp) . "' AND otp_expiry > NOW()") or die('query failed: ' . mysqli_error($con));
-        if (mysqli_num_rows($query) > 0) {mysqli_query($con, "UPDATE grace_user SET otp = NULL, otp_expiry = NULL  WHERE email = '$email'");
+       $query = mysqli_query($con, "SELECT u.*, e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE e.email = '$email' AND u.otp = '" . mysqli_real_escape_string($con, $entered_otp) . "' AND u.otp_expiry > NOW()") or die('query failed: ' . mysqli_error($con));
+        if (mysqli_num_rows($query) > 0) {
+              $row = mysqli_fetch_assoc($query);
+              mysqli_query($con, "UPDATE grace_user SET otp = NULL, otp_expiry = NULL WHERE userID = " . $row['userID']);
             header("Location: forgot-password-reset.php?email=" . urlencode($email));
             exit();
         } else {

@@ -33,10 +33,11 @@ if(isset($_POST['reset_password'])){
         echo "<script>alert('Password must contain at least one special character.');</script>";
     }
 
-    $select = mysqli_query($con, "SELECT * FROM grace_user WHERE email = '$email'") or die('query failed');
+    $select = mysqli_query($con, "SELECT u.*, e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE e.email = '$email'") or die('query failed');
     if(mysqli_num_rows($select) > 0){
         $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
-        $update = mysqli_query($con, "UPDATE grace_user SET password ='$hashed_password' WHERE email = '$email'") or die('query failed');
+        $row = mysqli_fetch_assoc($select);
+          $update = mysqli_query($con, "UPDATE grace_user SET password = '$hashed_password' WHERE userID = " . $row['userID']) or die('query failed');
         if ($update) {
             echo "<script>alert('Password has been reset successfully. You can now log in with your new password.');</script>";
             unset($_SESSION['reset_email']);

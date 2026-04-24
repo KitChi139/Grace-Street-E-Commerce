@@ -3,7 +3,7 @@ include('../components/connect.php');
 
 if(isset($_POST['contact_id'])) {
     $contactId = $_POST['contact_id'];
-    $deleteSql = "DELETE FROM contact WHERE id = $contactId";
+    $deleteSql = "DELETE FROM contact WHERE contactID = $contactId";
     if(mysqli_query($con, $deleteSql)) {
         echo "Contact entry deleted successfully.";
     } else {

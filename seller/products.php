@@ -12,7 +12,7 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
 
 if(isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
-    $stmt = $con->prepare("DELETE FROM product_list WHERE id = ?");
+    $stmt = $con->prepare("DELETE FROM product WHERE proID = ?");
     $stmt->bind_param("i", $delete_id);
     $stmt->execute();
     header("Location: products.php");
@@ -21,7 +21,19 @@ if(isset($_GET['delete_id'])) {
 }
 
 // Modify the SQL query to include search functionality
-$stmt = $con->prepare("SELECT * FROM product_list WHERE product_name LIKE ? LIMIT ?, ?");
+$stmt = $con->prepare("SELECT 
+                        p.*, 
+                        MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s,
+                        MAX(CASE WHEN s.sizes = 'M' THEN i.stock ELSE 0 END) AS product_stock_m,
+                        MAX(CASE WHEN s.sizes = 'L' THEN i.stock ELSE 0 END) AS product_stock_l,
+                        MAX(CASE WHEN s.sizes = 'XL' THEN i.stock ELSE 0 END) AS product_stock_xl,
+                        MAX(CASE WHEN s.sizes = 'XXL' THEN i.stock ELSE 0 END) AS product_stock_xxl
+                    FROM product p
+                    LEFT JOIN inventory i ON p.proID = i.proID
+                    LEFT JOIN sizes s ON i.sizeID = s.sizeID
+                    WHERE p.name LIKE ? 
+                    GROUP BY p.proID
+                    LIMIT ?, ?");
 $search_param = '%' . $search . '%';
 $stmt->bind_param("sii", $search_param, $start, $limit);
 $stmt->execute();
@@ -160,9 +172,9 @@ $stmt->close();
                         <?php
                             while($row = mysqli_fetch_assoc($result)){  
                             ?>
-                            <tr data-name="<?php echo htmlspecialchars($row['product_name']); ?>" data-desc="<?php echo htmlspecialchars($row['description']); ?>" data-status="<?php echo strtolower($row['product_status']); ?>" data-gender="<?php echo strtolower($row['gender']); ?>" data-id="<?php echo $row['id']; ?>">
-                                <td><img width="30" src="../uploads/images/<?php echo $row['product_image']; ?>" alt="<?php echo $row['product_name']; ?>"></td>
-                                <td><?php echo $row['product_name']; ?></td>
+                            <tr data-name="<?php echo htmlspecialchars($row['name']); ?>" data-desc="<?php echo htmlspecialchars($row['description']); ?>" data-status="<?php echo strtolower($row['status']); ?>" data-gender="<?php echo strtolower($row['gender']); ?>" data-id="<?php echo $row['proID']; ?>">
+                                <td><img width="30" src="../uploads/images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>"></td>
+                                <td><?php echo $row['name']; ?></td>
                                 <td>
                                     <?php
                                         $s = isset($row['product_stock_s']) ? $row['product_stock_s'] : 0;
@@ -173,13 +185,13 @@ $stmt->close();
                                         echo 'S: ' . $s . ' / M: ' . $m . ' / L: ' . $l . ' / XL: ' . $xl . ' / XXL: ' . $xxl;
                                     ?>
                                 </td>
-                                <td><?php echo $row['product_price']; ?></td>
-                                <td><?php echo $row['product_status']; ?></td>
+                                <td><?php echo $row['price']; ?></td>
+                                <td><?php echo $row['status']; ?></td>
                                 <td  style="5px"><?php echo $row['description']; ?></td>
                                 <td><?php echo $row['gender']; ?></td>
                                 <td class='action-buttons'>
-                                    <button onclick='updateItem(<?php echo $row['id']; ?>)'>Update</button>
-                                    <a href="?delete_id=<?php echo $row['id']; ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                                    <button onclick='updateItem(<?php echo $row['proID']; ?>)'>Update</button>
+                                    <a href="?delete_id=<?php echo $row['proID']; ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
                                 </td>
                             </tr>
                             <?php
@@ -195,7 +207,7 @@ $stmt->close();
             <!-- Pagination links -->
             <?php
                 // Count total pages for pagination'
-                $stmt = $con->prepare("SELECT COUNT(*) AS total FROM product_list WHERE product_name LIKE ?");
+                $stmt = $con->prepare("SELECT COUNT(DISTINCT p.proID) AS total FROM product p LEFT JOIN inventory i ON p.proID = i.proID LEFT JOIN sizes s ON i.sizeID = s.sizeID WHERE p.name LIKE ?");
                 $stmt->bind_param("s", $search_param);
                 $stmt->execute();
                 $result_count = $stmt->get_result();
@@ -229,8 +241,8 @@ $stmt->close();
                 <div class="products_add_info_pad">
                     <div class="products_add_info">
                         <div class="productname">
-                            <label for="product_name">Product Name</label>
-                            <input type="text" placeholder="20 Characters Only" id="product_name" name="product_name" required maxlength="20"> 
+                            <label for="name">Product Name</label>
+                            <input type="text" placeholder="20 Characters Only" id="name" name="name" required maxlength="20"> 
                         </div>
                         <div class="productname-short">
                             <label for="small_stock">Small Stocks</label>
@@ -253,12 +265,12 @@ $stmt->close();
                             <input type="number" id="xxlarge_stock" name="xxlarge_stock" required>
                         </div>
                         <div class="productname">
-                            <label for="product_image">Product Image</label>
-                            <input type="file" id="product_image" name="product_image" required>
+                            <label for="image">Product Image</label>
+                            <input type="file" id="image" name="image" required>
                         </div>
                         <div class="productname">
-                            <label for="product_price">Product Price</label>
-                            <input type="number" id="product_price" name="product_price" min="100" max='9999' required>
+                            <label for="price">Product Price</label>
+                            <input type="number" id="price" name="price" min="100" max='9999' required>
                         </div>
                         <div class="productname">
                             <label for="product_gender">Gender</label>
@@ -273,7 +285,7 @@ $stmt->close();
                             <input type="text" id="Description" name="Description" maxlength="100"  >
                         </div>
                         <div class="productname">
-                            <input type="text" value="Available" name="product_status" hidden>
+                            <input type="text" value="Available" name="status" hidden>
                         </div>
                     </div>
                     <div class="products_addbtn">

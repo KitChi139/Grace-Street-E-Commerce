@@ -9,7 +9,7 @@ if(isset($_POST['submit'])){
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $pass = $_POST['pass'];
 
-    $select = mysqli_query($con, "SELECT * FROM grace_user WHERE email = '$email'") or die('query failed');
+    $select = mysqli_query($con, "SELECT grace_user.*, email.email FROM grace_user JOIN email ON grace_user.emailID = email.emailID WHERE email.email = '$email'") or die('query failed');
     if(mysqli_num_rows($select) > 0){
         $row = mysqli_fetch_assoc($select);
         
@@ -20,15 +20,21 @@ if(isset($_POST['submit'])){
         // 2. Verify password (using password_verify for new users and sha1 for old users)
         elseif (password_verify($pass, $row['password']) || sha1($pass) === $row['password']) {
             // If it was sha1, we should ideally rehash it here, but let's keep it simple
-            $_SESSION['user-id'] = $row['id'];
+            $_SESSION['user-id'] = $row['userID'];
             $_SESSION['user-email'] = $email;
             $_SESSION['code'] = false;     
             
             
-            if ($row['role'] === 'admin') {
-                header('Location: ./admin/dashboard.php');
+            // Fetch role name from roles table
+            $role_id = $row['roleID'];
+            $role_query = mysqli_query($con, "SELECT role FROM roles WHERE roleID = '$role_id'");
+            $role_row = mysqli_fetch_assoc($role_query);
+            $role_name = $role_row['role'];
+
+            if ($role_name === 'admin') {
+                header('Location: ./admin/overview.php');
                 exit(); 
-            }else if($row['role'] === 'employee'){
+            }else if($role_name === 'employee'){
                 header('Location: ./seller/dashboard.php');
                 exit(); 
             } else {

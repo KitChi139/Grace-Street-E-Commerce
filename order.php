@@ -52,12 +52,16 @@
                     <?php
                     include('./components/connect.php');
                     
-                    if (isset($_SESSION['user-email'])) {
-                        $userEmail = $_SESSION['user-email'];
+                    if (isset($_SESSION['user-id'])) {
+                        $userId = $_SESSION['user-id'];
                     
-                        $sql = "SELECT * FROM orders WHERE order_email = ?";
+                        $sql = "SELECT o.orderID AS ID, o.time_ordered AS Placed_on, u.username AS Name, u.contact AS Number, e.email AS Email, u.address AS Address, o.price AS Total_Price, o.status AS Order_Status 
+                                FROM orders o 
+                                JOIN grace_user u ON o.userID = u.userID 
+                                JOIN email e ON u.emailID = e.emailID 
+                                WHERE o.userID = ?";
                         $stmt = $con->prepare($sql);
-                        $stmt->bind_param("s", $userEmail);
+                        $stmt->bind_param("i", $userId);
                         $stmt->execute();
                         $result = $stmt->get_result();
 
@@ -70,15 +74,15 @@
                                 <p style="display: block; margin-bottom: 15px;">Number: <span><?php echo $row['Number']; ?></span></p>
                                 <p style="display: block; margin-bottom: 15px;">Email: <span><?php echo $row['Email']; ?></span></p>
                                 <p style="display: block; margin-bottom: 15px;">Address: <span><?php echo $row['Address']; ?></span></p>
-                                <p style="display: block; margin-bottom: 15px;">Orders: <span style="display: block; margin-bottom: 15px;"><?php echo $row['Total_Products']; ?></span></p>
-                                <p style="display: block; margin-bottom: 15px;">Payment Method: <span><?php echo $row['Method']; ?></span></p>
                                 <p style="display: block; margin-bottom: 15px;">Total Price: PHP <span><?php echo number_format($row['Total_Price'], 2); ?></span></p>
                                 <p style="display: block; margin-bottom: 15px;">Order Status: <span class="order-status" data-status="<?php echo $row['Order_Status']; ?>">
                                 <?php 
-                                    if ($row['Order_Status'] == 0) {
+                                    if ($row['Order_Status'] == 'Pending') {
                                         echo '<span style="color: orange;">Pending</span>';
-                                    } else if ($row['Order_Status'] == 1) {
+                                    } else if ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
                                         echo '<span style="color: green;">Approved</span>';
+                                    } else if ($row['Order_Status'] == 'Completed') {
+                                        echo '<span style="color: blue;">Received</span>';
                                     } else {
                                         echo '<span>' . $row['Order_Status'] . '</span>';
                                     }
@@ -87,14 +91,14 @@
 
                                     
                                     <?php if ($row['Order_Status'] != 'Pending'): ?>
-                                        <?php if ($row['Order_Status'] != 'Canceled'):?>
+                                        <?php if ($row['Order_Status'] != 'Cancelled'):?>
                                             <div class="invoice_button">
-                                                <?php if ($row['Order_Status'] != 'Received'): ?>
+                                                <?php if ($row['Order_Status'] != 'Completed'): ?>
                                                     <button class="received-order" data-id="<?php echo $row['ID']; ?>">Received Order</button>
-                                                    <td><a class="print-invoice" type="submit" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_products=<?php echo urlencode($row['Total_Products']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>&method=<?php echo urlencode($row['Method']); ?>">Print Invoice</a></td>
+                                                    <td><a class="print-invoice" type="submit" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>">Print Invoice</a></td>
                                                 <?php else: ?>
                                                     
-                                                    <td><a style="width: 100%;" class="print-invoice" type="submit" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_products=<?php echo urlencode($row['Total_Products']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>&method=<?php echo urlencode($row['Method']); ?>">Print Invoice</a></td>
+                                                    <td><a style="width: 100%;" class="print-invoice" type="submit" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>">Print Invoice</a></td>
 
                                                 <?php endif; ?>
                                                 

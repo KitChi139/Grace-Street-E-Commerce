@@ -1,10 +1,10 @@
 <?php
 include('../components/connect.php');
 
-$sql = "SELECT * FROM orders";
+$sql = "SELECT orders.*, grace_user.username AS Name, grace_user.address AS Address, grace_user.contact AS Number, orders.price AS Total_Price, orders.time_ordered AS Placed_on, orders.status AS Order_Status, orders.orderID AS ID FROM orders JOIN grace_user ON orders.userID = grace_user.userID";
 $result = mysqli_query($con, $sql);
 
-$sqls = "SELECT COUNT(*) as total_rows FROM orders WHERE Order_Status = 0 AND Order_Status != 'Received'";
+$sqls = "SELECT COUNT(*) as total_rows FROM orders WHERE status = 'Pending'";
 $results = mysqli_query($con, $sqls);
 $row = mysqli_fetch_assoc($results);
 $totalRows = $row['total_rows'];
@@ -13,8 +13,8 @@ if(isset($_POST['approve'])) {
     // Get the order ID from the submitted form
     $orderId = $_POST['appid'];
     
-    // Update the order status to 1 (approved)
-    $updateSql = "UPDATE orders SET Order_Status = 1 WHERE ID = $orderId";
+    // Update the order status to Shipped (approved)
+    $updateSql = "UPDATE orders SET status = 'Shipped' WHERE orderID = $orderId";
     $updateQuery = mysqli_query($con, $updateSql);
     
     // Check if the update was successful
@@ -206,24 +206,20 @@ if(isset($_POST['approve'])) {
                                 <td><?php echo $row['Total_Products']; ?></td>
                                 <td><?php echo $row['Total_Price']; ?></td>
                                 <td><?php echo $row['Method']; ?></td>
-                                <td style="color: <?php
-                                    if ($row['Order_Status'] == 0) {
-                                        echo 'orange';
-                                    } elseif ($row['Order_Status'] == 1) {
-                                        echo 'green';
-                                    } elseif ($row['Order_Status'] == 'Received') {
-                                        echo 'blue';
+                                <?php
+                                    if ($row['Order_Status'] == 'Pending') {
+                                        $status_text = 'Pending';
+                                        $status_class = 'orange';
+                                    } elseif ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
+                                        $status_text = 'Approved';
+                                        $status_class = 'green';
+                                    } elseif ($row['Order_Status'] == 'Completed') {
+                                        $status_text = 'Received';
+                                        $status_class = 'blue';
                                     }
-                                ?>">
-                                    <?php 
-                                    if ($row['Order_Status'] == 0) {
-                                        echo 'Pending';
-                                    } elseif ($row['Order_Status'] == 1) {
-                                        echo 'Approved';
-                                    } elseif ($row['Order_Status'] == 'Received') {
-                                        echo 'Received';
-                                    }
-                                    ?>
+                                ?>
+                                <td style="color: <?php echo $status_class; ?>">
+                                    <?php echo $status_text; ?>
                                 </td>
                                 <td><a class="printbtn" type="submit" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_products=<?php echo urlencode($row['Total_Products']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>&method=<?php echo urlencode($row['Method']); ?>">Print</a></td>
                             </tr>
@@ -280,10 +276,12 @@ if(isset($_POST['approve'])) {
                                                 <td><?php echo $result['Method']; ?></td>
                                                 <td>
                                                     <?php
-                                                    if ($result['Order_Status'] == 0) {
-                                                        echo "Pending";
-                                                    } else {
-                                                        echo "Approved";
+                                                    if ($result['Order_Status'] == 'Pending') {
+                                                        echo 'Pending';
+                                                    } elseif ($result['Order_Status'] == 'Shipped' || $result['Order_Status'] == 'Paid') {
+                                                        echo 'Approved';
+                                                    } elseif ($result['Order_Status'] == 'Completed') {
+                                                        echo 'Received';
                                                     }
                                                     ?>
                                                 </td>

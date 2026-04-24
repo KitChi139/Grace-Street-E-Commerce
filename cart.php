@@ -16,25 +16,29 @@
                 <div class="cart-product">
                     <?php
                     include 'components/connect.php';
-                    if(isset($_SESSION['user-email'])) {
-                        $userEmail = $_SESSION['user-email'];
-                        $query = "SELECT * FROM cart WHERE User_Email = ?";
+                    if(isset($_SESSION['user-id'])) {
+                        $userId = $_SESSION['user-id'];
+                        $query = "SELECT cart.*, product.name, product.price, product.image, cart.quantity AS Product_Quantity, cart.cartID AS ID 
+                                  FROM cart 
+                                  JOIN inventory ON cart.inventoryID = inventory.inventoryID 
+                                  JOIN product ON inventory.proID = product.proID 
+                                  WHERE cart.userID = ?";
                         $stmt = $con->prepare($query);
-                        $stmt->bind_param("s", $userEmail);
+                        $stmt->bind_param("i", $userId);
                         $stmt->execute();
                         $result = $stmt->get_result();
                         $totalPrice = 0;
 
                         if ($result->num_rows > 0) {
                             while ($product = $result->fetch_assoc()) {
-                                $originalprice = $product['Product_Price'];
+                                $originalprice = $product['price'];
                                 $subtotal = $originalprice * $product['Product_Quantity'];
                                 $totalPrice += $subtotal;
                                 ?>  
                                 <div class="cart-item" data-product-id="<?php echo $product['ID']; ?>">
                                     <div class="cart-img">
                                         <?php
-                                        $imagePath = 'uploads/images/' . $product['Product_Image'];
+                                        $imagePath = 'uploads/images/' . $product['image'];
                                         if (file_exists($imagePath)) {
                                             ?>
                                             <img src="<?php echo $imagePath; ?>" alt="Product Image">
@@ -42,12 +46,12 @@
                                             <p>Image not found</p>
                                         <?php } ?>
                                     </div>
-                                    <h2 style="font-size: 15px; margin-top:5px;"><?php echo htmlspecialchars($product['Product_Name']); ?></h2>
-                                    <p class="item-price" style="font-size: 14px;">PHP <?php echo htmlspecialchars($product['Product_Price']); ?></p>
+                                    <h2 style="font-size: 15px; margin-top:5px;"><?php echo htmlspecialchars($product['name']); ?></h2>
+                                    <p class="item-price" style="font-size: 14px;">PHP <?php echo htmlspecialchars($product['price']); ?></p>
                                     <div class="input-group" style="width: 100%; padding: 3px; display: flex; align-items: center;">
                                         <p style="font-size: 12px; margin-right:5px; color: #adadad;">Qty: </p>
                                         <input type="number" style="width: 5vh;" min="1" max="1000" step="1" value="<?php echo htmlspecialchars($product['Product_Quantity']); ?>" class="quantity-input" name="quantity">
-                                        <button onclick="editQuantity(<?php echo $product['ID']; ?>)" style="height: 25px; padding:2.50px; border-radius: 2px; width: fit-content; background-color: black; margin-left: 2px; cursor: pointer; border: 1px solid black;"><img style="filter: invert(100); width: 17px; height: auto;"src="img/edit.svg" alt="Edit"></button>
+                                        <button onclick="editQuantity(<?php echo $product['ID']; ?>)" style="height: 25px; padding:2.50px; border-radius: 2px; width: fit-content; background-color: black; margin-left: 2px; cursor: pointer; border: 1px solid black;"><i class="fa-solid fa-pen-to-square" style="color: white; font-size: 14px;"></i></button>
                                     </div>
                                     <p style="font-size: 14px;">Subtotal: <?php echo htmlspecialchars($subtotal); ?></p>
                                     <button class="remove-btn" style="cursor: pointer;" onclick="removeFromCart(<?php echo $product['ID']; ?>)">Remove from cart</button>
@@ -69,7 +73,7 @@
                     }
                     ?>
                 </div>
-                <?php if(isset($_SESSION['user-email'])): ?>
+                <?php if(isset($_SESSION['user-id'])): ?>
                 <div class="total-price" style="text-align: center;">
                     <p style="margin: 0; margin-top: 20px; color:#8c8b8b; font-size: 13px;">Total Price:</p>
                     <p id="totalPriceDisplay" style="margin: 0; font-size: 25px;">PHP <?php echo number_format($totalPrice, 2); ?></p>

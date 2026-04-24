@@ -2,17 +2,17 @@
 include('./components/connect.php');
 
 $sort_order = "DESC";
-$sort_by = "id"; 
+$sort_by = "proID"; 
 $category_label = "Category";
 
 if(isset($_GET['sort'])) {
     if($_GET['sort'] == 'lowest') {
         $sort_order = "ASC";
-        $sort_by = "product_price";
+        $sort_by = "price";
         $category_label = "Lowest to Highest Price";
     } elseif($_GET['sort'] == 'highest') {
         $sort_order = "DESC";
-        $sort_by = "product_price";
+        $sort_by = "price";
         $category_label = "Highest to Lowest Price";
     }
 }
@@ -24,14 +24,34 @@ if(isset($_GET['category']) && $_GET['category'] == 'All') {
 
 if(isset($_GET['category']) && $_GET['category'] == 'New Items') {
     $category_label = "New Items";
-    $select_product = mysqli_query($con, "SELECT * FROM product_list WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY) ORDER BY $sort_by $sort_order") or die('query failed');
+    $select_product = mysqli_query($con, "SELECT p.*, 
+                                            MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s
+                                          FROM product p
+                                          LEFT JOIN inventory i ON p.proID = i.proID
+                                          LEFT JOIN sizes s ON i.sizeID = s.sizeID
+                                          GROUP BY p.proID
+                                          ORDER BY p.proID DESC LIMIT 10") or die('query failed');
 } else {
     if(isset($_GET['category']) && ($_GET['category'] == "Men's Clothing" || $_GET['category'] == "Women's Clothing")) {
-        $gender = $_GET['category'] == "Men's Clothing" ? "Mens" : "Womens";
-        $select_product = mysqli_query($con, "SELECT * FROM product_list WHERE gender='$gender' ORDER BY $sort_by $sort_order") or die('query failed');
+        $gender = $_GET['category'] == "Men's Clothing" ? "Male" : "Female";
+        $select_product = mysqli_query($con, "SELECT p.*, 
+                                                MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s
+                                              FROM product p
+                                              JOIN gender g ON p.genderID = g.genderID
+                                              LEFT JOIN inventory i ON p.proID = i.proID
+                                              LEFT JOIN sizes s ON i.sizeID = s.sizeID
+                                              WHERE g.gender = '$gender' 
+                                              GROUP BY p.proID
+                                              ORDER BY $sort_by $sort_order") or die('query failed');
         $category_label = $_GET['category'];
     } else {
-        $select_product = mysqli_query($con, "SELECT * FROM product_list ORDER BY $sort_by $sort_order") or die('query failed');
+        $select_product = mysqli_query($con, "SELECT p.*, 
+                                                MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s
+                                              FROM product p
+                                              LEFT JOIN inventory i ON p.proID = i.proID
+                                              LEFT JOIN sizes s ON i.sizeID = s.sizeID
+                                              GROUP BY p.proID
+                                              ORDER BY $sort_by $sort_order") or die('query failed');
     }
 }
 
@@ -39,10 +59,10 @@ if(isset($_POST['search'])) {
     $search_term = $_POST['search'];
     if(empty($search_term)) {
         $category_label = "Category";
-        $select_product = mysqli_query($con, "SELECT * FROM product_list ORDER BY id DESC") or die('query failed');
+        $select_product = mysqli_query($con, "SELECT p.*, MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s FROM product p LEFT JOIN inventory i ON p.proID = i.proID LEFT JOIN sizes s ON i.sizeID = s.sizeID GROUP BY p.proID ORDER BY p.proID DESC") or die('query failed');
     } else {
         $category_label = "Category";
-        $search_query = mysqli_query($con, "SELECT * FROM product_list WHERE product_name LIKE '%$search_term%'") or die('search query failed');
+        $search_query = mysqli_query($con, "SELECT p.*, MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s FROM product p LEFT JOIN inventory i ON p.proID = i.proID LEFT JOIN sizes s ON i.sizeID = s.sizeID WHERE p.name LIKE '%$search_term%' GROUP BY p.proID") or die('search query failed');
         $select_product = $search_query;
     }
 }
@@ -105,29 +125,29 @@ if(isset($_POST['search'])) {
                 <?php
                     if(mysqli_num_rows($select_product) > 0) {
                         while($fetch_product = mysqli_fetch_assoc($select_product)) {
-                            $original_price = $fetch_product['product_price'];
+                            $original_price = $fetch_product['price'];
                             $discount = $fetch_product['product_discount'];
                             $discounted_price = $original_price - ($original_price * ($discount / 100));
                     ?>
-                    <form id="productForm<?= $fetch_product['id']; ?>">
+                    <form id="productForm<?= $fetch_product['proID']; ?>">
                             <div class="items-product">
                                 <div class="product_table">
                                     <div class="items-content">
                                         <div class="quick_view">
-                                            <a href="quick_view.php?pid=<?= $fetch_product['id']; ?>" class="fas fa-eye"></a>
+                                            <a href="quick_view.php?pid=<?= $fetch_product['proID']; ?>" class="fas fa-eye"></a>
                                             <a href="#" class="fa-solid fa-heart wishlist-btn" 
-                                                data-pid="<?= $fetch_product['id']; ?>" 
-                                                data-product-image="<?= htmlspecialchars($fetch_product['product_image']); ?>" 
-                                                data-product-name="<?= htmlspecialchars($fetch_product['product_name']); ?>" 
-                                                data-product-price="<?= $fetch_product['product_price']; ?>" 
+                                                data-pid="<?= $fetch_product['proID']; ?>" 
+                                                data-product-image="<?= htmlspecialchars($fetch_product['image']); ?>" 
+                                                data-product-name="<?= htmlspecialchars($fetch_product['name']); ?>" 
+                                                data-product-price="<?= $fetch_product['price']; ?>" 
                                                 data-discounted-price="<?= $discounted_price; ?>" 
                                                 onclick="addToWishlist(event)"></a>
                                         </div>
-                                        <input type="hidden" name="pid" value="<?= $fetch_product['id']; ?>">
-                                        <div class="product_images">
-                                            <img src="uploads/images/<?php echo $fetch_product['product_image'];?>" alt="">
+                                        <input type="hidden" name="pid" value="<?= $fetch_product['proID']; ?>">
+                                        <div class="images">
+                                            <img src="uploads/images/<?php echo $fetch_product['image'];?>" alt="">
                                         </div>
-                                        <h1 style="margin: 0; margin-top: 10px; font-size: 15px;" class="product_name"><?php echo $fetch_product['product_name'];?></h1>
+                                        <h1 style="margin: 0; margin-top: 10px; font-size: 15px;" class="name"><?php echo $fetch_product['name'];?></h1>
                                         <div class="discount_price">
                                             <p style="margin: 0; font-size: 13px;">
                                                 <?php
@@ -143,7 +163,7 @@ if(isset($_POST['search'])) {
                                             <?php endif; ?>
                                         </div>
                                         <div class="itembottom-content">
-                                            <button type="button" class="add-btn" <?php echo ($fetch_product['product_stock_s'] > 0) ? '' : 'disabled'; ?> onclick="addToCart(<?php echo $fetch_product['id']; ?>, '<?php echo addslashes($fetch_product['product_image']); ?>', '<?php echo addslashes($fetch_product['product_name']); ?>', '<?php echo $fetch_product['product_price'];  ?>' , '<?php echo $discounted_price  ?>')">Add to cart</button>
+                                            <button type="button" class="add-btn" <?php echo ($fetch_product['product_stock_s'] > 0) ? '' : 'disabled'; ?> onclick="addToCart(<?php echo $fetch_product['proID']; ?>, '<?php echo addslashes($fetch_product['image']); ?>', '<?php echo addslashes($fetch_product['name']); ?>', '<?php echo $fetch_product['price'];  ?>' , '<?php echo $discounted_price  ?>')">Add to cart</button>
                                             <span style="margin: 0; color:#8c8989; font-size: 12px;">PHP
                                                 <?php if ($fetch_product['product_discount'] > 0): ?>
                                                     <p class="product-price" style="color: green; font-size: 16px; margin: 0; text-decoration: line-through;">

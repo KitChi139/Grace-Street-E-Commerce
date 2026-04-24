@@ -14,10 +14,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $paymentMethod = $_POST['PaymentMethod'];
     $status = $_POST['status']; 
 
-    $userEmail = $_SESSION['user-email'];
-    $sql = "SELECT * FROM cart WHERE User_Email = ?";
-    $stmt = $con->prepare($sql);
-    $stmt->bind_param("s", $userEmail);
+    // Fetch cart items for the logged-in user
+    $userId = $_SESSION['user-id'];
+    $query = "SELECT cart.*, product.name, product.price 
+              FROM cart 
+              JOIN inventory ON cart.inventoryID = inventory.inventoryID 
+              JOIN product ON inventory.proID = product.proID 
+              WHERE cart.userID = ?";
+    $stmt = $con->prepare($query);
+    $stmt->bind_param("i", $userId);
     $stmt->execute();
     $result = $stmt->get_result();
     $totalSubtotal = 0;
@@ -25,19 +30,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $productName = $row['Product_Name'];
-            $productPrice = $row['Product_Price'];
-            $productQuantity = $row['Product_Quantity'];
+            $productName = $row['name'];
+            $productPrice = $row['price'];
+            $productQuantity = $row['quantity'];
+            $inventoryId = $row['inventoryID'];
             $subtotal = $productPrice * $productQuantity;
             $totalSubtotal += $subtotal;
 
             // Collecting product details
             $totalProducts [] = '<span style="display: block; margin-bottom: 10px;">- ' . $productName . ' PHP' . $productPrice . '(' . $productQuantity . ')</span>';
 
-            // Subtract product quantity from product_stock
-            $updateStockSql = "UPDATE product_list SET product_stock_s = product_stock_s - ? WHERE product_name = ?";
+            // Subtract product quantity from inventory stock
+            $updateStockSql = "UPDATE inventory SET stock = stock - ? WHERE inventoryID = ?";
             $updateStockStmt = $con->prepare($updateStockSql);
-            $updateStockStmt->bind_param("is", $productQuantity, $productName);
+            $updateStockStmt->bind_param("ii", $productQuantity, $inventoryId);
             $updateStockStmt->execute();
         }
     }
@@ -45,18 +51,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Convert array to string for database
     $productsString = implode($totalProducts);
 
-    // Insert into orders table
-    $insertSql = "INSERT INTO orders (Name, Email, Number, Address, Method, Total_Products, Total_Price, Placed_on, Order_Status, order_email) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, ?)";
+    // Insert into orders table (Grace Street 1 schema)
+    $status = 'Pending';
+    $insertSql = "INSERT INTO orders (userID, status, price, time_ordered) 
+                  VALUES (?, ?, ?, NOW())";
     $stmt = $con->prepare($insertSql);
-    $stmt->bind_param("sssssssss", $name, $email, $number, $address, $paymentMethod, $productsString, $totalSubtotal, $status, $userEmail);
+    $stmt->bind_param("isd", $userId, $status, $totalSubtotal);
     $stmt->execute();
+    $orderID = $stmt->insert_id;
 
     if ($stmt->affected_rows > 0) {
+        // Also insert into order_items if that table exists in your logic
+        // But for now, let's keep it simple as per previous logic
+        
         // Delete records from the cart table
-        $deleteSql = "DELETE FROM cart WHERE User_Email = ?";
+        $deleteSql = "DELETE FROM cart WHERE userID = ?";
         $stmt = $con->prepare($deleteSql);
-        $stmt->bind_param("s", $userEmail);
+        $stmt->bind_param("i", $userId);
         if ($stmt->execute()) {
             $successMessage = "Order placed successfully!";
         } else {
@@ -95,12 +106,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="checkout_item" >
                                 <?php
                                 
-                                if(isset($_SESSION['user-email'])) {
+                                if(isset($_SESSION['user-id'])) {
                                     // Fetch data from the database
-                                    $userEmail = $_SESSION['user-email'];
-                                    $query = "SELECT * FROM cart WHERE User_Email = ?";
+                                    $userId = $_SESSION['user-id'];
+                                    $query = "SELECT cart.*, product.name, product.price, product.image 
+                                              FROM cart 
+                                              JOIN inventory ON cart.inventoryID = inventory.inventoryID 
+                                              JOIN product ON inventory.proID = product.proID 
+                                              WHERE cart.userID = ?";
                                     $stmt = $con->prepare($query);
-                                    $stmt->bind_param("s", $userEmail);
+                                    $stmt->bind_param("i", $userId);
                                     $stmt->execute();
                                     $result = $stmt->get_result();
 
@@ -112,10 +127,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         // Loop through each row of the result
                                         while ($row = $result->fetch_assoc()) {
                                             // Extract data from the current row
-                                            $productName = $row['Product_Name'];
-                                            $productPrice = $row['Product_Price'];
-                                            $productQuantity = $row['Product_Quantity'];
-                                            $productImage = $row['Product_Image'];
+                                            $productName = $row['name'];
+                                            $productPrice = $row['price'];
+                                            $productQuantity = $row['quantity'];
+                                            $productImage = $row['image'];
                                             $subtotal = $productPrice * $productQuantity;
 
                                             // Add subtotal to total subtotal

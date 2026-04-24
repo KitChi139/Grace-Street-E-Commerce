@@ -1,7 +1,7 @@
 <?php
 
 include('../components/connect.php');
-$sql = "SELECT COUNT(*) AS total_products FROM product_list"; // Query to get the total count of records
+$sql = "SELECT COUNT(*) AS total_products FROM product"; // Query to get the total count of records
 $result = mysqli_query($con, $sql);
 
 $row = mysqli_fetch_assoc($result);
@@ -13,17 +13,17 @@ $userResult = mysqli_query($con, $userSql);
 $userRow = mysqli_fetch_assoc($userResult);
 $totalUsers = $userRow['total_users'];
 
-$totalSql = "SELECT SUM(Total_Price) AS total_price FROM orders WHERE Order_Status = 0 AND Order_Status != 'Received'";
+$totalSql = "SELECT SUM(price) AS total_price FROM orders WHERE status = 'Pending'";
 $totalResult = mysqli_query($con, $totalSql);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalprice = $totalRow['total_price'];
 
-$approveSql = "SELECT SUM(Total_Price) AS total_approve FROM orders WHERE Order_Status IN (1, 'Received')";
+$approveSql = "SELECT SUM(price) AS total_approve FROM orders WHERE status IN ('Shipped', 'Completed', 'Paid')";
 $approveResult = mysqli_query($con, $approveSql);
 $approveRow = mysqli_fetch_assoc($approveResult);
 $approveUsers = $approveRow['total_approve'];
 
-$placedSql = "SELECT COUNT(*) AS total_placed FROM orders WHERE Order_Status = 0 AND Order_Status != 'Received'";
+$placedSql = "SELECT COUNT(*) AS total_placed FROM orders WHERE status = 'Pending'";
 $placedResult = mysqli_query($con, $placedSql);
 $placedRow = mysqli_fetch_assoc($placedResult);
 $placedUsers = $placedRow['total_placed'];

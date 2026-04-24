@@ -6,9 +6,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 
 $create_table_query = "CREATE TABLE IF NOT EXISTS `reviews` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `user_id` INT NOT NULL,
-    `username` VARCHAR(255) NOT NULL,
+    `reviewsID` INT AUTO_INCREMENT PRIMARY KEY,
+    `userID` INT NOT NULL,
     `rating` INT NOT NULL,
     `comment` TEXT NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -26,12 +25,7 @@ if (isset($_POST['submit_review'])) {
         $rating = mysqli_real_escape_string($con, $_POST['rating']);
         $comment = mysqli_real_escape_string($con, $_POST['comment']);
         
-        // Get username
-        $select_user = mysqli_query($con, "SELECT username FROM grace_user WHERE id = '$user_id'");
-        $user_data = mysqli_fetch_assoc($select_user);
-        $username = $user_data['username'];
-
-        $insert_review = mysqli_query($con, "INSERT INTO reviews (user_id, username, rating, comment) VALUES ('$user_id', '$username', '$rating', '$comment')");
+        $insert_review = mysqli_query($con, "INSERT INTO reviews (userID, rating, comment) VALUES ('$user_id', '$rating', '$comment')");
         
         if ($insert_review) {
             $message = "Thank you for your feedback!";
@@ -42,7 +36,7 @@ if (isset($_POST['submit_review'])) {
 }
 
 // Fetch Reviews
-$select_reviews = mysqli_query($con, "SELECT * FROM reviews ORDER BY created_at DESC");
+$select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM reviews JOIN grace_user ON reviews.userID = grace_user.userID ORDER BY created_at DESC");
 ?>
 
 <!DOCTYPE html>
@@ -154,7 +148,8 @@ $select_reviews = mysqli_query($con, "SELECT * FROM reviews ORDER BY created_at 
                         <div class="review-header">
                             <span class="review-username"><?= htmlspecialchars($review['username']); ?></span>
                             <span class="review-rating">
-                                <?php for($i=0; $i<$review['rating']; $i++) echo "★"; ?>
+                                <?php for($i=0; $i<$review['rating']; $i++) echo '<i class="fa-solid fa-star"></i>'; ?>
+                                <?php for($i=$review['rating']; $i<5; $i++) echo '<i class="fa-regular fa-star"></i>'; ?>
                             </span>
                         </div>
                         <div class="review-date"><?= date('F j, Y', strtotime($review['created_at'])); ?></div>

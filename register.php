@@ -42,18 +42,21 @@
 
         if (isset($captcha_valid) && $captcha_valid) {
 
-            $select = mysqli_query($con, "SELECT * FROM grace_user WHERE username = '$username' OR email = '$email'") or die('Query failed');
+            $select = mysqli_query($con, "SELECT grace_user.*, email.email FROM grace_user JOIN email ON grace_user.emailID = email.emailID WHERE grace_user.username = '$username' OR email.email = '$email'") or die('Query failed');
 
             if (mysqli_num_rows($select) > 0) {
                 $error_msg = "User already exists";
             } else {
+                // Insert email first
+                mysqli_query($con, "INSERT INTO email (email) VALUES ('$email')");
+                $emailID = mysqli_insert_id($con);
 
                 $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
 
                 $activation_token = bin2hex(random_bytes(16));
                 
-                $insert_query = "INSERT INTO grace_user (first_name, last_name, username, email, password, is_active, activation_token) 
-                                 VALUES ('$first_name', '$last_name', '$username', '$email', '$hashed_pass', 0, '$activation_token')";
+                $insert_query = "INSERT INTO grace_user (username, emailID, password, is_active, activation_token, roleID) 
+                                 VALUES ('$username', '$emailID', '$hashed_pass', 0, '$activation_token', 3)"; // Assuming 3 is 'user' role
                 
                 if(mysqli_query($con, $insert_query)){
                     

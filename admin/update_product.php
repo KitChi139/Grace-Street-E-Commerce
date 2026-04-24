@@ -6,33 +6,45 @@ include('../components/connect.php');
 if(isset($_GET['id'])) {
     $productId = $_GET['id'];
 
-    $productQuery = "SELECT * FROM product_list WHERE id = $productId";
+    $productQuery = "SELECT p.*, 
+                        MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s,
+                        MAX(CASE WHEN s.sizes = 'M' THEN i.stock ELSE 0 END) AS product_stock_m,
+                        MAX(CASE WHEN s.sizes = 'L' THEN i.stock ELSE 0 END) AS product_stock_l,
+                        MAX(CASE WHEN s.sizes = 'XL' THEN i.stock ELSE 0 END) AS product_stock_xl,
+                        MAX(CASE WHEN s.sizes = 'XXL' THEN i.stock ELSE 0 END) AS product_stock_xxl
+                    FROM product p
+                    LEFT JOIN inventory i ON p.proID = i.proID
+                    LEFT JOIN sizes s ON i.sizeID = s.sizeID
+                    WHERE p.proID = $productId
+                    GROUP BY p.proID";
     $productResult = mysqli_query($con, $productQuery);
     $productData = mysqli_fetch_assoc($productResult);
 }
 
 if(isset($_POST['productId'])) {
     $productId = $_POST['productId'];
-    $productName = $_POST['product_name'];
-    $productStockS = $_POST['product_stock_s'];
-    $productStockM = $_POST['product_stock_m'];
-    $productStockL = $_POST['product_stock_l'];
-    $productStockXL = $_POST['product_stock_xl'];
-    $productStockXXL = $_POST['product_stock_xxl'];
-    $productPrice = $_POST['product_price'];
+    $productName = $_POST['name'];
+    $stocks = [
+        'S' => $_POST['product_stock_s'],
+        'M' => $_POST['product_stock_m'],
+        'L' => $_POST['product_stock_l'],
+        'XL' => $_POST['product_stock_xl'],
+        'XXL' => $_POST['product_stock_xxl']
+    ];
+    $productPrice = $_POST['price'];
     $productDescription = $_POST['Description'];
     $productGender = $_POST['product_gender'];
 
     // Retrieve existing image name from the database
-    $productQuery = "SELECT product_image FROM product_list WHERE id = $productId";
+    $productQuery = "SELECT image FROM product WHERE proID = $productId";
     $productResult = mysqli_query($con, $productQuery);
     $productData = mysqli_fetch_assoc($productResult);
-    $imageName = $productData['product_image'];
+    $imageName = $productData['image'];
 
     // Check if a new image is uploaded
-    if(isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
-        $imageTmpName = $_FILES['product_image']['tmp_name'];
-        $imageName = $_FILES['product_image']['name'];
+    if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $imageTmpName = $_FILES['image']['tmp_name'];
+        $imageName = $_FILES['image']['name'];
         
         // Move uploaded image to the desired location
         $uploadDirectory = "../uploads/images/";
@@ -41,20 +53,30 @@ if(isset($_POST['productId'])) {
     }
 
     // Update product information in the database
-    $updateQuery = "UPDATE product_list SET 
-                    product_name = '$productName', 
-                    product_stock_s = '$productStockS', 
-                    product_stock_m = '$productStockM', 
-                    product_stock_l = '$productStockL', 
-                    product_stock_xl = '$productStockXL', 
-                    product_stock_xxl = '$productStockXXL', 
-                    product_price = '$productPrice', 
-                    product_image = '$imageName', 
+    $updateQuery = "UPDATE product SET 
+                    name = '$productName', 
+                    price = '$productPrice', 
+                    image = '$imageName', 
                     description = '$productDescription', 
                     gender = '$productGender' 
-                    WHERE id = $productId";
+                    WHERE proID = $productId";
     
     if(mysqli_query($con, $updateQuery)) {
+        // Update inventory for each size
+        foreach ($stocks as $sizeName => $stockAmount) {
+            $sizeQuery = mysqli_query($con, "SELECT sizeID FROM sizes WHERE sizes = '$sizeName'");
+            if ($sizeRow = mysqli_fetch_assoc($sizeQuery)) {
+                $sizeID = $sizeRow['sizeID'];
+                $invStatus = ($stockAmount > 0) ? 'In Stock' : 'Empty';
+                
+                $checkInv = mysqli_query($con, "SELECT inventoryID FROM inventory WHERE proID = '$productId' AND sizeID = '$sizeID'");
+                if (mysqli_num_rows($checkInv) > 0) {
+                    mysqli_query($con, "UPDATE inventory SET stock = '$stockAmount', status = '$invStatus' WHERE proID = '$productId' AND sizeID = '$sizeID'");
+                } else {
+                    mysqli_query($con, "INSERT INTO inventory (proID, sizeID, stock, status) VALUES ('$productId', '$sizeID', '$stockAmount', '$invStatus')");
+                }
+            }
+        }
         // Product updated successfully
         header("Location: products.php"); // Redirect back to products page
         exit();
@@ -89,36 +111,36 @@ if(isset($_POST['productId'])) {
                     <div class="update_this_box">
                         <div class="update_columns">
                             <div class="product_update_1">
-                                <label for="product_name">Product Name</label>
-                                <input type="text" id="product_name" name="product_name" value="<?php echo $productData['product_name']; ?>" required>
+                                <label for="name">Product Name</label>
+                                <input type="text" id="name" name="name" value="<?php echo $productData['name']; ?>" required>
                             </div>
                             <div class="product_update_1">
                                 <label for="total_stock_s">Stock (S)</label>
-                                <input type="number" id="total_stock_s" name="product_stock_s" value="<?php echo $productData['product_stock_s']; ?>" required>
+                                <input type="number" id="total_stock_s" name="product_stock_s" value="<?php echo $productData['product_stock_s']; ?>" min="0" required>
                             </div>
                             <div class="product_update_1">
                                 <label for="total_stock_m">Stock (M)</label>
-                                <input type="number" id="total_stock_m" name="product_stock_m" value="<?php echo $productData['product_stock_m']; ?>" required>
+                                <input type="number" id="total_stock_m" name="product_stock_m" value="<?php echo $productData['product_stock_m']; ?>" min="0" required>
                             </div>
                             <div class="product_update_1">
                                 <label for="total_stock_l">Stock (L)</label>
-                                <input type="number" id="total_stock_l" name="product_stock_l" value="<?php echo $productData['product_stock_l']; ?>" required>
+                                <input type="number" id="total_stock_l" name="product_stock_l" value="<?php echo $productData['product_stock_l']; ?>" min="0" required>
                             </div>
                             <div class="product_update_1">
                                 <label for="total_stock_xl">Stock (XL)</label>
-                                <input type="number" id="total_stock_xl" name="product_stock_xl" value="<?php echo $productData['product_stock_xl']; ?>" required>
+                                <input type="number" id="total_stock_xl" name="product_stock_xl" value="<?php echo $productData['product_stock_xl']; ?>" min="0" required>
                             </div>
                             <div class="product_update_1">
                                 <label for="total_stock_xxl">Stock (XXL)</label>
-                                <input type="number" id="total_stock_xxl" name="product_stock_xxl" value="<?php echo $productData['product_stock_xxl']; ?>" required>
+                                <input type="number" id="total_stock_xxl" name="product_stock_xxl" value="<?php echo $productData['product_stock_xxl']; ?>" min="0" required>
                             </div>
                             <div class="product_update_1">
-                                <label for="product_price">Product Price</label>
-                                <input type="number" id="product_price" name="product_price" value="<?php echo $productData['product_price']; ?>" required>
+                                <label for="price">Product Price</label>
+                                <input type="number" id="price" name="price" value="<?php echo $productData['price']; ?>" required>
                             </div>
                             <div class="product_update_1">
-                                <label for="product_image">Product Image</label>
-                                <input type="file" id="product_image" name="product_image">
+                                <label for="image">Product Image</label>
+                                <input type="file" id="image" name="image">
                             </div>
                             <div class="product_update_1">
                                 <label for="product_gender">Gender</label>

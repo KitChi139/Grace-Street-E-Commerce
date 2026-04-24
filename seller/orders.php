@@ -1,10 +1,10 @@
 <?php
 include('../components/connect.php');
 
-$sql = "SELECT * FROM orders";
+$sql = "SELECT orders.*, grace_user.username AS Name, grace_user.address AS Address, grace_user.contact AS Number, orders.price AS Total_Price, orders.time_ordered AS Placed_on, orders.status AS Order_Status, orders.orderID AS ID FROM orders JOIN grace_user ON orders.userID = grace_user.userID";
 $result = mysqli_query($con, $sql);
 
-$sqls = "SELECT COUNT(*) as total_rows FROM orders WHERE Order_Status = 0 AND Order_Status != 'Received'";
+$sqls = "SELECT COUNT(*) as total_rows FROM orders WHERE status = 'Pending'";
 $results = mysqli_query($con, $sqls);
 $row = mysqli_fetch_assoc($results);
 $totalRows = $row['total_rows'];
@@ -13,8 +13,8 @@ if(isset($_POST['approve'])) {
     // Get the order ID from the submitted form
     $orderId = $_POST['appid'];
     
-    // Update the order status to 1 (approved)
-    $updateSql = "UPDATE orders SET Order_Status = 1 WHERE ID = $orderId";
+    // Update the order status to Shipped (approved)
+    $updateSql = "UPDATE orders SET status = 'Shipped' WHERE orderID = $orderId";
     $updateQuery = mysqli_query($con, $updateSql);
     
     // Check if the update was successful
@@ -354,13 +354,13 @@ if(isset($_POST['approve'])) {
                             while($row = mysqli_fetch_assoc($result)): 
                                 $status_text = '';
                                 $status_class = '';
-                                if ($row['Order_Status'] == 0) {
+                                if ($row['Order_Status'] == 'Pending') {
                                     $status_text = 'Pending';
                                     $status_class = 'orange';
-                                } elseif ($row['Order_Status'] == 1) {
+                                } elseif ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
                                     $status_text = 'Approved';
                                     $status_class = 'green';
-                                } elseif ($row['Order_Status'] == 'Received') {
+                                } elseif ($row['Order_Status'] == 'Completed') {
                                     $status_text = 'Received';
                                     $status_class = 'blue';
                                 }
@@ -392,15 +392,15 @@ if(isset($_POST['approve'])) {
                         while($row = mysqli_fetch_assoc($result)): 
                             $status_text = '';
                             $status_color = '';
-                            if ($row['Order_Status'] == 0) {
+                            if ($row['Order_Status'] == 'Pending') {
                                 $status_text = 'Pending';
                                 $status_color = '#ffa500';
                                 $status_bg = '#fff4e6';
-                            } elseif ($row['Order_Status'] == 1) {
+                            } elseif ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
                                 $status_text = 'Approved';
                                 $status_color = '#2ecc71';
                                 $status_bg = '#e8f8f0';
-                            } elseif ($row['Order_Status'] == 'Received') {
+                            } elseif ($row['Order_Status'] == 'Completed') {
                                 $status_text = 'Received';
                                 $status_color = '#3498db';
                                 $status_bg = '#ebf5fb';
@@ -519,15 +519,15 @@ if(isset($_POST['approve'])) {
        function showOrderDetails(order) {
            let statusText = '';
            let statusColor = '';
-           if (order.Order_Status == 0) {
+           if (order.Order_Status == 'Pending') {
                statusText = 'Pending';
-               statusColor = 'orange';
-           } else if (order.Order_Status == 1) {
+               statusColor = '#ffa500';
+           } else if (order.Order_Status == 'Shipped' || order.Order_Status == 'Paid') {
                statusText = 'Approved';
-               statusColor = 'green';
-           } else if (order.Order_Status == 'Received') {
+               statusColor = '#2ecc71';
+           } else if (order.Order_Status == 'Completed') {
                statusText = 'Received';
-               statusColor = 'blue';
+               statusColor = '#3498db';
            }
 
            modalContent.innerHTML = `

@@ -13,7 +13,7 @@ if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     
 
-    $update_profile = $con->prepare("UPDATE `grace_user` SET username = ?, email = ? WHERE id = ?");
+    $update_profile = $con->prepare("UPDATE `grace_user` SET username = ?, emailID = ? WHERE userID = ?");
     $update_profile->execute([$name, $email, $user_id]);
 
     $prev_pass = $_POST['prev_pass'];
@@ -36,7 +36,7 @@ if (isset($_POST['submit'])) {
         echo "<script>alert('Confirm password not matched!');</script>";
     } else {
         $hashed_new_pass = password_hash($new_pass_raw, PASSWORD_DEFAULT);
-        $update_admin_pass = $con->prepare("UPDATE `grace_user` SET password = ? WHERE id = ?");
+        $update_admin_pass = $con->prepare("UPDATE `grace_user` SET password = ? WHERE userID = ?");
         $update_admin_pass->bind_param("si", $hashed_new_pass, $user_id);
         $update_admin_pass->execute();
         echo "<script>alert('Password updated successfully!');</script>";

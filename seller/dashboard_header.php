@@ -7,19 +7,19 @@ $user_id = isset($_SESSION['user-id']) ? $_SESSION['user-id'] : null;
 
 $fetch_user = null;
 if($user_id) {
-    $select_user = mysqli_query($con, "SELECT * FROM grace_user WHERE id = '$user_id'") or die("query failed");
+    $select_user = mysqli_query($con, "SELECT * FROM grace_user WHERE userID = '$user_id'") or die("query failed");
     if(mysqli_num_rows($select_user) > 0){
         $fetch_user = mysqli_fetch_assoc($select_user);
     }
 }
 
 function getCartItemCount($user_id, $con) {
-    $count_query = mysqli_query($con, "SELECT COUNT(*) AS count FROM cart WHERE user_id = '$user_id'");
+    $count_query = mysqli_query($con, "SELECT COUNT(*) AS count FROM cart WHERE userID = '$user_id'");
     $count_row = mysqli_fetch_assoc($count_query);
     return $count_row['count'];
 }
 function getWishListItemCount($user_id, $con) {
-    $count_query = mysqli_query($con, "SELECT COUNT(*) AS count FROM wishlist WHERE user_id = '$user_id'");
+    $count_query = mysqli_query($con, "SELECT COUNT(*) AS count FROM wishlist WHERE userID = '$user_id'");
     $count_row = mysqli_fetch_assoc($count_query);
     return $count_row['count'];
 }
@@ -57,9 +57,8 @@ if(isset($_GET['logout'])){
                         Hello, <?= htmlspecialchars($fetch_user['username']); ?>
                     </span>
                     <?php endif; ?>
-                    <a href="wishlist.php"><i class="fas fa-heart"></i><span>(<?php echo getWishListItemCount($user_id, $con); ?>)</span></a>
-                    <a href="cart.php"><i class="fas fa-shopping-cart"></i><span>(<?php echo getCartItemCount($user_id, $con); ?>)</span></a>
-                    <img src="./img/user.svg" onclick="togglePopup()" alt="" style="cursor: pointer;">
+                    
+                    <i class="fa-solid fa-user" onclick="togglePopup()" style="cursor: pointer; font-size: 20px;"></i>
 
                     <!-- Pop up -->
                     <div id="popupForm" class="pop-container">

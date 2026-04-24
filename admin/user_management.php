@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['unlock_user'])) {
 
     $id = $_POST['unlock_user'];
 
-    $stmt = $con->prepare("UPDATE grace_user SET is_active = 1 WHERE id = ?");
+    $stmt = $con->prepare("UPDATE grace_user SET is_active = 1 WHERE userID = ?");
     $stmt->bind_param("i", $id);
 
     $stmt->execute();

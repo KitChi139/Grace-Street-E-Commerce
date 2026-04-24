@@ -26,12 +26,22 @@
                 $errorMessage = "";
 
 
-                if(isset($_SESSION['user-email']) && isset($_POST['send'])) {
+                if(isset($_SESSION['user-id']) && isset($_POST['send'])) {
                     $email = mysqli_real_escape_string($con, $_POST['email']);
                     $msg = mysqli_real_escape_string($con, $_POST['msg']);
 
+                    // Get emailID for this email
+                    $email_res = mysqli_query($con, "SELECT emailID FROM email WHERE email = '$email'");
+                    if(mysqli_num_rows($email_res) > 0) {
+                        $email_row = mysqli_fetch_assoc($email_res);
+                        $emailID = $email_row['emailID'];
+                    } else {
+                        mysqli_query($con, "INSERT INTO email (email) VALUES ('$email')");
+                        $emailID = mysqli_insert_id($con);
+                    }
+
                     // Save data to the database
-                    $sql = "INSERT INTO contact (email, message) VALUES ('$email', '$msg')";
+                    $sql = "INSERT INTO contact (emailID, message) VALUES ('$emailID', '$msg')";
                     if(mysqli_query($con, $sql)) {
                         // Send email using PHPMailer
                         $to = 'didiaaa666@gmail.com';
@@ -50,16 +60,25 @@
                     }
                 }
 
-            if(!isset($_SESSION['user-email'])) {
+            if(!isset($_SESSION['user-id'])) {
                 echo '<div style="text-align: center;">
                     <p>Please log in to contact us.</p>
                     <a href="login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
                 </div>';
             } else {
+                // Fetch email from email table using user-id session
+                $user_id = $_SESSION['user-id'];
+                $email_query = mysqli_query($con, "SELECT e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE u.userID = '$user_id'");
+                $user_email = "";
+                if(mysqli_num_rows($email_query) > 0) {
+                    $email_row = mysqli_fetch_assoc($email_query);
+                    $user_email = $email_row['email'];
+                }
+
                 echo '<form action="" method="post">
                     <h1 style="text-align: center;">Get in touch</h1>
                     <label for="email">Your Email:</label>
-                    <input type="email" name="email" value="' . $_SESSION['user-email'] . '" class="box" readonly>
+                    <input type="email" name="email" value="' . $user_email . '" class="box" readonly>
                     <label for="msg">Message:</label>
                     <textarea name="msg" class="box" placeholder="Enter your message" cols="30" rows="10" required></textarea>
                     <input type="submit" value="Send message" name="send" class="btn">

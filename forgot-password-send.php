@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 if(isset($_POST['submit'])){
     $email = mysqli_real_escape_string($con, $_POST['email']);
 
-    $select = mysqli_query($con, "SELECT * FROM grace_user WHERE email = '$email'") or die('query failed');
+    $select = mysqli_query($con, "SELECT u.*, e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE e.email = '$email'") or die('query failed');
     if(mysqli_num_rows($select) > 0){
         $row = mysqli_fetch_assoc($select);
         
@@ -22,7 +22,7 @@ if(isset($_POST['submit'])){
             $otp = random_int(100000, 999999);
             $expiry = date('Y-m-d H:i:s', strtotime('+10 minutes')); // 10 minutes expiry
 
-            $update = mysqli_query($con, "UPDATE grace_user SET otp ='$otp', otp_expiry = '$expiry' WHERE email = '$email'") or die('query failed');
+            $update = mysqli_query($con, "UPDATE grace_user SET otp = '$otp', otp_expiry = '$expiry' WHERE userID = " . $row['userID']) or die('query failed');
 
             if ($update) {
                 sendOTP($email, $otp);  

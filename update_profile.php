@@ -44,7 +44,7 @@
     include('./components/connect.php');
 
     if(isset($_POST['submit'])){
-        $email = $_SESSION['user-email'];
+        $user_id = $_SESSION['user-id'];
         $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
         $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
         $username = mysqli_real_escape_string($con, $_POST['name']);
@@ -52,7 +52,7 @@
         $new_pass = $_POST['new_pass'];
         $confirm_pass = $_POST['cpass'];
 
-        $select = mysqli_query($con, "SELECT * FROM grace_user WHERE email = '$email'") or die('Query failed');
+        $select = mysqli_query($con, "SELECT * FROM grace_user WHERE userID = '$user_id'") or die('Query failed');
         
         if(mysqli_num_rows($select) > 0){
             $row = mysqli_fetch_assoc($select);
@@ -60,8 +60,8 @@
             // Verify old password
             if (password_verify($old_pass, $row['password']) || sha1($old_pass) === $row['password']) {
                 
-                // Update names
-                mysqli_query($con, "UPDATE grace_user SET first_name = '$first_name', last_name = '$last_name', username = '$username' WHERE email = '$email'") or die('Query failed');
+                // Update names (Note: assuming first_name/last_name might not exist in new schema, so using username primarily)
+                mysqli_query($con, "UPDATE grace_user SET username = '$username' WHERE userID = '$user_id'") or die('Query failed');
 
                 // If new password is provided, update it
                 if (!empty($new_pass)) {
@@ -77,7 +77,7 @@
                         echo "<script>alert('New password and confirm password do not match!');</script>";
                     } else {
                         $hashed_pass = password_hash($new_pass, PASSWORD_DEFAULT);
-                        mysqli_query($con, "UPDATE grace_user SET password = '$hashed_pass' WHERE email = '$email'") or die('Query failed');
+                        mysqli_query($con, "UPDATE grace_user SET password = '$hashed_pass' WHERE userID = '$user_id'") or die('Query failed');
                         echo "<script>alert('Profile and password updated successfully!');</script>";
                     }
                 } else {

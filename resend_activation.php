@@ -9,7 +9,7 @@ $link = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = mysqli_real_escape_string($con, $_POST['email']);
-    $query = "SELECT * FROM grace_user WHERE email = '$email' LIMIT 1";
+    $query = "SELECT u.*, e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE e.email = '$email' LIMIT 1";
     $res = mysqli_query($con, $query);
     if (mysqli_num_rows($res) > 0) {
         $user = mysqli_fetch_assoc($res);
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $info_msg = "This account is already activated. You can login.";
         } else {
             $token = bin2hex(random_bytes(16));
-            $update = "UPDATE grace_user SET activation_token = '$token' WHERE id = " . (int)$user['id'];
+            $update = "UPDATE grace_user SET activation_token = '$token' WHERE userID = " . (int)$user['userID'];
             if (mysqli_query($con, $update)) {
                 $activation_link = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/activate.php?token=$token";
                 $subject = "Account Activation - Grace Street";

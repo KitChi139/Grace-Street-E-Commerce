@@ -5,12 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $user_id = isset($_SESSION['user-id']) ? $_SESSION['user-id'] : null;
 
-$sql = "SELECT id,
-               CONCAT_WS(' ', NULLIF(first_name,''), NULLIF(last_name,'')) AS name,
-               email,
-               role,
-               is_active
-        FROM grace_user";
+$sql = "SELECT u.userID AS id,
+               u.username AS name,
+               e.email,
+               r.role,
+               u.is_active
+        FROM grace_user u
+        JOIN email e ON u.emailID = e.emailID
+        JOIN roles r ON u.roleID = r.roleID";
 $result = mysqli_query($con, $sql);
 
 if ($result) {

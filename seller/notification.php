@@ -2,7 +2,7 @@
     include('../components/connect.php');
 
     // Fetch contact data from the database
-    $sql = "SELECT id, name, email, number, message FROM contact";
+    $sql = "SELECT c.contactID AS id, c.name, e.email, c.number, c.message FROM contact c JOIN email e ON c.emailID = e.emailID";
     $result = mysqli_query($con, $sql);
 ?>
 <!DOCTYPE html>

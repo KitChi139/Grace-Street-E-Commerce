@@ -13,7 +13,7 @@ if (isset($_POST['submit'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);
     $email = mysqli_real_escape_string($con, $_POST['email']);
 
-    $update_profile = $con->prepare("UPDATE `grace_user` SET first_name = ?, last_name = ?, username = ?, email = ? WHERE id = ?");
+    $update_profile = $con->prepare("UPDATE `grace_user` SET first_name = ?, last_name = ?, username = ?, emailID = ? WHERE userID = ?");
     $update_profile->bind_param("ssssi", $first_name, $last_name, $name, $email, $user_id);
     $update_profile->execute();
 

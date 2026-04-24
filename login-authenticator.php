@@ -3,7 +3,7 @@ session_start();
 require 'GoogleAuthenticator.php';   // Make sure this file is in the same folder
 
 // Redirect if user is not logged in
-if (!isset($_SESSION['user-email']) || empty($_SESSION['user-email'])) {
+if (!isset($_SESSION['user-id']) || empty($_SESSION['user-id'])) {
     header("Location: login.php");
     exit;
 }
@@ -11,7 +11,15 @@ if (!isset($_SESSION['user-email']) || empty($_SESSION['user-email'])) {
 include('./components/connect.php');
 
 $GA = new PHPGangsta_GoogleAuthenticator();
-$useremail = $_SESSION['user-email'];
+$userId = $_SESSION['user-id'];
+
+// Fetch email from email table using user-id session
+$email_query = mysqli_query($con, "SELECT e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE u.userID = '$userId'");
+$useremail = "";
+if(mysqli_num_rows($email_query) > 0) {
+    $email_row = mysqli_fetch_assoc($email_query);
+    $useremail = $email_row['email'];
+}
 
 // Generate secret only once per session
 if (!isset($_SESSION['code']) || empty($_SESSION['code'])) {

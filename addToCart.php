@@ -3,44 +3,50 @@ session_start();
 
 include 'components/connect.php';
 
-if(isset($_POST['productId'], $_POST['productImage'], $_POST['productName'], $_POST['productPrice'], $_POST['productQuantity']) && isset($_SESSION['user-email']) && isset($_SESSION['user-id'])) {
+if(isset($_POST['productId'], $_POST['productQuantity']) && isset($_SESSION['user-id'])) {
     $productId = $_POST['productId'];
-    $productImage = $_POST['productImage'];
-    $productName = $_POST['productName'];
-    $productPrice = $_POST['productPrice'];
-    $userEmail = $_SESSION['user-email'];
     $userId = $_SESSION['user-id'];
     $productQuantity = $_POST['productQuantity'];
 
-    // Check if discounted price is provided
-    $discountedPrice = isset($_POST['discountedPrice']) ? $_POST['discountedPrice'] : $productPrice;
+    // Get the first available inventoryID for this product
+    $inventoryQuery = $con->prepare("SELECT inventoryID FROM inventory WHERE proID = ? LIMIT 1");
+    $inventoryQuery->bind_param("i", $productId);
+    $inventoryQuery->execute();
+    $inventoryResult = $inventoryQuery->get_result();
     
-    $existingProductQuery = $con->prepare("SELECT * FROM cart WHERE Product_Name = ? AND user_email = ? LIMIT 1");
-    $existingProductQuery->bind_param("ss", $productName, $userEmail);
-    $existingProductQuery->execute();
-    $existingProductResult = $existingProductQuery->get_result();
+    if ($inventoryResult->num_rows > 0) {
+        $inventoryRow = $inventoryResult->fetch_assoc();
+        $inventoryId = $inventoryRow['inventoryID'];
 
-    if ($existingProductResult->num_rows > 0) {
-        $existingProduct = $existingProductResult->fetch_assoc();
-        $newQuantity = $existingProduct['Product_Quantity'] + $productQuantity;
+        $existingProductQuery = $con->prepare("SELECT * FROM cart WHERE userID = ? AND inventoryID = ? LIMIT 1");
+        $existingProductQuery->bind_param("ii", $userId, $inventoryId);
+        $existingProductQuery->execute();
+        $existingProductResult = $existingProductQuery->get_result();
 
-        $updateQuery = $con->prepare("UPDATE cart SET Product_Quantity = ? WHERE Product_Name = ? AND user_email = ?");
-        $updateQuery->bind_param("iss", $newQuantity, $productName, $userEmail);
-        $success = $updateQuery->execute();
-        $updateQuery->close();
+        if ($existingProductResult->num_rows > 0) {
+            $existingProduct = $existingProductResult->fetch_assoc();
+            $newQuantity = $existingProduct['quantity'] + $productQuantity;
+
+            $updateQuery = $con->prepare("UPDATE cart SET quantity = ? WHERE userID = ? AND inventoryID = ?");
+            $updateQuery->bind_param("iii", $newQuantity, $userId, $inventoryId);
+            $success = $updateQuery->execute();
+            $updateQuery->close();
+        } else {
+            $sql = "INSERT INTO cart (userID, inventoryID, quantity) VALUES (?, ?, ?)";
+            $stmt = $con->prepare($sql);
+            $stmt->bind_param("iii", $userId, $inventoryId, $productQuantity);
+            $success = $stmt->execute();
+            $stmt->close();
+        }
     } else {
-        $totalPrice = $discountedPrice * $productQuantity; // Use discounted price for total price calculation
-        $sql = "INSERT INTO cart (Product_Name, Product_Price, Product_Quantity, Product_Image, user_id, user_email) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $con->prepare($sql);
-        $stmt->bind_param("sdisss", $productName, $totalPrice, $productQuantity, $productImage, $userId, $userEmail);
-        $success = $stmt->execute();
-        $stmt->close();
+        $success = false;
+        $error = 'Product out of stock or inventory not found';
     }
 
     if ($success) {
         echo json_encode(array('success' => true));
     } else {
-        echo json_encode(array('success' => false, 'error' => 'Error adding item to cart'));
+        echo json_encode(array('success' => false, 'error' => isset($error) ? $error : 'Error adding item to cart'));
     }
 } else {
     echo json_encode(array('success' => false, 'error' => 'Invalid data received or user not logged in'));

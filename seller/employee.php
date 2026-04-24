@@ -12,18 +12,18 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
 
 if(isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
-    $delete_sql = "DELETE FROM product_list WHERE id = $delete_id";
+    $delete_sql = "DELETE FROM product WHERE id = $delete_id";
     mysqli_query($con, $delete_sql);
 }
 
 if(isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
-    $delete_sql = "DELETE FROM grace_user WHERE id = $delete_id";
+    $delete_sql = "DELETE FROM grace_user WHERE userID = $delete_id";
     mysqli_query($con, $delete_sql);
 }
 
 // Modify the SQL query to include search functionality
-$sql = "SELECT * FROM grace_user WHERE role IN ('admin','employee') ";
+$sql = "SELECT u.*, r.role FROM grace_user u JOIN roles r ON u.roleID = r.roleID WHERE r.role IN ('admin','employee')";
 $result = mysqli_query($con, $sql);
 ?>
 
@@ -176,7 +176,7 @@ $result = mysqli_query($con, $sql);
                 <div class="products_add_info_pad">
                     <div class="products_add_info">
                         <div class="productname">
-                            <label for="product_name">Employee Name</label>
+                            <label for="name">Employee Name</label>
                             <input type="text" id="name" name="name" required> 
                         </div>
                         <div class="productname">
@@ -184,11 +184,11 @@ $result = mysqli_query($con, $sql);
                             <input type="email" id="email" name="email" required>
                         </div>
                         <div class="productname">
-                            <label for="product_image">Password</label>
+                            <label for="image">Password</label>
                             <input type="password" id="password" name="password" required>
                         </div>
                         <div class="productname">
-                            <label for="product_price">Confirm Password</label>
+                            <label for="price">Confirm Password</label>
                             <input type="password" id="cpassword" name="cpassword" required>
                         </div>
                         <div class="productname">

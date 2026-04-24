@@ -21,68 +21,74 @@
                         include('./components/connect.php');
 
                         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                            if (!isset($_SESSION['user-email']) || !isset($_SESSION['user-id'])) {
+                            if (!isset($_SESSION['user-id'])) {
                                 echo "<script>alert('You must log in first'); window.location='login.php';</script>";
                                 exit;
                             } else {
-                                if (isset($_POST['productId'], $_POST['productImage'], $_POST['productName'], $_POST['productPrice'], $_POST['productQuantity']) && isset($_SESSION['user-email']) && isset($_SESSION['user-id'])) {
-                                    $productId = $_POST['productId'];
-                                    $productImage = $_POST['productImage'];
-                                    $productName = $_POST['productName'];
-                                    $productPrice = $_POST['productPrice'];
-                                    $userEmail = $_SESSION['user-email'];
+                                if (isset($_POST['productId'], $_POST['productImage'], $_POST['productName'], $_POST['productPrice'], $_POST['productQuantity'])) {
+                                    $productId = $_POST['productId']; // This is actually wishID from the query below
                                     $userId = $_SESSION['user-id'];
                                     $quantity = $_POST['productQuantity'];
+                                    
+                                    // We need the proID for this wishlist item
+                                    $getProID = $con->prepare("SELECT proID FROM wishlist WHERE wishID = ?");
+                                    $getProID->bind_param("i", $productId);
+                                    $getProID->execute();
+                                    $proRes = $getProID->get_result();
+                                    $proRow = $proRes->fetch_assoc();
+                                    $proID = $proRow['proID'];
+
+                                    // Get inventoryID (assuming first available)
+                                    $invQuery = $con->prepare("SELECT inventoryID FROM inventory WHERE proID = ? LIMIT 1");
+                                    $invQuery->bind_param("i", $proID);
+                                    $invQuery->execute();
+                                    $invRes = $invQuery->get_result();
+                                    $invRow = $invRes->fetch_assoc();
+                                    $inventoryID = $invRow['inventoryID'];
                         
-                                    $existingProductQuery = $con->prepare("SELECT * FROM cart WHERE Product_Name = ? AND user_email = ? LIMIT 1");
-                                    $existingProductQuery->bind_param("ss", $productName, $userEmail);
+                                    $existingProductQuery = $con->prepare("SELECT * FROM cart WHERE userID = ? AND inventoryID = ? LIMIT 1");
+                                    $existingProductQuery->bind_param("ii", $userId, $inventoryID);
                                     $existingProductQuery->execute();
                                     $existingProductResult = $existingProductQuery->get_result();
                         
                                     if ($existingProductResult->num_rows > 0) {
                                         $existingProduct = $existingProductResult->fetch_assoc();
-                                        $newQuantity = $existingProduct['Product_Quantity'] + $quantity;
+                                        $newQuantity = $existingProduct['quantity'] + $quantity;
                         
-                                        $updateQuery = $con->prepare("UPDATE cart SET Product_Quantity = ? WHERE Product_Name = ? AND user_email = ?");
-                                        $updateQuery->bind_param("iss", $newQuantity, $productName, $userEmail);
+                                        $updateQuery = $con->prepare("UPDATE cart SET quantity = ? WHERE userID = ? AND inventoryID = ?");
+                                        $updateQuery->bind_param("iii", $newQuantity, $userId, $inventoryID);
                                         $success = $updateQuery->execute();
                                         $updateQuery->close();
-                        
-                                        $deleteSql = "DELETE FROM wishlist WHERE ID = ?";
-                                        $deleteStmt = $con->prepare($deleteSql);
-                                        $deleteStmt->bind_param("i", $productId);
-                                        $deleteStmt->execute();
-                                        $deleteStmt->close();
-                        
-                                        echo "<script>alert('Data saved successfully!'); window.location='cart.php';</script>";
-                                        exit;
                                     } else {
-                                        $totalPrice = $productPrice * $quantity;
-                                        $sql = "INSERT INTO cart (Product_Name, Product_Price, Product_Quantity, Product_Image, user_id, user_email) VALUES (?, ?, ?, ?, ?, ?)";
+                                        $sql = "INSERT INTO cart (userID, inventoryID, quantity) VALUES (?, ?, ?)";
                                         $stmt = $con->prepare($sql);
-                                        $stmt->bind_param("sdisss", $productName, $totalPrice, $quantity, $productImage, $userId, $userEmail);
+                                        $stmt->bind_param("iii", $userId, $inventoryID, $quantity);
                                         $success = $stmt->execute();
                                         $stmt->close();
-                        
-                                        $deleteSql = "DELETE FROM wishlist WHERE ID = ?";
-                                        $deleteStmt = $con->prepare($deleteSql);
-                                        $deleteStmt->bind_param("i", $productId);
-                                        $deleteStmt->execute();
-                                        $deleteStmt->close();
-                        
-                                        echo "<script>alert('Data saved successfully!'); window.location='cart.php';</script>";
-                                        exit;
                                     }
+
+                                    // Delete from wishlist
+                                    $deleteSql = "DELETE FROM wishlist WHERE wishID = ?";
+                                    $deleteStmt = $con->prepare($deleteSql);
+                                    $deleteStmt->bind_param("i", $productId);
+                                    $deleteStmt->execute();
+                                    $deleteStmt->close();
+                    
+                                    echo "<script>alert('Data saved successfully!'); window.location='cart.php';</script>";
+                                    exit;
                                 }
                             }
                         }
                         
                         
-                        if(isset($_SESSION['user-email'])){
-                            $useremail = $_SESSION['user-email'];
-                            $sql = "SELECT * FROM wishlist WHERE user_email = ?";
+                        if(isset($_SESSION['user-id'])){
+                            $userId = $_SESSION['user-id'];
+                            $sql = "SELECT wishlist.*, product.name AS Wishlist_Name, product.price AS Wishlist_Price, product.image AS Wishlist_Image, wishlist.wishID AS ID 
+                                    FROM wishlist 
+                                    JOIN product ON wishlist.proID = product.proID 
+                                    WHERE wishlist.userID = ?";
                             $stmt = $con->prepare($sql);
-                            $stmt->bind_param("s", $useremail);
+                            $stmt->bind_param("i", $userId);
                             $stmt->execute();
                             $result = $stmt->get_result();
 

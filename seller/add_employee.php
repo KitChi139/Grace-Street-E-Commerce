@@ -10,12 +10,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
    
 
     // Insert the values into the database, including the current date
-    $select = mysqli_query($con, "SELECT * FROM grace_user WHERE username = '$name' OR email = '$email'") or die('Query failed');
+    $select = mysqli_query($con, "SELECT u.*, e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE u.username = '$name' OR e.email = '$email'") or die('Query failed');
 
     if (mysqli_num_rows($select) > 0) {
         echo "<script>alert('User already exists');</script>";
     } else {
-        mysqli_query($con, "INSERT INTO grace_user (username, email, password, role) VALUES ('$name', '$email', '$password', '$role')") or die('Query failed');
+        // Insert email first
+        mysqli_query($con, "INSERT INTO email (email) VALUES ('$email')");
+        $emailID = mysqli_insert_id($con);
+
+        // Get roleID
+        $role_res = mysqli_query($con, "SELECT roleID FROM roles WHERE role = '$role'");
+        $role_row = mysqli_fetch_assoc($role_res);
+        $roleID = $role_row['roleID'];
+
+        mysqli_query($con, "INSERT INTO grace_user (username, emailID, password, roleID, is_active) VALUES ('$name', '$emailID', '$password', '$roleID', 1)") or die('Query failed');
 
         // Alert and redirect using JavaScript
         echo "<script>alert('Employee Added Successfully'); window.location.href = 'employee.php';</script>";

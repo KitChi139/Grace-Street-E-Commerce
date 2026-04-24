@@ -7,14 +7,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // =========================
     // INPUTS
     // =========================
-    $product_name = trim($_POST['product_name']);
+    $name = trim($_POST['name']);
     $product_stock_small = (int)$_POST['small_stock'];
     $product_stock_medium = (int)$_POST['medium_stock'];
     $product_stock_large = (int)$_POST['large_stock'];
     $product_stock_xlarge = (int)$_POST['xlarge_stock'];
     $product_stock_xxlarge = (int)$_POST['xxlarge_stock'];
-    $product_price = (float)$_POST['product_price'];
-    $product_status = trim($_POST['product_status']);
+    $price = (float)$_POST['price'];
+    $status = trim($_POST['status']);
     $product_description = trim($_POST['Description']);
     $product_gender = trim($_POST['product_gender']);
     $current_date = date('Y-m-d H:i:s');
@@ -25,11 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allowed_types = ['image/jpeg', 'image/png', 'image/webp'];
     $max_size = 2 * 1024 * 1024;
 
-    if (!isset($_FILES['product_image']) || $_FILES['product_image']['error'] !== 0) {
+    if (!isset($_FILES['image']) || $_FILES['image']['error'] !== 0) {
         die("File upload error.");
     }
 
-    $file = $_FILES['product_image'];
+    $file = $_FILES['image'];
 
     // ✔ Secure MIME check
     $file_type = mime_content_type($file['tmp_name']);
@@ -54,24 +54,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // DB INSERT (BLOB SAFE)
     // =========================
     $stmt = $con->prepare("
-        INSERT INTO product_list 
-        (product_image, product_name, product_stock_s, product_stock_m, product_stock_l, product_stock_xl, product_stock_xxl, product_price, product_status, description, gender, Date) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO product 
+        (image, name, price, status, description, gender, Date) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     ");
 
     $null = NULL;
 
     $stmt->bind_param(
-        "bssiiiiidsss",
+        "bsdssss",
         $null,
-        $product_name,
-        $product_stock_small,
-        $product_stock_medium,
-        $product_stock_large,
-        $product_stock_xlarge,
-        $product_stock_xxlarge,
-        $product_price,
-        $product_status,
+        $name,
+        $price,
+        $status,
         $product_description,
         $product_gender,
         $current_date
@@ -81,6 +76,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->send_long_data(0, $imageData);
 
     if ($stmt->execute()) {
+        $proID = $stmt->insert_id;
+        $stmt->close();
+
+        // Insert into inventory for each size
+        $stocks = [
+            'S' => $product_stock_small,
+            'M' => $product_stock_medium,
+            'L' => $product_stock_large,
+            'XL' => $product_stock_xlarge,
+            'XXL' => $product_stock_xxlarge
+        ];
+
+        foreach ($stocks as $sizeName => $stockAmount) {
+            // Get sizeID
+            $sizeStmt = $con->prepare("SELECT sizeID FROM sizes WHERE sizes = ?");
+            $sizeStmt->bind_param("s", $sizeName);
+            $sizeStmt->execute();
+            $sizeRes = $sizeStmt->get_result();
+            if ($sizeRow = $sizeRes->fetch_assoc()) {
+                $sizeID = $sizeRow['sizeID'];
+                $invStatus = ($stockAmount > 0) ? 'In Stock' : 'Empty';
+                $invStmt = $con->prepare("INSERT INTO inventory (proID, sizeID, stock, status) VALUES (?, ?, ?, ?)");
+                $invStmt->bind_param("iiis", $proID, $sizeID, $stockAmount, $invStatus);
+                $invStmt->execute();
+                $invStmt->close();
+            }
+            $sizeStmt->close();
+        }
+
         $_SESSION['product_added'] = true;
         header("Location: products.php");
         exit();
