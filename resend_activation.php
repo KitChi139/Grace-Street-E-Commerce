@@ -16,12 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ((int)$user['is_active'] === 1) {
             $info_msg = "This account is already activated. You can login.";
         } else {
-            $token = bin2hex(random_bytes(16));
+            // Generate a 6-digit OTP
+            $token = sprintf("%06d", mt_rand(1, 999999));
             $update = "UPDATE grace_user SET activation_token = '$token' WHERE userID = " . (int)$user['userID'];
             if (mysqli_query($con, $update)) {
                 $activation_link = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/activate.php?token=$token";
                 $subject = "Account Activation - Grace Street";
-                $message = "Hello,\n\nPlease click the link below to activate your account:\n$activation_link\n\nThank you!";
+                $message = "Hello,\n\nYour new account activation code is: $token\n\nYou can also click the link below to activate your account:\n$activation_link\n\nThank you!";
                 
                 $sent = false;
                 if (file_exists('PHPMailer/src/PHPMailer.php')) {
@@ -33,9 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if ($sent) {
-                    $success_msg = "Activation email sent. Please check your inbox.";
+                    $success_msg = "Activation email sent. Please check your inbox for the code.";
+                    $redirect_to = "activate.php?email=" . urlencode($email);
                 } else {
-                    $error_msg = "Email sending is not available on this server. Your activation link is: $activation_link";
+                    $success_msg = "Email sending is not available on this server. Your activation code is: $token";
+                    $redirect_to = "activate.php?email=" . urlencode($email);
                 }
             } else {
                 $error_msg = "Failed to generate new activation link. Please try again.";

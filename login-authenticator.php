@@ -13,24 +13,31 @@ include('./components/connect.php');
 $GA = new PHPGangsta_GoogleAuthenticator();
 $userId = $_SESSION['user-id'];
 
-// Fetch email from email table using user-id session
-$email_query = mysqli_query($con, "SELECT e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE u.userID = '$userId'");
-$useremail = "";
-if(mysqli_num_rows($email_query) > 0) {
-    $email_row = mysqli_fetch_assoc($email_query);
-    $useremail = $email_row['email'];
+// Fetch user data including 2FA secret
+$user_query = mysqli_query($con, "SELECT u.two_factor_secret, e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE u.userID = '$userId'");
+$user_data = mysqli_fetch_assoc($user_query);
+$useremail = $user_data['email'] ?? "";
+$db_secret = $user_data['two_factor_secret'] ?? null;
+
+$is_first_time = empty($db_secret);
+
+// If secret exists in DB, use it. Otherwise, generate a temporary one for setup.
+if (!$is_first_time) {
+    $secret = $db_secret;
+} else {
+    if (!isset($_SESSION['temp_secret']) || empty($_SESSION['temp_secret'])) {
+        $_SESSION['temp_secret'] = $GA->createSecret();
+    }
+    $secret = $_SESSION['temp_secret'];
 }
 
-// Generate secret only once per session
-if (!isset($_SESSION['code']) || empty($_SESSION['code'])) {
-    $_SESSION['code'] = $GA->createSecret();
+$issuer = 'Grace Street Clothing';
+
+// Generate QR Code URL only if it's the first time
+$qrCodeUrl = "";
+if ($is_first_time) {
+    $qrCodeUrl = $GA->getQRCodeGoogleUrl($useremail, $secret, $issuer);
 }
-
-$secret = $_SESSION['code'];
-$issuer = 'AdminIndex';
-
-// Generate QR Code URL
-$qrCodeUrl = $GA->getQRCodeGoogleUrl($useremail, $secret, $issuer);
 
 $message = '';
 
@@ -41,7 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     $valid = $GA->verifyCode($secret, $code, 3);
     
     if ($valid) {
-        unset($_SESSION['code']);           // Remove secret after successful verification
+        // If it was the first time, save the secret to the database
+        if ($is_first_time) {
+            mysqli_query($con, "UPDATE grace_user SET two_factor_secret = '$secret' WHERE userID = '$userId'");
+            unset($_SESSION['temp_secret']);
+        }
+        
         $_SESSION['2fa_verified'] = true;
         $_SESSION['verified'] = true;
         
@@ -76,12 +88,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             max-width: 400px;
             margin: 40px auto;
             padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .qr-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
         }
         img {
             margin: 15px 0;
             border: 1px solid #ddd;
             padding: 5px;
             background: #fff;
+        }
+        .code-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .verify-btn {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .verify-btn:hover {
+            background: #333;
         }
     </style>
 </head>
@@ -92,29 +135,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     <section>
         <div class="loginuser-container1">
             <h2>Two-Factor Authentication</h2>
-            <p>Scan this QR code with Google Authenticator app:</p>
             
-            <img src="<?= htmlspecialchars($qrCodeUrl) ?>" 
-                 alt="Google Authenticator QR Code" 
-                 width="220" 
-                 height="220">
-            
-            <hr>
+            <?php if ($is_first_time): ?>
+                <div class="qr-section">
+                    <p>First-time setup: Scan this QR code with your Google Authenticator app:</p>
+                    <img src="<?= htmlspecialchars($qrCodeUrl) ?>" 
+                         alt="Google Authenticator QR Code" 
+                         width="220" 
+                         height="220">
+                    <p style="font-size: 12px; color: #666;">Once you scan this, it won't be shown again.</p>
+                </div>
+            <?php else: ?>
+                <div style="margin: 20px 0;">
+                    <p>Enter the 6-digit code from your Authenticator app to continue.</p>
+                </div>
+            <?php endif; ?>
             
             <form method="POST" autocomplete="off">
-                <label>
-                    Enter the 6-digit code from the app:
-                </label>
-                
                 <input type="text" 
                        name="code" 
+                       class="code-input"
                        maxlength="6" 
+                       placeholder="000000"
                        pattern="\d{6}" 
                        inputmode="numeric"
                        required 
                        autofocus>
                 
-                <button type="submit">Verify Code</button>
+                <button type="submit" class="verify-btn">Verify & Continue</button>
             </form>
             
             <?= $message ?>

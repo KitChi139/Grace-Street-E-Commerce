@@ -18,9 +18,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['unlock_user'])) {
 // HANDLE LOCK
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lock_user'])) {
     $id = $_POST['lock_user'];
-    $stmt = $con->prepare("UPDATE grace_user SET is_active = 0 WHERE userID = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
+    
+    // Fetch username for logging
+    $user_query = mysqli_query($con, "SELECT username FROM grace_user WHERE userID = '$id'");
+    if ($user_row = mysqli_fetch_assoc($user_query)) {
+        $username = $user_row['username'];
+        
+        // Lock the account
+        $stmt = $con->prepare("UPDATE grace_user SET is_active = 0 WHERE userID = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        
+        // Log to locked_accounts table
+        // We set tries to 0 or manual to indicate it was an admin action
+        mysqli_query($con, "INSERT INTO locked_accounts (username, tries) VALUES ('$username', 0)");
+    }
+    
     header("Location: user_management.php");
     exit();
 }
