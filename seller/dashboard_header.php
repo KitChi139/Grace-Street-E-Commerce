@@ -67,7 +67,7 @@ if(isset($_GET['logout'])){
                               echo '<div class="pop-content" style="text-align: center;">
                                       <h2>Welcome<br><span>' . $fetch_user['username'] . '</span></h2>
                                       <a href="./update_profile.php"><button onclick="updateProfile()">Update Profile</button></a>
-                                      <a href="home.php?logout=' . $user_id . '" onclick="return confirm(\'Are you sure you want to logout?\')"><button class="logBtn">Log out</button></a>
+                                      <a href="../logout.php?logout=' . $user_id . '" onclick="return confirm(\'Are you sure you want to logout?\')"><button class="logBtn">Log out</button></a>
                                     </div>';
                           } else {
                               echo '<div class="pop-content" style="text-align: center;">

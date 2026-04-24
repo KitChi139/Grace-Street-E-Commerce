@@ -68,16 +68,17 @@
 
                 $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
 
-                $activation_token = bin2hex(random_bytes(16));
+                // Generate a 6-digit OTP
+                $activation_token = sprintf("%06d", mt_rand(1, 999999));
                 
-                $insert_query = "INSERT INTO grace_user (username, emailID, password, contact_number, address, is_active, activation_token, roleID) 
-                                 VALUES ('$username', '$emailID', '$hashed_pass', '$contact', '$address', 0, '$activation_token', 3)"; // Assuming 3 is 'user' role
+                $insert_query = "INSERT INTO grace_user (first_name, last_name, username, emailID, password, contact_number, address, is_active, activation_token, roleID) 
+                                 VALUES ('$first_name', '$last_name', '$username', '$emailID', '$hashed_pass', '$contact', '$address', 0, '$activation_token', 3)"; // Assuming 3 is 'user' role
                 
                 if(mysqli_query($con, $insert_query)){
                     
                     $activation_link = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/activate.php?token=$activation_token";
                     $subject = "Account Activation - Grace Street";
-                    $message = "Hello $first_name $last_name,\n\nPlease click the link below to activate your account:\n$activation_link\n\nThank you!";
+                    $message = "Hello $first_name $last_name,\n\nYour account activation code is: $activation_token\n\nYou can also click the link below to activate your account:\n$activation_link\n\nThank you!";
                     
                     $sent = false;
                     if (file_exists('PHPMailer/src/PHPMailer.php')) {
@@ -95,11 +96,11 @@
                     unset($_SESSION['captcha_answer']);
                     
                     if ($sent) {
-                        $success_msg = "Registered successfully! Please check your email to activate your account.";
-                        $redirect_to = "login.php";
+                        $success_msg = "Registered successfully! Please check your email for the 6-digit activation code.";
+                        $redirect_to = "activate.php?email=" . urlencode($email);
                     } else {
-                        $success_msg = "Registered successfully, but email could not be sent. You can activate your account using this link: $activation_link";
-                        $redirect_to = "login.php";
+                        $success_msg = "Registered successfully, but email could not be sent. Your activation code is: $activation_token";
+                        $redirect_to = "activate.php?email=" . urlencode($email);
                     }
                 } else {
                     $error_msg = "Registration failed. Please try again.";
@@ -279,7 +280,7 @@
                 <p id="upper-req" style="color: red; <?php echo ($min_upper == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_upper; ?> CAPITAL letter<?php echo ($min_upper > 1) ? 's' : ''; ?></p>
                 <p id="lower-req" style="color: red; <?php echo ($min_lower == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_lower; ?> small letter<?php echo ($min_lower > 1) ? 's' : ''; ?></p>
                 <p id="number-req" style="color: red; <?php echo ($min_numbers == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_numbers; ?> number<?php echo ($min_numbers > 1) ? 's' : ''; ?></p>
-                <p id="special-req" style="color: red; <?php echo ($min_symbols == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_symbols; ?> special character<?php echo ($min_symbols > 1) ? 's' : ''; ?></p>
+                <p id="special-req" style="color: red; <?php echo ($min_symbols == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_symbols; ?> special character<?php echo ($min_symbols > 1) ? 's' : ''; ?> (~@#$%^&*()!?)</p>
             </div>
             
            
@@ -399,12 +400,12 @@
             }
             
            
-            const specialCount = (val.match(/[^A-Za-z0-9]/g) || []).length;
+            const specialCount = (val.match(/[~@#$%^&*()!?]/g) || []).length;
             if (specialCount >= minSymbols) {
-                specialReq.innerHTML = `✅ At least ${minSymbols} special character${minSymbols > 1 ? 's' : ''}`;
+                specialReq.innerHTML = `✅ At least ${minSymbols} special character${minSymbols > 1 ? 's' : ''} (~@#$%^&*()!?)`;
                 specialReq.style.color = 'green';
             } else {
-                specialReq.innerHTML = `❌ At least ${minSymbols} special character${minSymbols > 1 ? 's' : ''}`;
+                specialReq.innerHTML = `❌ At least ${minSymbols} special character${minSymbols > 1 ? 's' : ''} (~@#$%^&*()!?)`;
                 specialReq.style.color = 'red';
             }
         });

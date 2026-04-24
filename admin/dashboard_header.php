@@ -43,6 +43,7 @@ if(isset($_GET['logout'])){
                 <a href="./overview.php">Home</a>
                 <a href="./user_management.php">User Management</a>
                 <a href="./supplier_management.php">Supplier Management</a>
+                <a href="./locked_accounts.php">Locked Accounts</a>
                 <a href="./audit_trail.php">Audit Trail</a>
                 <a href="./settings.php">Settings</a>
               </nav>

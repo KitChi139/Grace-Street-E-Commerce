@@ -49,9 +49,9 @@ function validatePassword($password, $con) {
     // Symbol check
     $min_symbols = (int)($settings['pw_min_symbols'] ?? 0);
     if ($min_symbols > 0) {
-        preg_match_all('/[@$!%*?&]/', $password, $matches);
+        preg_match_all('/[~@#$%^&*()!?]/', $password, $matches);
         if (count($matches[0]) < $min_symbols) {
-            $errors[] = "at least $min_symbols special character" . ($min_symbols > 1 ? "s" : "") . " (@$!%*?&)";
+            $errors[] = "at least $min_symbols special character" . ($min_symbols > 1 ? "s" : "") . " (~@#$%^&*()!?)";
         }
     }
 

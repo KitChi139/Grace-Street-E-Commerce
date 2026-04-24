@@ -15,7 +15,22 @@ if(isset($_POST['submit'])){
         
         // 1. Check if account is active
         if ($row['is_active'] == 0) {
-            echo "<script>alert('Your account is locked or inactive. Please contact support.');</script>";
+            $user_email_enc = urlencode($email);
+            echo "<script>
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Account Inactive',
+                    text: 'Your account is not activated yet. Would you like to enter your activation code?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Activate Now',
+                    cancelButtonText: 'Contact Support',
+                    confirmButtonColor: '#000'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'activate.php?email=$user_email_enc';
+                    }
+                });
+            </script>";
         } 
         // 2. Verify password
         elseif (password_verify($pass, $row['password']) || sha1($pass) === $row['password']) {
@@ -25,8 +40,6 @@ if(isset($_POST['submit'])){
 
             $_SESSION['user-id'] = $row['userID'];
             $_SESSION['user-email'] = $email;
-            $_SESSION['code'] = false;     
-            
             
             // Fetch role name from roles table
             $role_id = $row['roleID'];
@@ -55,7 +68,9 @@ if(isset($_POST['submit'])){
             $new_attempts = $row['login_attempts'] + 1;
             
             if ($new_attempts >= $max_attempts) {
+                $username_locked = $row['username'];
                 mysqli_query($con, "UPDATE grace_user SET login_attempts = $new_attempts, is_active = 0 WHERE userID = '$user_id_actual'");
+                mysqli_query($con, "INSERT INTO locked_accounts (username, tries) VALUES ('$username_locked', $new_attempts)");
                 echo "<script>alert('Your account has been locked. Please contact support.');</script>";
             } else {
                 mysqli_query($con, "UPDATE grace_user SET login_attempts = $new_attempts WHERE userID = '$user_id_actual'");
@@ -85,6 +100,9 @@ if(isset($_POST['submit'])){
 
 
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
     .password-container {
