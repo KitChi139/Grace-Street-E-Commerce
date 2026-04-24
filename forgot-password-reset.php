@@ -1,9 +1,25 @@
 <?php
 
 include('./components/connect.php');
+include('./components/password_validation.php');
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Fetch system settings for password requirements
+$settings = [];
+$setting_query = mysqli_query($con, "SELECT * FROM system_settings WHERE setting_key LIKE 'pw_%'");
+while($row = mysqli_fetch_assoc($setting_query)) {
+    $settings[$row['setting_key']] = $row['setting_value'];
+}
+
+$min_length = $settings['pw_min_length'] ?? 12;
+$min_upper = $settings['pw_min_uppercase'] ?? 1;
+$min_lower = $settings['pw_min_lowercase'] ?? 1;
+$min_numbers = $settings['pw_min_numbers'] ?? 1;
+$min_symbols = $settings['pw_min_symbols'] ?? 1;
+
 $email = $_SESSION['reset_email'] ?? '';
 if (empty($email)) {
     header("Location: forgot-password-send.php");
@@ -14,40 +30,30 @@ if(isset($_POST['reset_password'])){
     $pass = trim($_POST['pass'] ?? '');
     $confirm_pass = trim($_POST['confirm_pass'] ?? '');
 
+    // Dynamic password validation
+    $pw_check = validatePassword($pass, $con);
+
     if ($pass !== $confirm_pass) {
         echo "<script>alert('Passwords do not match. Please try again.');</script>";
-    }
-    if (strlen($pass) < 12) {
-        echo "<script>alert('Password must be at least 12 characters long.');</script>";
-    }
-    if (!preg_match('/[A-Z]/', $pass)) {
-        echo "<script>alert('Password must contain at least one uppercase letter.');</script>";
-    }
-    if (!preg_match('/[a-z]/', $pass)) {
-        echo "<script>alert('Password must contain at least one lowercase letter.');</script>";
-    }
-    if (!preg_match('/[0-9]/', $pass)) {
-        echo "<script>alert('Password must contain at least one number.');</script>";
-    }
-    if (!preg_match('/[\W_]/', $pass)) {
-        echo "<script>alert('Password must contain at least one special character.');</script>";
-    }
-
-    $select = mysqli_query($con, "SELECT u.*, e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE e.email = '$email'") or die('query failed');
-    if(mysqli_num_rows($select) > 0){
-        $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
-        $row = mysqli_fetch_assoc($select);
-          $update = mysqli_query($con, "UPDATE grace_user SET password = '$hashed_password' WHERE userID = " . $row['userID']) or die('query failed');
-        if ($update) {
-            echo "<script>alert('Password has been reset successfully. You can now log in with your new password.');</script>";
-            unset($_SESSION['reset_email']);
-            header("Location: login.php");
-            exit();
+    } elseif (!$pw_check['valid']) {
+        echo "<script>alert('" . $pw_check['message'] . "');</script>";
+    } else {
+        $select = mysqli_query($con, "SELECT u.*, e.email FROM grace_user u JOIN email e ON u.emailID = e.emailID WHERE e.email = '$email'") or die('query failed');
+        if(mysqli_num_rows($select) > 0){
+            $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
+            $row = mysqli_fetch_assoc($select);
+              $update = mysqli_query($con, "UPDATE grace_user SET password = '$hashed_password' WHERE userID = " . $row['userID']) or die('query failed');
+            if ($update) {
+                echo "<script>alert('Password has been reset successfully. You can now log in with your new password.');</script>";
+                unset($_SESSION['reset_email']);
+                header("Location: login.php");
+                exit();
+            } else {
+                echo "<script>alert('Failed to reset password. Please try again.');</script>";
+            }
         } else {
             echo "<script>alert('Failed to reset password. Please try again.');</script>";
         }
-    } else {
-        echo "<script>alert('Failed to reset password. Please try again.');</script>";
     }
 }
 ?>
@@ -112,11 +118,11 @@ if(isset($_POST['reset_password'])){
                     <i class="fas fa-eye-slash toggle-password" id="toggleConfirmPassword"></i>
                 </div>
                 <div id="password-requirements" style="font-size: 14px; margin-bottom: 20px; ">
-                    <p id="length-req" style="color: red;">❌ At least 12 characters long</p>
-                    <p id="upper-req" style="color: red;">❌ At least one uppercase letter</p>
-                    <p id="lower-req" style="color: red;">❌ At least one lowercase letter</p>
-                    <p id="number-req" style="color: red;">❌ At least one number</p>
-                    <p id="special-req" style="color: red;">❌ At least one special character</p>
+                    <p id="length-req" style="color: red; <?php echo ($min_length == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_length; ?> characters long</p>
+                    <p id="upper-req" style="color: red; <?php echo ($min_upper == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_upper; ?> CAPITAL letter<?php echo ($min_upper > 1) ? 's' : ''; ?></p>
+                    <p id="lower-req" style="color: red; <?php echo ($min_lower == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_lower; ?> small letter<?php echo ($min_lower > 1) ? 's' : ''; ?></p>
+                    <p id="number-req" style="color: red; <?php echo ($min_numbers == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_numbers; ?> number<?php echo ($min_numbers > 1) ? 's' : ''; ?></p>
+                    <p id="special-req" style="color: red; <?php echo ($min_symbols == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_symbols; ?> special character<?php echo ($min_symbols > 1) ? 's' : ''; ?></p>
                 </div>
 
                 <input type="submit" value="Reset Password" class="btn" name="reset_password">
@@ -149,49 +155,59 @@ if(isset($_POST['reset_password'])){
         const numberReq = document.getElementById('number-req');
         const specialReq = document.getElementById('special-req');
 
-         passwordInput.addEventListener('input', () => {
+        const minLength = <?php echo $min_length; ?>;
+        const minUpper = <?php echo $min_upper; ?>;
+        const minLower = <?php echo $min_lower; ?>;
+        const minNumbers = <?php echo $min_numbers; ?>;
+        const minSymbols = <?php echo $min_symbols; ?>;
+
+        passwordInput.addEventListener('input', () => {
             const val = passwordInput.value;
             
             // Length
-            if (val.length >= 12) {
-                lengthReq.innerHTML = '✅ At least 12 characters long';
+            if (val.length >= minLength) {
+                lengthReq.innerHTML = `✅ At least ${minLength} characters long`;
                 lengthReq.style.color = 'green';
             } else {
-                lengthReq.innerHTML = '❌ At least 12 characters long';
+                lengthReq.innerHTML = `❌ At least ${minLength} characters long`;
                 lengthReq.style.color = 'red';
             }
             
-            if (/[A-Z]/.test(val)) {
-                upperReq.innerHTML = '✅ At least one uppercase letter';
+            const upperCount = (val.match(/[A-Z]/g) || []).length;
+            if (upperCount >= minUpper) {
+                upperReq.innerHTML = `✅ At least ${minUpper} CAPITAL letter${minUpper > 1 ? 's' : ''}`;
                 upperReq.style.color = 'green';
             } else {
-                upperReq.innerHTML = '❌ At least one uppercase letter';
+                upperReq.innerHTML = `❌ At least ${minUpper} CAPITAL letter${minUpper > 1 ? 's' : ''}`;
                 upperReq.style.color = 'red';
             }
             
            
-            if (/[a-z]/.test(val)) {
-                lowerReq.innerHTML = '✅ At least one lowercase letter';
+            const lowerCount = (val.match(/[a-z]/g) || []).length;
+            if (lowerCount >= minLower) {
+                lowerReq.innerHTML = `✅ At least ${minLower} small letter${minLower > 1 ? 's' : ''}`;
                 lowerReq.style.color = 'green';
             } else {
-                lowerReq.innerHTML = '❌ At least one lowercase letter';
+                lowerReq.innerHTML = `❌ At least ${minLower} small letter${minLower > 1 ? 's' : ''}`;
                 lowerReq.style.color = 'red';
             }
             
-            if (/[0-9]/.test(val)) {
-                numberReq.innerHTML = '✅ At least one number';
+            const numberCount = (val.match(/[0-9]/g) || []).length;
+            if (numberCount >= minNumbers) {
+                numberReq.innerHTML = `✅ At least ${minNumbers} number${minNumbers > 1 ? 's' : ''}`;
                 numberReq.style.color = 'green';
             } else {
-                numberReq.innerHTML = '❌ At least one number';
+                numberReq.innerHTML = `❌ At least ${minNumbers} number${minNumbers > 1 ? 's' : ''}`;
                 numberReq.style.color = 'red';
             }
             
            
-            if (/[^A-Za-z0-9]/.test(val)) {
-                specialReq.innerHTML = '✅ At least one special character';
+            const specialCount = (val.match(/[^A-Za-z0-9]/g) || []).length;
+            if (specialCount >= minSymbols) {
+                specialReq.innerHTML = `✅ At least ${minSymbols} special character${minSymbols > 1 ? 's' : ''}`;
                 specialReq.style.color = 'green';
             } else {
-                specialReq.innerHTML = '❌ At least one special character';
+                specialReq.innerHTML = `❌ At least ${minSymbols} special character${minSymbols > 1 ? 's' : ''}`;
                 specialReq.style.color = 'red';
             }
         });

@@ -15,11 +15,14 @@ if(isset($_POST['submit'])){
         
         // 1. Check if account is active
         if ($row['is_active'] == 0) {
-            echo "<script>alert('Please activate your account first. Check your email for the activation link.');</script>";
+            echo "<script>alert('Your account is locked or inactive. Please contact support.');</script>";
         } 
-        // 2. Verify password (using password_verify for new users and sha1 for old users)
+        // 2. Verify password
         elseif (password_verify($pass, $row['password']) || sha1($pass) === $row['password']) {
-            // If it was sha1, we should ideally rehash it here, but let's keep it simple
+            // Reset failed attempts on success
+            $user_id_actual = $row['userID'];
+            mysqli_query($con, "UPDATE grace_user SET login_attempts = 0 WHERE userID = '$user_id_actual'");
+
             $_SESSION['user-id'] = $row['userID'];
             $_SESSION['user-email'] = $email;
             $_SESSION['code'] = false;     
@@ -42,7 +45,22 @@ if(isset($_POST['submit'])){
                 exit(); 
             }
         } else {
-            echo "<script>alert('Incorrect password or email');</script>";
+            // Fetch max attempts from settings
+            $setting_query = mysqli_query($con, "SELECT setting_value FROM system_settings WHERE setting_key = 'max_login_attempts'");
+            $setting_row = mysqli_fetch_assoc($setting_query);
+            $max_attempts = $setting_row ? (int)$setting_row['setting_value'] : 3;
+
+            // Increment failed attempts
+            $user_id_actual = $row['userID'];
+            $new_attempts = $row['login_attempts'] + 1;
+            
+            if ($new_attempts >= $max_attempts) {
+                mysqli_query($con, "UPDATE grace_user SET login_attempts = $new_attempts, is_active = 0 WHERE userID = '$user_id_actual'");
+                echo "<script>alert('Your account has been locked. Please contact support.');</script>";
+            } else {
+                mysqli_query($con, "UPDATE grace_user SET login_attempts = $new_attempts WHERE userID = '$user_id_actual'");
+                echo "<script>alert('Incorrect password or email');</script>";
+            }
         }
     }else{
         echo "<script>alert('Incorrect password or email');</script>";

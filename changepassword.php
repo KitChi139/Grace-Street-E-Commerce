@@ -1,6 +1,23 @@
 <?php
 include './components/connect.php';
+include './components/password_validation.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Fetch system settings for password requirements
+$settings = [];
+$setting_query = mysqli_query($con, "SELECT * FROM system_settings WHERE setting_key LIKE 'pw_%'");
+while($row = mysqli_fetch_assoc($setting_query)) {
+    $settings[$row['setting_key']] = $row['setting_value'];
+}
+
+$min_length = $settings['pw_min_length'] ?? 12;
+$min_upper = $settings['pw_min_uppercase'] ?? 1;
+$min_lower = $settings['pw_min_lowercase'] ?? 1;
+$min_numbers = $settings['pw_min_numbers'] ?? 1;
+$min_symbols = $settings['pw_min_symbols'] ?? 1;
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -21,17 +38,15 @@ if (isset($_POST['submit'])) {
     $new_pass_raw = $_POST['new_pass'];
     $cpass_raw = $_POST['cpass'];
 
-    $uppercase = preg_match('@[A-Z]@', $new_pass_raw);
-    $lowercase = preg_match('@[a-z]@', $new_pass_raw);
-    $number    = preg_match('@[0-9]@', $new_pass_raw);
-    $specialChars = preg_match('@[^\w]@', $new_pass_raw);
+    // Dynamic password validation
+    $pw_check = validatePassword($new_pass_raw, $con);
 
     if (empty($old_pass_raw)) {
         echo "<script>alert('Please enter old password!');</script>";
     } elseif (!(password_verify($old_pass_raw, $prev_pass) || sha1($old_pass_raw) === $prev_pass)) {
         echo "<script>alert('Old password not matched!');</script>";
-    } elseif (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($new_pass_raw) < 12) {
-        echo "<script>alert('New password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');</script>";
+    } elseif (!$pw_check['valid']) {
+        echo "<script>alert('" . $pw_check['message'] . "');</script>";
     } elseif ($new_pass_raw != $cpass_raw) {
         echo "<script>alert('Confirm password not matched!');</script>";
     } else {
@@ -74,11 +89,11 @@ if (isset($_POST['submit'])) {
                 <label for="new_password">New Password</label>
                 <input type="password" id="new_password" name="new_pass" required placeholder="Enter your new password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
                 <div id="password-requirements" style="font-size: 14px; margin-bottom: 20px;">
-                    <p id="length-req" style="color: red;">❌ At least 12 characters long</p>
-                    <p id="upper-req" style="color: red;">❌ At least one uppercase letter</p>
-                    <p id="lower-req" style="color: red;">❌ At least one lowercase letter</p>
-                    <p id="number-req" style="color: red;">❌ At least one number</p>
-                    <p id="special-req" style="color: red;">❌ At least one special character</p>
+                    <p id="length-req" style="color: red; <?php echo ($min_length == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_length; ?> characters long</p>
+                    <p id="upper-req" style="color: red; <?php echo ($min_upper == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_upper; ?> CAPITAL letter<?php echo ($min_upper > 1) ? 's' : ''; ?></p>
+                    <p id="lower-req" style="color: red; <?php echo ($min_lower == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_lower; ?> small letter<?php echo ($min_lower > 1) ? 's' : ''; ?></p>
+                    <p id="number-req" style="color: red; <?php echo ($min_numbers == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_numbers; ?> number<?php echo ($min_numbers > 1) ? 's' : ''; ?></p>
+                    <p id="special-req" style="color: red; <?php echo ($min_symbols == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_symbols; ?> special character<?php echo ($min_symbols > 1) ? 's' : ''; ?></p>
                 </div>
 
                 <label for="confirm_password">Confirm Password</label>
@@ -99,51 +114,59 @@ if (isset($_POST['submit'])) {
         const numberReq = document.getElementById('number-req');
         const specialReq = document.getElementById('special-req');
 
+        const minLength = <?php echo $min_length; ?>;
+        const minUpper = <?php echo $min_upper; ?>;
+        const minLower = <?php echo $min_lower; ?>;
+        const minNumbers = <?php echo $min_numbers; ?>;
+        const minSymbols = <?php echo $min_symbols; ?>;
+
         passwordInput.addEventListener('input', () => {
             const val = passwordInput.value;
             
             // Length
-            if (val.length >= 12) {
-                lengthReq.innerHTML = '✅ At least 12 characters long';
+            if (val.length >= minLength) {
+                lengthReq.innerHTML = `✅ At least ${minLength} characters long`;
                 lengthReq.style.color = 'green';
             } else {
-                lengthReq.innerHTML = '❌ At least 12 characters long';
+                lengthReq.innerHTML = `❌ At least ${minLength} characters long`;
                 lengthReq.style.color = 'red';
             }
             
-            // Uppercase
-            if (/[A-Z]/.test(val)) {
-                upperReq.innerHTML = '✅ At least one uppercase letter';
+            const upperCount = (val.match(/[A-Z]/g) || []).length;
+            if (upperCount >= minUpper) {
+                upperReq.innerHTML = `✅ At least ${minUpper} CAPITAL letter${minUpper > 1 ? 's' : ''}`;
                 upperReq.style.color = 'green';
             } else {
-                upperReq.innerHTML = '❌ At least one uppercase letter';
+                upperReq.innerHTML = `❌ At least ${minUpper} CAPITAL letter${minUpper > 1 ? 's' : ''}`;
                 upperReq.style.color = 'red';
             }
             
-            // Lowercase
-            if (/[a-z]/.test(val)) {
-                lowerReq.innerHTML = '✅ At least one lowercase letter';
+           
+            const lowerCount = (val.match(/[a-z]/g) || []).length;
+            if (lowerCount >= minLower) {
+                lowerReq.innerHTML = `✅ At least ${minLower} small letter${minLower > 1 ? 's' : ''}`;
                 lowerReq.style.color = 'green';
             } else {
-                lowerReq.innerHTML = '❌ At least one lowercase letter';
+                lowerReq.innerHTML = `❌ At least ${minLower} small letter${minLower > 1 ? 's' : ''}`;
                 lowerReq.style.color = 'red';
             }
             
-            // Number
-            if (/[0-9]/.test(val)) {
-                numberReq.innerHTML = '✅ At least one number';
+            const numberCount = (val.match(/[0-9]/g) || []).length;
+            if (numberCount >= minNumbers) {
+                numberReq.innerHTML = `✅ At least ${minNumbers} number${minNumbers > 1 ? 's' : ''}`;
                 numberReq.style.color = 'green';
             } else {
-                numberReq.innerHTML = '❌ At least one number';
+                numberReq.innerHTML = `❌ At least ${minNumbers} number${minNumbers > 1 ? 's' : ''}`;
                 numberReq.style.color = 'red';
             }
             
-            // Special character
-            if (/[^A-Za-z0-9]/.test(val)) {
-                specialReq.innerHTML = '✅ At least one special character';
+           
+            const specialCount = (val.match(/[^A-Za-z0-9]/g) || []).length;
+            if (specialCount >= minSymbols) {
+                specialReq.innerHTML = `✅ At least ${minSymbols} special character${minSymbols > 1 ? 's' : ''}`;
                 specialReq.style.color = 'green';
             } else {
-                specialReq.innerHTML = '❌ At least one special character';
+                specialReq.innerHTML = `❌ At least ${minSymbols} special character${minSymbols > 1 ? 's' : ''}`;
                 specialReq.style.color = 'red';
             }
         });

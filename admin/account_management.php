@@ -2,7 +2,7 @@
 <head>
   <title>Grace Street Clothing – Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="account_management.css">
+  <link rel="stylesheet" href="./styles/account_management.css">
 </head>
 <body>
 

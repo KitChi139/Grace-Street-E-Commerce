@@ -25,9 +25,11 @@ function getWishListItemCount($user_id, $con) {
 }
 
 if(isset($_GET['logout'])){
-    unset($_SESSION['user-id']); 
+    unset($_SESSION['user-id']);
+    unset($_SESSION['user_id']);
     session_destroy();
-    header('location:login.php');
+    header('location:../login.php');
+    exit();
 }
 ?>
 
@@ -42,7 +44,7 @@ if(isset($_GET['logout'])){
                 <a href="./user_management.php">User Management</a>
                 <a href="./supplier_management.php">Supplier Management</a>
                 <a href="./audit_trail.php">Audit Trail</a>
-                <a href="./edit_profile.php">Settings</a>
+                <a href="./settings.php">Settings</a>
               </nav>
               <div class="header-btn">
                 <?php if (!isset($user_id)): ?>
