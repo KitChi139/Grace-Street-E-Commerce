@@ -21,10 +21,10 @@
                     <h1>Welcome to <br><span style="font-size: 50px;">GRACE STREET</span></br> <span style="font-weight: 300;">Clothing Shop</span></h1>
                 </div>
                 <div class="slider">
-                    <img src="img/img1.png" alt="Image 1">
-                    <img src="img/img2.png" alt="Image 2">
-                    <img src="img/img3.png" alt="Image 3">
-                    <img src="img/img4.png" alt="Image 4">
+                    <img src="uploads/images/1.jpg" alt="Image 1">
+                    <img src="uploads/images/2.jpg" alt="Image 2">
+                    <img src="uploads/images/5.jpg" alt="Image 3">
+                    <img src="uploads/images/6.jpg" alt="Image 4">
                 </div>
             </div>
 
