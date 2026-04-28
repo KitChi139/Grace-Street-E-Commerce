@@ -1,6 +1,18 @@
 <?php
-include('../components/connect.php');
+include_once '../components/connect.php';
+include_once '../components/audit_logger.php';
 
+// Ensure table exists before querying
+ensure_audit_table_exists();
+
+// Fetch audit trail with user details
+$select_audit = mysqli_query($con, "
+    SELECT a.*, u.username, r.role 
+    FROM audit_trail a 
+    JOIN grace_user u ON a.performed_by = u.userID 
+    JOIN roles r ON u.roleID = r.roleID 
+    ORDER BY a.timestamp DESC
+") or die('Query failed');
 ?>
 <!DOCTYPE html>
 <head>
@@ -67,34 +79,25 @@ include('../components/connect.php');
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="action-name">User Account Terminated</td>
-            <td class="performed-by">Admin User</td>
-            <td class="target">Mike Johnson (Customer)</td>
-            <td class="timestamp">2026-04-11 10:30 AM</td>
-            <td><span class="badge badge-critical">Critical</span></td>
-          </tr>
-          <tr>
-            <td class="action-name">Seller Application Approved</td>
-            <td class="performed-by">Admin User</td>
-            <td class="target">Sarah's Store (Seller)</td>
-            <td class="timestamp">2026-04-11 09:15 AM</td>
-            <td><span class="badge badge-info">Info</span></td>
-          </tr>
-          <tr>
-            <td class="action-name">User Account Modified</td>
-            <td class="performed-by">Admin User</td>
-            <td class="target">John Doe (Customer)</td>
-            <td class="timestamp">2026-04-10 04:45 PM</td>
-            <td><span class="badge badge-warning">Warning</span></td>
-          </tr>
-          <tr>
-            <td class="action-name">Seller Application Rejected</td>
-            <td class="performed-by">Admin User</td>
-            <td class="target">Test Store (Seller)</td>
-            <td class="timestamp">2026-04-10 02:20 PM</td>
-            <td><span class="badge badge-info">Info</span></td>
-          </tr>
+          <?php
+          if (mysqli_num_rows($select_audit) > 0) {
+              while ($row = mysqli_fetch_assoc($select_audit)) {
+                  $status_class = 'badge-info';
+                  if ($row['status'] == 'Critical') $status_class = 'badge-critical';
+                  if ($row['status'] == 'Warning') $status_class = 'badge-warning';
+                  
+                  echo "<tr>";
+                  echo "<td class='action-name'>" . htmlspecialchars($row['action']) . "</td>";
+                  echo "<td class='performed-by'>" . htmlspecialchars($row['username']) . " (" . ucfirst($row['role']) . ")</td>";
+                  echo "<td class='target'>" . ($row['target'] ? htmlspecialchars($row['target']) : '-') . "</td>";
+                  echo "<td class='timestamp'>" . date('Y-m-d h:i A', strtotime($row['timestamp'])) . "</td>";
+                  echo "<td><span class='badge $status_class'>" . htmlspecialchars($row['status']) . "</span></td>";
+                  echo "</tr>";
+              }
+          } else {
+              echo "<tr><td colspan='5' style='text-align:center;'>No administrative actions recorded yet.</td></tr>";
+          }
+          ?>
         </tbody>
       </table>
     </div>

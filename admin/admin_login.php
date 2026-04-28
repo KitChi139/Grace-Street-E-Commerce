@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/index.css">
     <title>Admin Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php
+    if (isset($_GET['timeout'])) {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Session Expired',
+                    text: 'Your session has timed out due to inactivity. Please login again.',
+                    confirmButtonColor: '#000'
+                });
+            });
+        </script>";
+    }
+    ?>
 </head>
 <body>
     <div class="admin_login_container">

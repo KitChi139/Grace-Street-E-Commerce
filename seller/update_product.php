@@ -3,10 +3,10 @@
 include('../components/connect.php');
 
 // Check if ID is provided in the URL
-if(isset($_GET['id'])) {
-    $productId = $_GET['id'];
+if(isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $productId = (int)$_GET['id'];
 
-    $productQuery = "SELECT p.*, 
+    $stmt = $con->prepare("SELECT p.*, 
                         MAX(CASE WHEN s.sizes = 'S' THEN i.stock ELSE 0 END) AS product_stock_s,
                         MAX(CASE WHEN s.sizes = 'M' THEN i.stock ELSE 0 END) AS product_stock_m,
                         MAX(CASE WHEN s.sizes = 'L' THEN i.stock ELSE 0 END) AS product_stock_l,
@@ -15,18 +15,24 @@ if(isset($_GET['id'])) {
                     FROM product p
                     LEFT JOIN inventory i ON p.proID = i.proID
                     LEFT JOIN sizes s ON i.sizeID = s.sizeID
-                    WHERE p.proID = $productId
-                    GROUP BY p.proID";
-    $productResult = mysqli_query($con, $productQuery);
-    $productData = mysqli_fetch_assoc($productResult);
+                    WHERE p.proID = ?
+                    GROUP BY p.proID");
+    $stmt->bind_param("i", $productId);
+    $stmt->execute();
+    $productResult = $stmt->get_result();
+    $productData = $productResult->fetch_assoc();
+    $stmt->close();
+} else {
+    header("Location: products.php");
+    exit();
 }
 
 if(isset($_POST['productId'])) {
-    $productId = $_POST['productId'];
-    $productName = $_POST['name'];
-    $productPrice = $_POST['price'];
-    $product_description = $_POST['Description'];
-    $productGender = $_POST['product_gender'];
+    $productId = (int)$_POST['productId'];
+    $productName = mysqli_real_escape_string($con, $_POST['name']);
+    $productPrice = (float)$_POST['price'];
+    $product_description = mysqli_real_escape_string($con, $_POST['Description']);
+    $productGender = (int)$_POST['product_gender'];
 
     $stocks = [
         'S' => (int)$_POST['product_stock_s'],
@@ -37,10 +43,13 @@ if(isset($_POST['productId'])) {
     ];
 
     // Retrieve existing image name from the database
-    $productQuery = "SELECT image FROM product WHERE proID = $productId";
-    $productResult = mysqli_query($con, $productQuery);
-    $productData = mysqli_fetch_assoc($productResult);
+    $stmt = $con->prepare("SELECT image FROM product WHERE proID = ?");
+    $stmt->bind_param("i", $productId);
+    $stmt->execute();
+    $productResult = $stmt->get_result();
+    $productData = $productResult->fetch_assoc();
     $imageName = $productData['image'];
+    $stmt->close();
 
     // Check if a new image is uploaded
     if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -54,9 +63,10 @@ if(isset($_POST['productId'])) {
     }
 
     // Update product information in the database
-    $updateQuery = "UPDATE product SET name = '$productName', price = '$productPrice', image = '$imageName',description = '$product_description' , gender = '$productGender' WHERE proID = $productId";
+    $updateStmt = $con->prepare("UPDATE product SET name = ?, price = ?, image = ?, description = ?, gender = ? WHERE proID = ?");
+    $updateStmt->bind_param("sdisii", $productName, $productPrice, $imageName, $product_description, $productGender, $productId);
     
-    if(mysqli_query($con, $updateQuery)) {
+    if($updateStmt->execute()) {
         // Update inventory for each size
         foreach ($stocks as $sizeName => $stockAmount) {
             // Get sizeID

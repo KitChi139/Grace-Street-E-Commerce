@@ -54,6 +54,10 @@ $search_param = '%' . $search . '%';
 $stmt->bind_param("siii", $search_param, $user_id, $start, $limit);
 $stmt->execute();
 $result = $stmt->get_result();
+$products = [];
+while($row = mysqli_fetch_assoc($result)){
+    $products[] = $row;
+}
 $stmt->close();
 ?>
 
@@ -96,6 +100,8 @@ $stmt->close();
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .search-bar {
     margin-top: 20px;
@@ -128,6 +134,146 @@ $stmt->close();
     background: none;
     cursor: pointer;
     padding: 5px;
+}
+.view-toggle {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.view-toggle-btn {
+    padding: 8px 14px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+.view-toggle-btn:hover {
+    background-color: #f0f0f0;
+}
+.view-toggle-btn.active {
+    background-color: #333;
+    color: white;
+    border-color: #333;
+}
+.grid-view {
+    display: none;
+    padding: 15px;
+}
+.grid-view.active {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+.table-view {
+    overflow-x: auto;
+}
+.table-view.hidden {
+    display: none;
+}
+.product-card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+.product-card-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+.product-card-name {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #333;
+}
+.product-card-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e74c3c;
+    margin-bottom: 8px;
+}
+.product-card-stock {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+}
+.product-card-stock span {
+    display: inline-block;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
+.product-card-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+.product-card-status.available {
+    background: #d4edda;
+    color: #155724;
+}
+.product-card-status.unavailable {
+    background: #f8d7da;
+    color: #721c24;
+}
+.product-card-gender {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 8px;
+}
+.product-card-description {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 12px;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.product-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+.product-card-actions button,
+.product-card-actions a {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: center;
+    text-decoration: none;
+}
+.product-card-actions button {
+    background: #3498db;
+    color: white;
+}
+.product-card-actions a {
+    background: #e74c3c;
+    color: white;
 }
     </style>
     <title>Dashboard</title>
@@ -167,10 +313,18 @@ $stmt->close();
                         <option value="womens">Female</option>
                     </select>
                 </div>
+                <div class="view-toggle">
+                    <button class="view-toggle-btn active" onclick="setView('table')" id="tableViewBtn">
+                        <i class="fa-solid fa-table"></i> Table
+                    </button>
+                    <button class="view-toggle-btn" onclick="setView('grid')" id="gridViewBtn">
+                        <i class="fa-solid fa-grid-2"></i> Grid
+                    </button>
+                </div>
            </div>
             <div class="main_products_box">
-            <div class="main_products_table">
-                <?php if(mysqli_num_rows($result) > 0): ?>
+            <div class="main_products_table table-view" id="tableView">
+                <?php if(count($products) > 0): ?>
                     <table>
                     <thead>
                         <tr>
@@ -186,7 +340,7 @@ $stmt->close();
                     </thead>
                     <tbody id="productTableBody">
                         <?php
-                            while($row = mysqli_fetch_assoc($result)){  
+                            foreach($products as $row){  
                             ?>
                             <tr data-name="<?php echo htmlspecialchars($row['name']); ?>" 
                             data-desc="<?php echo htmlspecialchars($row['description']); ?>" 
@@ -219,6 +373,45 @@ $stmt->close();
                         ?>
                     </tbody>
                 </table>
+                <?php else: ?>
+                <p class="no-products">No products found.</p>
+                <?php endif; ?>
+            </div>
+            <div class="grid-view" id="gridView">
+                <?php if(count($products) > 0):
+                    foreach($products as $row){  
+                        $s = isset($row['product_stock_s']) ? $row['product_stock_s'] : 0;
+                        $m = isset($row['product_stock_m']) ? $row['product_stock_m'] : 0;
+                        $l = isset($row['product_stock_l']) ? $row['product_stock_l'] : 0;
+                        $xl = isset($row['product_stock_xl']) ? $row['product_stock_xl'] : 0;
+                        $xxl = isset($row['product_stock_xxl']) ? $row['product_stock_xxl'] : 0;
+                        $statusClass = strtolower($row['status']) === 'available' ? 'available' : 'unavailable';
+                ?>
+                    <div class="product-card" 
+                         data-name="<?php echo htmlspecialchars($row['name']); ?>" 
+                         data-desc="<?php echo htmlspecialchars($row['description']); ?>" 
+                         data-status="<?php echo strtolower($row['status']); ?>"
+                         data-gender="<?php echo strtolower($row['gender']); ?>"
+                         data-id="<?php echo $row['proID']; ?>">
+                        <img class="product-card-image" src="../uploads/images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>">
+                        <div class="product-card-name"><?php echo $row['name']; ?></div>
+                        <div class="product-card-price">$<?php echo number_format($row['price'], 2); ?></div>
+                        <div class="product-card-stock">
+                            <span>S: <?php echo $s; ?></span>
+                            <span>M: <?php echo $m; ?></span>
+                            <span>L: <?php echo $l; ?></span>
+                            <span>XL: <?php echo $xl; ?></span>
+                            <span>XXL: <?php echo $xxl; ?></span>
+                        </div>
+                        <div class="product-card-status <?php echo $statusClass; ?>"><?php echo $row['status']; ?></div>
+                        <div class="product-card-gender"><?php echo $row['gender']; ?></div>
+                        <div class="product-card-description"><?php echo $row['description']; ?></div>
+                        <div class="product-card-actions">
+                            <button onclick='updateItem(<?php echo $row['proID']; ?>)'>Update</button>
+                            <a href="?delete_id=<?php echo $row['proID']; ?>" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                        </div>
+                    </div>
+                <?php } ?>
                 <?php else: ?>
                 <p class="no-products">No products found.</p>
                 <?php endif; ?>
@@ -319,13 +512,11 @@ $stmt->close();
    </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-// Function to handle click event on addProductBtn
 function showProductPopup() {
     var mainProductBg = document.getElementById("mainProductBg");
     mainProductBg.style.display = "block";
 }
 
-// Function to handle click event on closeProductBtn
 function hideProductPopup() {
     var mainProductBg = document.getElementById("mainProductBg");
     mainProductBg.style.display = "none";
@@ -341,18 +532,38 @@ function updateItem(productId) {
             alert("Product Added");
         }
 
+        function setView(view) {
+            const tableView = document.getElementById('tableView');
+            const gridView = document.getElementById('gridView');
+            const tableViewBtn = document.getElementById('tableViewBtn');
+            const gridViewBtn = document.getElementById('gridViewBtn');
+
+            if (view === 'table') {
+                tableView.classList.remove('hidden');
+                gridView.classList.remove('active');
+                tableViewBtn.classList.add('active');
+                gridViewBtn.classList.remove('active');
+            } else {
+                tableView.classList.add('hidden');
+                gridView.classList.add('active');
+                tableViewBtn.classList.remove('active');
+                gridViewBtn.classList.add('active');
+            }
+        }
+
         const productSearch = document.getElementById('productSearch');
         const statusFilter = document.getElementById('productStatusFilter');
         const genderFilter = document.getElementById('productGenderFilter');
 
-        // Search and Filter Logic for products
         function filterProducts() {
             const searchTerm = (productSearch ? productSearch.value : '').toLowerCase();
             const filterStatus = (statusFilter ? statusFilter.value : 'all').toLowerCase();
             const filterGender = (genderFilter ? genderFilter.value : 'all').toLowerCase();
 
-            const rows = document.querySelectorAll('#productTableBody tr');
-            rows.forEach(row => {
+            const tableRows = document.querySelectorAll('#productTableBody tr');
+            const gridCards = document.querySelectorAll('.product-card');
+
+            tableRows.forEach(row => {
                 const name = (row.getAttribute('data-name') || '').toLowerCase();
                 const desc = (row.getAttribute('data-desc') || '').toLowerCase();
                 const status = (row.getAttribute('data-status') || '').toLowerCase();
@@ -367,6 +578,24 @@ function updateItem(productId) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
+                }
+            });
+
+            gridCards.forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const desc = (card.getAttribute('data-desc') || '').toLowerCase();
+                const status = (card.getAttribute('data-status') || '').toLowerCase();
+                const gender = (card.getAttribute('data-gender') || '').toLowerCase();
+                const id = (card.getAttribute('data-id') || '').toLowerCase();
+
+                const matchesSearch = name.includes(searchTerm) || desc.includes(searchTerm) || id.includes(searchTerm);
+                const matchesStatus = filterStatus === 'all' || (filterStatus === 'available' && status === 'available') || (filterStatus === 'unavailable' && status !== 'available');
+                const matchesGender = filterGender === 'all' || gender === filterGender;
+
+                if (matchesSearch && matchesStatus && matchesGender) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
                 }
             });
         }

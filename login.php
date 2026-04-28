@@ -41,6 +41,10 @@ if(isset($_POST['submit'])){
             $_SESSION['user-id'] = $row['userID'];
             $_SESSION['user-email'] = $email;
             
+            // Log successful login
+            include_once './components/audit_logger.php';
+            log_audit('User Login', $row['userID'], $email, 'Info');
+            
             // Fetch role name from roles table
             $role_id = $row['roleID'];
             $role_query = mysqli_query($con, "SELECT role FROM roles WHERE roleID = '$role_id'");
@@ -103,6 +107,20 @@ if(isset($_POST['submit'])){
 
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php
+    if (isset($_GET['timeout'])) {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Session Expired',
+                    text: 'Your session has timed out due to inactivity. Please login again.',
+                    confirmButtonColor: '#000'
+                });
+            });
+        </script>";
+    }
+    ?>
 </head>
 <style>
     .password-container {

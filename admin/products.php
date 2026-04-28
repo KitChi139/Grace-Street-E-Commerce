@@ -12,8 +12,17 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
 
 if(isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
+    
+    // Fetch product name for logging before deletion
+    $fetch_name = mysqli_query($con, "SELECT name FROM product WHERE id = $delete_id");
+    $product_name = mysqli_fetch_assoc($fetch_name)['name'] ?? "Unknown Product";
+
     $delete_sql = "DELETE FROM product WHERE id = $delete_id";
-    mysqli_query($con, $delete_sql);
+    if (mysqli_query($con, $delete_sql)) {
+        // Log product deletion
+        include_once '../components/audit_logger.php';
+        log_audit('Product Deleted', $_SESSION['user-id'], $product_name, 'Warning');
+    }
 }
 
 // Modify the SQL query to include search functionality

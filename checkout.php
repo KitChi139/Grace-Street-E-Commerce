@@ -112,7 +112,36 @@
     // }
 
     $successMessage = "";
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    // Fetch user details for pre-filling the form
+    $userName = "";
+    $userEmail = "";
+    $userNumber = "";
+    $userAddress = "";
+
+    if (isset($_SESSION['user-id'])) {
+        $userId = $_SESSION['user-id'];
+        $user_query = "SELECT u.first_name, u.last_name, u.username, e.email, u.contact_number, u.address 
+                       FROM grace_user u 
+                       JOIN email e ON u.emailID = e.emailID 
+                       WHERE u.userID = ?";
+        $user_stmt = $con->prepare($user_query);
+        $user_stmt->bind_param("i", $userId);
+        $user_stmt->execute();
+        $user_result = $user_stmt->get_result();
+        if ($user_row = $user_result->fetch_assoc()) {
+            $userName = trim($user_row['first_name'] . ' ' . $user_row['last_name']);
+            if (empty($userName)) {
+                $userName = $user_row['username'];
+            }
+            $userEmail = $user_row['email'];
+            $userNumber = $user_row['contact_number'];
+            $userAddress = $user_row['address'];
+        }
+        $user_stmt->close();
+    }
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
             try {
                 if (!isset($_SESSION['user-id'])) {
                     throw new Exception("User not logged in");
@@ -360,16 +389,16 @@
                                 </div>
                         <div class="checkout_inputs">
                             <label for="YourName">Your Name:</label><br>
-                            <input type="text" id="YourName" name="YourName" required placeholder="e.g. John Doe">
+                            <input type="text" id="YourName" name="YourName" required placeholder="e.g. John Doe" value="<?php echo htmlspecialchars($userName); ?>">
                             
                             <label for="YourEmail">Your Email:</label><br>
-                            <input type="text" id="YourEmail" name="YourEmail" required placeholder="e.g. john@example.com">
+                            <input type="text" id="YourEmail" name="YourEmail" required placeholder="e.g. john@example.com" value="<?php echo htmlspecialchars($userEmail); ?>">
                             
                             <label for="YourNumber">Your Number:</label><br>
-                            <input type="text" id="YourNumber" name="YourNumber" required placeholder="e.g. 123-456-7890">
+                            <input type="text" id="YourNumber" name="YourNumber" required placeholder="e.g. 123-456-7890" value="<?php echo htmlspecialchars($userNumber); ?>">
                             
                             <label for="Address">Address:</label><br>
-                            <input type="text" id="Address" name="Address" required placeholder="e.g. 123 Main Street, New York, NY 12345">
+                            <input type="text" id="Address" name="Address" required placeholder="e.g. 123 Main Street, New York, NY 12345" value="<?php echo htmlspecialchars($userAddress); ?>">
                             
                             <label for="PaymentMethod">Payment Method:</label><br>
                             <select id="PaymentMethod" name="PaymentMethod" required>
