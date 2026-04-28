@@ -2,7 +2,7 @@
 include('./components/connect.php');
 
 if (!isset($_SESSION['user-id'])) {
-    header("Location: ../login.php");
+    header("Location: ./login.php");
     exit();
 }
 

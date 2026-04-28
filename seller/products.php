@@ -395,7 +395,7 @@ $stmt->close();
                          data-id="<?php echo $row['proID']; ?>">
                         <img class="product-card-image" src="../uploads/images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>">
                         <div class="product-card-name"><?php echo $row['name']; ?></div>
-                        <div class="product-card-price">$<?php echo number_format($row['price'], 2); ?></div>
+                        <div class="product-card-price">₱<?php echo number_format($row['price'], 2); ?></div>
                         <div class="product-card-stock">
                             <span>S: <?php echo $s; ?></span>
                             <span>M: <?php echo $m; ?></span>
