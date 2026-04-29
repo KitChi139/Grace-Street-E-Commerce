@@ -38,10 +38,13 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: calc(100vh - 250px);
 }
 .cart-content {
-  background-color: white;
+  background: rgba(247, 243, 238, 0.85); /* soft cream card */
   padding: 10px;
+  border-radius: 12px; /* match the site's style */
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 1); /* same shadow as category boxes */
 }
 .cart-btn {
   justify-content: center;
@@ -678,7 +681,7 @@ nav a:hover { color: #2C2825; }
   border-radius: 12px; /* match the site's style */
   border: 0.5px solid #D4C5B0; /* warm border instead of grey */
   background: rgba(247, 243, 238, 0.85); /* soft cream card */
-  box-shadow: 0 8px 24px rgba(44, 40, 37, 0.08); /* same shadow as category boxes */
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 1); /* same shadow as category boxes */
   padding: 40px;
   width: 60vh;
   margin: 0 auto;
@@ -710,7 +713,7 @@ nav a:hover { color: #2C2825; }
 .registeruser-container {
   height: auto;
   padding: 100px 0;
-  background-color: rgba(201, 201, 201, 0.1);
+  background-color: transparent;
 }
 .registeruser-container form {
   display: flex;
@@ -718,6 +721,8 @@ nav a:hover { color: #2C2825; }
   justify-content: center;
   border-radius: 20px;
   border: 2px solid rgb(201, 201, 201);
+  background: rgba(247, 243, 238, 0.85); /* soft cream card */
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 1);
   padding: 40px;
   width: 60vh;
   margin: 0 auto;
@@ -729,7 +734,8 @@ nav a:hover { color: #2C2825; }
   background-color: rgba(201, 201, 201, 0.3);
 }
 .registeruser-container input[type="submit"] {
-  background-color: black;
+  border: 0.5px solid #E8DED2;
+  background-color: rgba(232, 222, 210, 0.3);
   color: white;
   cursor: pointer;
 }
@@ -904,6 +910,11 @@ footer section {
 /* Wishlist */
 .wishlist-container {
   padding: 10px;
+  min-height: calc(100vh - 250px);
+}
+
+.wishlist-container h2{
+  font-family: 'Cormorant Garamond', serif;
 }
 .wishlist-content {
   height: auto;

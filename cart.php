@@ -11,7 +11,7 @@
     <?php include 'additional/header.php'; ?>
     <section>
         <div class="cart-container">
-            <h1 style="text-align: center;">Shopping Cart</h1>
+            <h1 style="text-align: center;font-family: 'Cormorant Garamond', serif;">Shopping Cart</h1>
             <div class="cart-content">
                 <div class="cart-product">
                     <?php

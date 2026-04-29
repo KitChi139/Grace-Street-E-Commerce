@@ -140,10 +140,10 @@ if (isset($_POST['submit'])) {
     .seller-reg-container {
         max-width: 700px;
         margin: 50px auto;
-        background: #fff;
+        background: rgba(247, 243, 238, 0.85); /* soft cream card */
         padding: 30px;
         border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 24px rgba(44, 40, 37, 1);
     }
     .form-row {
         display: flex;
@@ -218,11 +218,11 @@ if (isset($_POST['submit'])) {
                 <div class="form-row">
                     <div class="form-group">
                         <label for="first_name">First Name:</label>
-                        <input type="text" id="first_name" name="first_name" required placeholder="Enter your first name" class="box">
+                        <input style="background-color: rgba(232, 222, 210, 0.3);" type="text" id="first_name" name="first_name" required placeholder="Enter your first name" class="box">
                     </div>
                     <div class="form-group">
                         <label for="last_name">Last Name:</label>
-                        <input type="text" id="last_name" name="last_name" required placeholder="Enter your last name" class="box">
+                        <input style="background-color: rgba(232, 222, 210, 0.3);" type="text" id="last_name" name="last_name" required placeholder="Enter your last name" class="box">
                     </div>
                 </div>
 
@@ -230,7 +230,7 @@ if (isset($_POST['submit'])) {
                 <div class="form-row">
                     <div class="form-group full-width">
                         <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" required placeholder="Enter your username" class="box">
+                        <input style="background-color: rgba(232, 222, 210, 0.3);" type="text" id="username" name="username" required placeholder="Enter your username" class="box">
                     </div>
                 </div>
 
@@ -238,11 +238,11 @@ if (isset($_POST['submit'])) {
                 <div class="form-row">
                     <div class="form-group">
                         <label for="email">Email Address:</label>
-                        <input type="email" id="email" name="email" required placeholder="Enter your email" class="box">
+                        <input style="background-color: rgba(232, 222, 210, 0.3);" type="email" id="email" name="email" required placeholder="Enter your email" class="box">
                     </div>
                     <div class="form-group">
                         <label for="contact">Contact Number:</label>
-                        <input type="text" id="contact" name="contact" required placeholder="Enter your contact number" class="box">
+                        <input style="background-color: rgba(232, 222, 210, 0.3);" type="text" id="contact" name="contact" required placeholder="Enter your contact number" class="box">
                     </div>
                 </div>
 
@@ -250,7 +250,7 @@ if (isset($_POST['submit'])) {
                 <div class="form-row">
                     <div class="form-group full-width">
                         <label for="address">Address:</label>
-                        <textarea id="address" name="address" required placeholder="Enter your complete address" class="box" style="height: 100px;"></textarea>
+                        <textarea style="background-color: rgba(232, 222, 210, 0.3);" id="address" name="address" required placeholder="Enter your complete address" class="box" style="height: 100px;"></textarea>
                     </div>
                 </div>
 
@@ -258,7 +258,7 @@ if (isset($_POST['submit'])) {
                 <div class="form-row">
                     <div class="form-group full-width">
                         <label for="password">Password:</label>
-                        <input type="password" id="password" name="pass" required placeholder="Create a password" class="box">
+                        <input style="background-color: rgba(232, 222, 210, 0.3);" type="password" id="password" name="pass" required placeholder="Create a password" class="box">
                     </div>
                 </div>
 
@@ -266,7 +266,7 @@ if (isset($_POST['submit'])) {
                 <div class="form-row">
                     <div class="form-group full-width">
                         <label for="confirm_password">Confirm Password:</label>
-                        <input type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box">
+                        <input style="background-color: rgba(232, 222, 210, 0.3);" type="password" id="confirm_password" name="cpass" required placeholder="Confirm your password" class="box">
                     </div>
                 </div>
 
@@ -288,7 +288,7 @@ if (isset($_POST['submit'])) {
                         <img src="captcha_gen.php" id="captcha-img" alt="Captcha" style="margin-right: 10px;  border: 1px solid #ccc; border-radius: 5px; ">
                         <button type="button" onclick="refreshCaptcha()" style="padding: 5px 10px; cursor: pointer; background: #eee; border: 1px solid #ccc; border-radius: 5px;">Refresh</button>
                     </div>
-                    <input type="text" id="captcha" name="captcha" required placeholder="Enter captcha" class="box">
+                    <input style="background-color: rgba(232, 222, 210, 0.3);" type="text" id="captcha" name="captcha" required placeholder="Enter captcha" class="box">
                 <?php else: 
                     $num1 = rand(1, 10);
                     $num2 = rand(1, 10);

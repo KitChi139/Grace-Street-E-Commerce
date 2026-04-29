@@ -53,11 +53,11 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
             padding: 20px;
         }
         .review-form {
-            background: #f9f9f9;
+            background: rgba(247, 243, 238, 0.85); /* soft cream card */
             padding: 30px;
             border-radius: 10px;
             margin-bottom: 50px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(44, 40, 37, 1);
         }
         .review-form h2 {
             margin-bottom: 20px;
@@ -66,8 +66,9 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
+            border: 0.5px solid #E8DED2;
             border-radius: 5px;
+            background-color: rgba(232, 222, 210, 0.3); /* warm tint instead of grey */ /* warm tint instead of grey */
         }
         .review-form input[type="submit"] {
             background: black;
