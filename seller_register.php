@@ -173,16 +173,20 @@ if (isset($_POST['submit'])) {
     }
     .btn {
         width: 100%;
-        padding: 12px;
-        background: #000;
-        color: #fff;
+        padding: 15px;
+        background-color: #2C2825;
+        color: #F7F3EE;
         border: none;
-        border-radius: 5px;
+        border-radius: 0;
         cursor: pointer;
-        font-size: 16px;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: background-color 0.25s;
     }
     .btn:hover {
-        background: #333;
+        background-color: #8B6F56;
     }
     .captcha-container {
         display: flex;
@@ -202,9 +206,10 @@ if (isset($_POST['submit'])) {
         cursor: pointer;
     }
     .btn:disabled {
-        background-color: #7e7e7eff !important;
-        cursor: not-allowed;
-    }
+    background-color: #C4B5A5 !important;
+    color: rgba(247,243,238,0.6) !important;
+    cursor: not-allowed;
+}
 </style>
 <body>
     <?php include 'additional/loginheader.php'; ?>

@@ -71,13 +71,21 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
             background-color: rgba(232, 222, 210, 0.3); /* warm tint instead of grey */ /* warm tint instead of grey */
         }
         .review-form input[type="submit"] {
-            background: black;
-            color: white;
+            background-color: #2C2825;
+            color: #F7F3EE;
             border: none;
-            padding: 10px 30px;
+            padding: 15px 30px;
             cursor: pointer;
-            border-radius: 5px;
-        }
+            font-family: 'Jost', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: background-color 0.25s;
+            border-radius: 0;
+}
+.review-form input[type="submit"]:hover {
+    background-color: #8B6F56;
+}
         .reviews-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

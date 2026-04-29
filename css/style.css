@@ -395,7 +395,11 @@ nav a:hover { color: #2C2825; }
   width: 100%;
   text-align: center;
   padding: 20px 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: 2rem;
 }
+
 
 .products-table {
   width: 100%;
@@ -409,24 +413,46 @@ nav a:hover { color: #2C2825; }
   padding: 70px 0;
   background-color: transparent;
 }
+.contact-container h1{
+  font-family: 'Cormorant Garamond', serif; 
+  font-weight: 400; 
+  font-size: 3rem;
+}
 .contact-container form {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: white;
+  border: 0.5px solid #D4C5B0; /* warm border instead of grey */
+  background: rgba(247, 243, 238, 0.85); /* soft cream card */
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 1);
   width: 60vh;
   padding: 40px;
   border-radius: 20px;
-  border: 2px solid rgb(201, 201, 201);
 }
-.contact-container form input,
-.contact-container form textarea {
+.contact-container form input.box,
+.contact-container form textarea.box {
   margin-bottom: 20px;
   padding: 15px;
-  border: none;
-  background-color: rgba(201, 201, 201, 0.3);
+  border: 0.5px solid #E8DED2;
+  background-color: rgba(232, 222, 210, 0.3);
   resize: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.contact-container form input.btn {
+  background-color: #2C2825;
+  color: #F7F3EE;
+  cursor: pointer;
+  border: none;
+  padding: 15px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.contact-container form input.btn:hover {
+  background-color: #8B6F56;
 }
 .contact-container input[type="submit"] {
   background-color: black;
@@ -708,6 +734,22 @@ nav a:hover { color: #2C2825; }
   width: 30vh;
   margin: 0 auto;
 }
+.loginuser-container form input.btn {
+  background-color: #2C2825;
+  color: #F7F3EE;
+  cursor: pointer;
+  border: none;
+  padding: 15px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  width: 100%;
+  transition: background-color 0.25s;
+}
+.loginuser-container form input.btn:hover {
+  background-color: #8B6F56;
+}
 .loginuser-container form input,
 .loginuser-container1 form input {
   margin-bottom: 20px;
@@ -738,6 +780,27 @@ nav a:hover { color: #2C2825; }
   padding: 40px;
   width: 60vh;
   margin: 0 auto;
+}
+.registeruser-container form input.btn {
+  background-color: #2C2825;
+  color: #F7F3EE;
+  cursor: pointer;
+  border: none;
+  padding: 15px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  width: 100%;
+  transition: background-color 0.25s;
+}
+.registeruser-container form input.btn:hover {
+  background-color: #8B6F56;
+}
+.registeruser-container form input.btn:disabled {
+  background-color: #C4B5A5 !important;
+  color: rgba(247,243,238,0.6) !important;
+  cursor: not-allowed;
 }
 .registeruser-container form input {
   margin-bottom: 20px;

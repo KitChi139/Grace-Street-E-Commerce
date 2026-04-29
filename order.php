@@ -226,8 +226,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
                 } else {
                     echo '<div style="text-align: center;">
-                            <p>Please log in to view your placed orders.</p>
-                            <a href="login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
+                        <p>Please log in to view your placed orders.</p>
+                        <a href="login.php"><button style="cursor: pointer; width: 25vh; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Login</button></a>
                         </div>';
                 }
 

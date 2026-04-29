@@ -67,7 +67,7 @@
                         ?>
                         <div style="text-align: center;">
                             <p>Please log in to view your cart.</p>
-                            <a href="Login.php"><button style="cursor: pointer;  width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
+                            <a href="Login.php"><button style="cursor: pointer; width: 25vh; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Login</button></a>
                         </div>
                         <?php
                     }
@@ -81,11 +81,11 @@
                 
                 <div class="cart-btn">
                     <?php if (isset($result) && $result->num_rows > 0) { ?>
-                        <a href="checkout.php"><button style="cursor: pointer;">Proceed To Checkout</button></a>
+                        <a href="checkout.php"><button style="cursor: pointer; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Proceed To Checkout</button></a>
                     <?php } else { ?>
                         <button disabled>Proceed To Checkout</button>
                     <?php } ?>
-                    <button onclick="deleteAllItems()" style="cursor: pointer; background-color: white;">Delete All</button>
+                    <button onclick="deleteAllItems()" style="cursor: pointer; border: 0.5px solid #2C2825; padding: 15px 30px; background-color: transparent; color: #2C2825; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Delete All</button>
                 </div>  
                 <?php endif; ?>
             </div>
