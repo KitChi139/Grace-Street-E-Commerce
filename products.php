@@ -107,7 +107,7 @@ if(isset($_POST['search'])) {
                 <div style="margin: 5vh 0;">
                     <form method="POST" action="" onsubmit="return false;">
                         <p style="margin:0 5px;">Search:</p>
-                        <input type="text" id="searchInput" placeholder="Type Item Name" name="search" style="padding: 10px; font-size: 13px; width: 28vh; border: none; background-color: #e8e8e8;">
+                        <input type="text" id="searchInput" placeholder="Type Item Name" name="search" style="padding: 10px; font-size: 13px; width: 100%; border: none; background-color: #e8e8e8; box-sizing: border-box;">
                         <button type="submit" style="display: none;"></button>
                     </form>
                 </div>

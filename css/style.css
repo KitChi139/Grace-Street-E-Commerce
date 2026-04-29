@@ -441,7 +441,13 @@ nav a:hover { color: #2C2825; }
 .filter {
   width: 30vh;
   padding: 20px;
-  padding-right: 50px;
+  padding-right: 30px;
+  background: rgba(247,243,238,0.85);
+  border-radius: 12px;
+  border: 0.5px solid #E8DED2;
+  box-shadow: 0 4px 16px rgba(44,40,37,0.06);
+  height: fit-content;
+  margin: 20px 0;
 }
 .products {
   flex-grow: 1;
@@ -586,11 +592,17 @@ nav a:hover { color: #2C2825; }
 .items-content {
   padding: 20px;
   height: auto;
-  background-color: white;
+  background-color: #FAF7F4;
   width: fit-content;
-  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
-    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 0.08);
+  border: 0.5px solid #E8DED2;
   display: inline-block;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.items-content:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(44, 40, 37, 0.13);
 }
 .items-content .itembottom-content {
   display: flex;
