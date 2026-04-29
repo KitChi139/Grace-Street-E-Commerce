@@ -246,7 +246,7 @@
             <div class="form-row">
                 <div class="form-group full-width">
                     <label for="address">Address:</label>
-                    <textarea id="address" name="address" required placeholder="Enter your complete address" class="box" style="height: 100px;"></textarea>
+                    <textarea style="background-color: rgba(232, 222, 210, 0.3);" id="address" name="address" required placeholder="Enter your complete address" class="box" style="height: 100px;"></textarea>
                 </div>
             </div>
 
