@@ -637,7 +637,7 @@ nav a:hover { color: #2C2825; }
 .loginuser-container form label,
 .loginuser-container form label,
 .registeruser-container form label {
-  font-size: 13px;
+  font-size: 0.85rem; /* was 13px */
 }
 
 .registeruser-container form a,
@@ -646,27 +646,38 @@ nav a:hover { color: #2C2825; }
 .loginuser-container form p,
 .loginuser-container1 form a,
 .loginuser-container1 form p {
-  color: black;
+  font-size: 0.85rem;
+  color: #1b0f05;
 }
 .registeruser-container form p,
 .loginuser-container form p,
 .loginuser-container1 form p {
-  margin: 30px 0;
-  font-size: 14px;
+  margin: 8px 0;
+  font-size: 0.90rem; /* bump this up from 0.82rem */
+  text-align: center;
+}
+.loginuser-container form h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #2C2825;
 }
 
 .loginuser-container,
 .loginuser-container1 {
   height: auto;
   padding: 100px 0;
-  background-color: rgba(201, 201, 201, 0.1);
+  background-color: transparent;
 }
 .loginuser-container form {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-radius: 20px;
-  border: 2px solid rgb(201, 201, 201);
+  border-radius: 12px; /* match the site's style */
+  border: 0.5px solid #D4C5B0; /* warm border instead of grey */
+  background: rgba(247, 243, 238, 0.85); /* soft cream card */
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 0.08); /* same shadow as category boxes */
   padding: 40px;
   width: 60vh;
   margin: 0 auto;
@@ -685,8 +696,8 @@ nav a:hover { color: #2C2825; }
 .loginuser-container1 form input {
   margin-bottom: 20px;
   padding: 15px;
-  border: none;
-  background-color: rgba(201, 201, 201, 0.3);
+  border: 0.5px solid #E8DED2;
+  background-color: rgba(232, 222, 210, 0.3); /* warm tint instead of grey */
 }
 .loginuser-container input[type="submit"],
 .loginuser-container1 input[type="submit"] {
