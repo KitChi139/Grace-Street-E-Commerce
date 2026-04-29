@@ -401,9 +401,10 @@ nav a:hover { color: #2C2825; }
 
 /* contact style */
 .contact-container {
+  min-height: calc(100vh - 250px); /* pushes footer down */
   height: auto;
   padding: 70px 0;
-  background-color: rgba(201, 201, 201, 0.1);
+  background-color: transparent;
 }
 .contact-container form {
   margin: 0 auto;
@@ -658,8 +659,8 @@ nav a:hover { color: #2C2825; }
 }
 .loginuser-container form h1 {
   font-family: 'Cormorant Garamond', serif;
-  font-weight: 400;
   font-size: 2.5rem;
+  font-weight: 400;
   margin-bottom: 1.5rem;
   color: #2C2825;
 }
@@ -912,12 +913,15 @@ footer section {
 
 /* invoice */
 .invoice_container {
+  min-height: calc(100vh - 250px); /* pushes footer down */
   padding: 20px;
 }
 .invoice_content {
   padding: 10px;
 }
 .invoice_header {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
   padding: 10px;
   text-align: center;
 }

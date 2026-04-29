@@ -114,7 +114,8 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
     <?php include 'additional/header.php'; ?>
 
     <div class="reviews-container">
-        <h1 style="text-align: center; margin-bottom: 40px;">Customer Reviews & Feedbacks</h1>
+        <h1 style="text-align: center; margin-bottom: 40px;font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;">Customer Reviews & Feedbacks</h1>
 
         <?php if ($message): ?>
             <div style="text-align: center; padding: 15px; background: #e8f5e9; color: #2e7d32; border-radius: 5px; margin-bottom: 30px;">

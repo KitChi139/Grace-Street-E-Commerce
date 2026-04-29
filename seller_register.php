@@ -212,7 +212,7 @@ if (isset($_POST['submit'])) {
     <section>
         <div class="seller-reg-container">
             <form action="" method="post" enctype="multipart/form-data">
-                <h1 style="text-align: center; margin-bottom: 30px;">Apply as Seller</h1>
+                <h1 style="text-align: center; margin-bottom: 30px;font-family: 'Cormorant Garamond', serif;font-size: 2.5rem;">Apply as Seller</h1>
                 
                 <!-- Row 1: First name | Last name -->
                 <div class="form-row">
