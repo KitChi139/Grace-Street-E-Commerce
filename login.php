@@ -50,17 +50,11 @@ if(isset($_POST['submit'])){
             $role_query = mysqli_query($con, "SELECT role FROM roles WHERE roleID = '$role_id'");
             $role_row = mysqli_fetch_assoc($role_query);
             $role_name = $role_row['role'];
+            $_SESSION['role'] = $role_name;
 
-            if ($role_name === 'admin') {
-                header('Location: ./admin/overview.php');
-                exit(); 
-            }else if($role_name === 'employee'){
-                header('Location: ./seller/dashboard.php');
-                exit(); 
-            } else {
-                header("Location: login-authenticator.php");
-                exit(); 
-            }
+            // Redirect all roles to 2FA verification
+            header("Location: login-authenticator.php");
+            exit(); 
         } else {
             // Fetch max attempts from settings
             $setting_query = mysqli_query($con, "SELECT setting_value FROM system_settings WHERE setting_key = 'max_login_attempts'");

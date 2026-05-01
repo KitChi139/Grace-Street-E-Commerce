@@ -57,7 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         $_SESSION['2fa_verified'] = true;
         $_SESSION['verified'] = true;
         
-        header("Location: home.php");
+        // Role-based redirection
+        $role_name = $_SESSION['role'] ?? 'customer';
+        
+        if ($role_name === 'admin') {
+            header("Location: ./admin/overview.php");
+        } else if ($role_name === 'employee') {
+            header("Location: ./seller/dashboard.php");
+        } else {
+            header("Location: home.php");
+        }
         exit;
     } else {
         $message = '<p class="error">Invalid code! Please try again.</p>';

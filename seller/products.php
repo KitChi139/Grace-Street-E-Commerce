@@ -419,7 +419,7 @@ $stmt->close();
             </div>
             <!-- Pagination links -->
             <?php
-                // Count total pages for pagination'
+                // Count total pages for pagination
                 $stmt = $con->prepare("SELECT COUNT(DISTINCT p.proID) AS total FROM product p LEFT JOIN inventory i ON p.proID = i.proID LEFT JOIN sizes s ON i.sizeID = s.sizeID WHERE p.name LIKE ?");
                 $stmt->bind_param("s", $search_param);
                 $stmt->execute();
