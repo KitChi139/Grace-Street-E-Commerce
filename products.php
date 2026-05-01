@@ -166,7 +166,7 @@ if(isset($_POST['search'])) {
                                                 if ($fetch_product['product_stock_s'] > 0) {
                                                     echo $fetch_product['product_stock_s'] . '<span> in stock</span>';
                                                 } else {
-                                                    echo '<span style="background-color: red; color: white; padding: 3px;">Out of stock</span>';
+                                                    echo '<span style="background-color: #B85C38; color: #F7F3EE; padding: 3px 8px; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: Jost, sans-serif;">Out of Stock</span>';
                                                 }
                                                 ?>
                                             </p>

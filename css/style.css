@@ -54,12 +54,21 @@ section {
   flex-direction: column;
 }
 .cart-btn button {
-  padding: 13px 25px;
+  padding: 15px 25px;
   width: 30vh;
   border: none;
-  background-color: black;
-  color: white;
+  background-color: #2C2825;
+  color: #F7F3EE;
   margin: 3px 0;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+.cart-btn button:hover {
+  background-color: #8B6F56;
 }
 .cart-btn button:nth-child(2) {
   background-color: white;
@@ -71,12 +80,19 @@ section {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 1.5rem;
 }
 .cart-product .cart-item {
-  background-color: white;
-  padding: 10px;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  background: rgba(247,243,238,0.85);
+  padding: 16px;
+  border-radius: 12px;
+  border: 0.5px solid #E8DED2;
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 0.5);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.cart-product .cart-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(44, 40, 37, 0.8);
 }
 .cart-item .cart-img {
   width: 20vh;
@@ -125,29 +141,91 @@ section {
 
 /* Pop up style */
 .pop-container {
-  background-color: white;
-  padding: 20px;
-  height: auto;
-  border-radius: 5px;
-  width: auto;
+  background: #F7F3EE;
+  border: 0.5px solid #E8DED2;
+  box-shadow: 0 4px 20px rgba(44,40,37,0.08);
+  border-radius: 8px;
+  padding: 16px;
+  width: 160px;
   position: absolute;
   z-index: 2;
   right: 10px;
   top: 40px;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   display: none;
 }
+
+.pop-content a {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  outline: none;
+  border: none;
+  color: inherit;
+}
+
 .pop-container .pop-content {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
+
 .pop-content button {
+  width: 100% !important;
+  padding: 12px 10px !important;
+  margin: 4px 0 !important;
+  display: block !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  font-family: 'Jost', sans-serif;
   background: #2C2825;
   color: #F7F3EE;
-  font-family: 'Jost', sans-serif;
+  border: none;
+  cursor: pointer;
   border-radius: 0;
+  transition: background-color 0.25s;
 }
-.pop-content button.logBtn { background: transparent; color: #2C2825; border: 0.5px solid #2C2825; }
+
+.pop-content button:hover {
+  background-color: #8B6F56;
+}
+
+.pop-content button.logBtn {
+  background: transparent;
+  color: #2C2825;
+  border: 0.1px solid rgba(44, 40, 37, 0.3);
+}
+
+.pop-content button.logBtn:hover {
+  background: #2C2825;
+  color: #F7F3EE;
+}
+
+.icon-badge-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #2C2825;
+  margin: 0 12px;
+}
+.icon-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: #C4956A;
+  color: #F7F3EE;
+  font-size: 0.6rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Jost', sans-serif;
+}
+
 
 /* Header style */
 .header-container {
@@ -618,7 +696,7 @@ nav a:hover { color: #2C2825; }
 .items-content {
   padding: 20px;
   height: auto;
-  background-color: #FAF7F4;
+  background: rgba(247, 243, 238, 0.85);
   width: fit-content;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(44, 40, 37, 0.08);
@@ -639,12 +717,20 @@ nav a:hover { color: #2C2825; }
   margin-right: 10px;
 }
 .itembottom-content button {
-  border: none;
-  background-color: black;
-  padding: 10px 30px;
-  color: white;
-  font-size: 12px;
+  border: 0.5px solid #2C2825;
+  background-color: transparent;
+  padding: 8px 16px;
+  color: #2C2825;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
+  transition: background-color 0.25s, color 0.25s;
+}
+.itembottom-content button:hover {
+  background-color: #2C2825;
+  color: #F7F3EE;
 }
 
 /* update form style */

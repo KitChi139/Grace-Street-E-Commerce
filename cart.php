@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grace Street/Cart</title>
     <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <?php include 'additional/header.php'; ?>
@@ -85,7 +85,7 @@
                     <?php } else { ?>
                         <button disabled>Proceed To Checkout</button>
                     <?php } ?>
-                    <button onclick="deleteAllItems()" style="cursor: pointer; border: 0.5px solid #2C2825; padding: 15px 30px; background-color: transparent; color: #2C2825; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Delete All</button>
+                    <button onclick="deleteAllItems()" onmouseover="this.style.backgroundColor='#2C2825';this.style.color='#F7F3EE';" onmouseout="this.style.backgroundColor='transparent';this.style.color='#2C2825';" style="cursor: pointer; border: 0.5px solid #2C2825; padding: 15px 30px; background-color: transparent; color: #2C2825; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Delete All</button>
                 </div>  
                 <?php endif; ?>
             </div>

@@ -59,9 +59,9 @@ if(isset($_GET['logout'])){
                         Hello, <?= htmlspecialchars($fetch_user['username']); ?>
                     </span>
                     <?php endif; ?>
-                    <a href="./wishlist.php" style="text-decoration: none; color: black;"><i class="fa-solid fa-heart"></i><span style="font-size: 12px;"> <?php if (isset($user_id)): ?>(<?php echo getWishListItemCount($user_id, $con) ?>)<?php endif; ?></span></a>
-                    <a href="./cart.php" style="text-decoration: none; color: black;"><i class="fa-solid fa-cart-shopping"></i><span style="font-size: 12px;"><?php if (isset($user_id)): ?>(<?php echo getCartItemCount($user_id, $con); ?>)<?php endif; ?></span></a>
-                    <i class="fa-solid fa-user" onclick="togglePopup()" style="cursor: pointer; font-size: 20px;"></i>
+                    <a href="./wishlist.php" class="icon-badge-wrap"><i class="fa-solid fa-heart"></i><?php if (isset($user_id) && getWishListItemCount($user_id, $con) > 0): ?><span class="icon-badge"><?php echo getWishListItemCount($user_id, $con); ?></span><?php endif; ?></a>
+                    <a href="./cart.php" class="icon-badge-wrap"><i class="fa-solid fa-cart-shopping"></i><?php if (isset($user_id) && getCartItemCount($user_id, $con) > 0): ?><span class="icon-badge"><?php echo getCartItemCount($user_id, $con); ?></span><?php endif; ?></a>
+                    <i class="fa-solid fa-user" onclick="togglePopup()" style="cursor: pointer; font-size: 20px; margin-left: 12px;"></i>
 
                     <!-- Pop up -->
                     <div id="popupForm" class="pop-container">
@@ -74,10 +74,9 @@ if(isset($_GET['logout'])){
                                     </div>';
                           } else {
                               echo '<div class="pop-content" style="text-align: center;">
-                                      
-                                      <a href="./login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
-                                      <a href="./register.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Register</button></a>
-                                    </div>';
+                                  <a href="./login.php"><button>Login</button></a>
+                                  <a href="./register.php"><button>Register</button></a>
+                                  </div>';
                           }
                       ?>
                     </div>

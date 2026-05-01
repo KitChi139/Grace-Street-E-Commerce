@@ -46,6 +46,7 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Reviews - Grace Street</title>
     <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         .reviews-container {
             max-width: 1200px;
