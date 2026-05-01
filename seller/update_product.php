@@ -1,6 +1,9 @@
 <?php
 // Include necessary files and connect to the database
 include('../components/connect.php');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Check if ID is provided in the URL
 if(isset($_GET['id']) && is_numeric($_GET['id'])) {
@@ -34,12 +37,12 @@ if(isset($_POST['productId'])) {
     $product_description = mysqli_real_escape_string($con, $_POST['Description']);
     $productGender = (int)$_POST['product_gender'];
 
-    $stocks = [
-        'S' => (int)$_POST['product_stock_s'],
-        'M' => (int)$_POST['product_stock_m'],
-        'L' => (int)$_POST['product_stock_l'],
-        'XL' => (int)$_POST['product_stock_xl'],
-        'XXL' => (int)$_POST['product_stock_xxl']
+    $adjustments = [
+        'S' => isset($_POST['product_adjust_stock_s']) ? (int)$_POST['product_adjust_stock_s'] : 0,
+        'M' => isset($_POST['product_adjust_stock_m']) ? (int)$_POST['product_adjust_stock_m'] : 0,
+        'L' => isset($_POST['product_adjust_stock_l']) ? (int)$_POST['product_adjust_stock_l'] : 0,
+        'XL' => isset($_POST['product_adjust_stock_xl']) ? (int)$_POST['product_adjust_stock_xl'] : 0,
+        'XXL' => isset($_POST['product_adjust_stock_xxl']) ? (int)$_POST['product_adjust_stock_xxl'] : 0
     ];
 
     // Retrieve existing image name from the database
@@ -67,8 +70,10 @@ if(isset($_POST['productId'])) {
     $updateStmt->bind_param("sdisii", $productName, $productPrice, $imageName, $product_description, $productGender, $productId);
     
     if($updateStmt->execute()) {
-        // Update inventory for each size
-        foreach ($stocks as $sizeName => $stockAmount) {
+        // Update inventory for each size using stock adjustment (current + change)
+        $stockErrors = [];
+        $stockChanges = [];
+        foreach ($adjustments as $sizeName => $adjustValue) {
             // Get sizeID
             $sizeStmt = $con->prepare("SELECT sizeID FROM sizes WHERE sizes = ?");
             $sizeStmt->bind_param("s", $sizeName);
@@ -76,26 +81,62 @@ if(isset($_POST['productId'])) {
             $sizeRes = $sizeStmt->get_result();
             if ($sizeRow = $sizeRes->fetch_assoc()) {
                 $sizeID = $sizeRow['sizeID'];
-                $invStatus = ($stockAmount > 0) ? 'In Stock' : 'Empty';
                 
                 // Check if entry exists
-                $checkInv = $con->prepare("SELECT inventoryID FROM inventory WHERE proID = ? AND sizeID = ?");
+                $checkInv = $con->prepare("SELECT inventoryID, stock FROM inventory WHERE proID = ? AND sizeID = ?");
                 $checkInv->bind_param("ii", $productId, $sizeID);
                 $checkInv->execute();
                 $checkRes = $checkInv->get_result();
                 
                 if ($checkRes->num_rows > 0) {
+                    $inventoryData = $checkRes->fetch_assoc();
+                    $currentStock = (int)$inventoryData['stock'];
+                    $newStock = $currentStock + $adjustValue;
+
+                    if ($newStock < 0) {
+                        $stockErrors[] = "Size $sizeName cannot go below 0 (current: $currentStock, adjustment: $adjustValue).";
+                        $checkInv->close();
+                        $sizeStmt->close();
+                        continue;
+                    }
+
+                    $invStatus = ($newStock > 0) ? 'In Stock' : 'Empty';
                     $invStmt = $con->prepare("UPDATE inventory SET stock = ?, status = ? WHERE proID = ? AND sizeID = ?");
-                    $invStmt->bind_param("isii", $stockAmount, $invStatus, $productId, $sizeID);
+                    $invStmt->bind_param("isii", $newStock, $invStatus, $productId, $sizeID);
+                    $stockChanges[] = "Size $sizeName: $currentStock " . ($adjustValue >= 0 ? "+$adjustValue" : "$adjustValue") . " = $newStock";
                 } else {
+                    $currentStock = 0;
+                    $newStock = $currentStock + $adjustValue;
+
+                    if ($newStock < 0) {
+                        $stockErrors[] = "Size $sizeName cannot go below 0 (current: 0, adjustment: $adjustValue).";
+                        $checkInv->close();
+                        $sizeStmt->close();
+                        continue;
+                    }
+
+                    $invStatus = ($newStock > 0) ? 'In Stock' : 'Empty';
                     $invStmt = $con->prepare("INSERT INTO inventory (proID, sizeID, stock, status) VALUES (?, ?, ?, ?)");
-                    $invStmt->bind_param("iiis", $productId, $sizeID, $stockAmount, $invStatus);
+                    $invStmt->bind_param("iiis", $productId, $sizeID, $newStock, $invStatus);
+                    $stockChanges[] = "Size $sizeName: 0 " . ($adjustValue >= 0 ? "+$adjustValue" : "$adjustValue") . " = $newStock";
                 }
                 $invStmt->execute();
                 $invStmt->close();
                 $checkInv->close();
             }
             $sizeStmt->close();
+        }
+
+        if (!empty($stockErrors)) {
+            $errorText = implode("\\n", $stockErrors);
+            echo "<script>alert('Stock update failed:\\n$errorText'); window.location.href='update_product.php?id=$productId';</script>";
+            exit();
+        }
+
+        if (!empty($stockChanges) && isset($_SESSION['user-id'])) {
+            include_once '../components/audit_logger.php';
+            $logMessage = "Inventory adjusted for Product ID $productId | " . implode(" | ", $stockChanges);
+            log_audit('Inventory Update', $_SESSION['user-id'], $logMessage, 'Info');
         }
 
         // Product updated successfully
@@ -136,24 +177,39 @@ if(isset($_POST['productId'])) {
                                 <input type="text" id="name" name="name" value="<?php echo $productData['name']; ?>" required>
                             </div>
                             <div class="product_update_1">
-                                <label for="stock_s">Stock S</label>
-                                <input type="number" id="stock_s" name="product_stock_s" value="<?php echo $productData['product_stock_s']; ?>" required>
+                                <label for="current_stock_s">Current Stock (S)</label>
+                                <input type="number" id="current_stock_s" value="<?php echo (int)$productData['product_stock_s']; ?>" readonly>
+                                <label for="adjust_stock_s">Add/Remove Quantity (S)</label>
+                                <input type="number" id="adjust_stock_s" name="product_adjust_stock_s" value="0" step="1" required>
+                                <small id="preview_stock_s">Preview: <?php echo (int)$productData['product_stock_s']; ?> + 0 = <?php echo (int)$productData['product_stock_s']; ?></small>
                             </div>
                             <div class="product_update_1">
-                                <label for="stock_m">Stock M</label>
-                                <input type="number" id="stock_m" name="product_stock_m" value="<?php echo $productData['product_stock_m']; ?>" required>
+                                <label for="current_stock_m">Current Stock (M)</label>
+                                <input type="number" id="current_stock_m" value="<?php echo (int)$productData['product_stock_m']; ?>" readonly>
+                                <label for="adjust_stock_m">Add/Remove Quantity (M)</label>
+                                <input type="number" id="adjust_stock_m" name="product_adjust_stock_m" value="0" step="1" required>
+                                <small id="preview_stock_m">Preview: <?php echo (int)$productData['product_stock_m']; ?> + 0 = <?php echo (int)$productData['product_stock_m']; ?></small>
                             </div>
                             <div class="product_update_1">
-                                <label for="stock_l">Stock L</label>
-                                <input type="number" id="stock_l" name="product_stock_l" value="<?php echo $productData['product_stock_l']; ?>" required>
+                                <label for="current_stock_l">Current Stock (L)</label>
+                                <input type="number" id="current_stock_l" value="<?php echo (int)$productData['product_stock_l']; ?>" readonly>
+                                <label for="adjust_stock_l">Add/Remove Quantity (L)</label>
+                                <input type="number" id="adjust_stock_l" name="product_adjust_stock_l" value="0" step="1" required>
+                                <small id="preview_stock_l">Preview: <?php echo (int)$productData['product_stock_l']; ?> + 0 = <?php echo (int)$productData['product_stock_l']; ?></small>
                             </div>
                             <div class="product_update_1">
-                                <label for="stock_xl">Stock XL</label>
-                                <input type="number" id="stock_xl" name="product_stock_xl" value="<?php echo $productData['product_stock_xl']; ?>" required>
+                                <label for="current_stock_xl">Current Stock (XL)</label>
+                                <input type="number" id="current_stock_xl" value="<?php echo (int)$productData['product_stock_xl']; ?>" readonly>
+                                <label for="adjust_stock_xl">Add/Remove Quantity (XL)</label>
+                                <input type="number" id="adjust_stock_xl" name="product_adjust_stock_xl" value="0" step="1" required>
+                                <small id="preview_stock_xl">Preview: <?php echo (int)$productData['product_stock_xl']; ?> + 0 = <?php echo (int)$productData['product_stock_xl']; ?></small>
                             </div>
                             <div class="product_update_1">
-                                <label for="stock_xxl">Stock XXL</label>
-                                <input type="number" id="stock_xxl" name="product_stock_xxl" value="<?php echo $productData['product_stock_xxl']; ?>" required>
+                                <label for="current_stock_xxl">Current Stock (XXL)</label>
+                                <input type="number" id="current_stock_xxl" value="<?php echo (int)$productData['product_stock_xxl']; ?>" readonly>
+                                <label for="adjust_stock_xxl">Add/Remove Quantity (XXL)</label>
+                                <input type="number" id="adjust_stock_xxl" name="product_adjust_stock_xxl" value="0" step="1" required>
+                                <small id="preview_stock_xxl">Preview: <?php echo (int)$productData['product_stock_xxl']; ?> + 0 = <?php echo (int)$productData['product_stock_xxl']; ?></small>
                             </div>
                             <div class="product_update_1">
                                 <label for="price">Product Price</label>
@@ -188,12 +244,46 @@ if(isset($_POST['productId'])) {
 
     <script>
         document.getElementById('updateForm').addEventListener('submit', function(event) {
+            const sizeKeys = ['s', 'm', 'l', 'xl', 'xxl'];
+            for (const sizeKey of sizeKeys) {
+                const currentStockInput = document.getElementById(`current_stock_${sizeKey}`);
+                const adjustStockInput = document.getElementById(`adjust_stock_${sizeKey}`);
+                const currentValue = parseInt(currentStockInput.value, 10) || 0;
+                const adjustValue = parseInt(adjustStockInput.value, 10) || 0;
+                const nextValue = currentValue + adjustValue;
+
+                if (nextValue < 0) {
+                    event.preventDefault();
+                    alert(`Stock cannot go below 0 for size ${sizeKey.toUpperCase()}.`);
+                    return;
+                }
+            }
             alert('Product Updated');
         });
         document.getElementById('closeProductBtn').addEventListener('click', function(event) {
             // Redirect to products.php when the button is clicked
             window.location.href = 'products.php';
         });
+
+        function bindStockPreview(sizeKey) {
+            const currentStockInput = document.getElementById(`current_stock_${sizeKey}`);
+            const adjustStockInput = document.getElementById(`adjust_stock_${sizeKey}`);
+            const preview = document.getElementById(`preview_stock_${sizeKey}`);
+
+            const renderPreview = () => {
+                const currentValue = parseInt(currentStockInput.value, 10) || 0;
+                const adjustValue = parseInt(adjustStockInput.value, 10) || 0;
+                const nextValue = currentValue + adjustValue;
+                const adjustText = adjustValue >= 0 ? `+ ${adjustValue}` : `- ${Math.abs(adjustValue)}`;
+                preview.textContent = `Preview: ${currentValue} ${adjustText} = ${nextValue}`;
+                preview.style.color = nextValue < 0 ? '#d93025' : '#218838';
+            };
+
+            adjustStockInput.addEventListener('input', renderPreview);
+            renderPreview();
+        }
+
+        ['s', 'm', 'l', 'xl', 'xxl'].forEach(bindStockPreview);
     </script>
 </body>
 </html>
