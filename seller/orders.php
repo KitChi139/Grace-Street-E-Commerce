@@ -234,8 +234,16 @@ if(isset($_POST['complete'])) {
             font-size: 14px;
         }
         .main_products_table th {
-            font-size: 15px;
-            font-weight: 600;
+            font-size: 1rem !important;
+            padding: 10px;
+        }
+        .main_products_table td {
+            font-size: 1rem !important;
+            padding: 12px 10px;
+        }
+        #orderTableBody td {
+            color: rgba(247,243,238,0.75);
+            font-size: 0.85rem;
         }
 
         /* New styles for search, filters and grid view */
@@ -254,18 +262,23 @@ if(isset($_POST['complete'])) {
         }
         .view_btn {
             padding: 10px 18px;
-            border: 1px solid #ddd;
+            border: 0.5px solid rgba(196,149,106,0.4);
             border-radius: 5px;
             cursor: pointer;
-            background: white;
-            color: #333;
+            background: transparent;
+            color: rgba(247,243,238,0.6);
             transition: all 0.3s;
             font-size: 16px;
+            font-family: 'Jost', sans-serif;
         }
-        .view_btn.active {
-            background: #333;
-            color: white;
-            border-color: #333;
+        .view_btn:hover {
+            background: rgba(196,149,106,0.1);
+            color: #C4956A;
+        }
+        view_btn.active {
+            background: #C4956A !important;
+            color: #2C2825 !important;
+            border-color: #C4956A !important;
         }
         
         /* Grid View Styling */
@@ -388,6 +401,67 @@ if(isset($_POST['complete'])) {
         .products_list .detail_value {
             line-height: 1.6;
         }
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .custom-select {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: rgba(247,243,238,0.06);
+            border: 0.5px solid rgba(196,149,106,0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            color: rgba(247,243,238,0.7);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            user-select: none;
+        }
+        .custom-select i {
+            font-size: 0.7rem;
+            color: #C4956A;
+            transition: transform 0.2s;
+        }
+        .custom-select.open i {
+            transform: rotate(180deg);
+        }
+        .custom-select-options {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #3D3530;
+            border: 0.5px solid rgba(196,149,106,0.3);
+            border-radius: 8px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        .custom-select-options.open {
+            display: block;
+        }
+        .custom-select-option {
+            padding: 10px 16px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.8rem;
+            color: rgba(247,243,238,0.7);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .custom-select-option:hover {
+            background: rgba(196,149,106,0.15);
+            color: #C4956A;
+        }
+        .custom-select-option.selected {
+            color: #C4956A;
+        }
+        /* hide original select */
+        .hidden-select {
+            display: none;
+        }
 </style>
 <body>
 <?php include 'dashboard_header.php'; ?>
@@ -401,12 +475,24 @@ if(isset($_POST['complete'])) {
                     <input type="text" id="orderSearch" placeholder="Search orders by name, ID, or address...">
                 </div>
                 <div class="filter_box">
-                    <select id="statusFilter">
+                    <select id="statusFilter" class="hidden-select">
                         <option value="all">All Statuses</option>
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
                         <option value="received">Received</option>
                     </select>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" data-target="statusFilter">
+                            <span>All Statuses</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options">
+                            <div class="custom-select-option selected" data-value="all">All Statuses</div>
+                            <div class="custom-select-option" data-value="pending">Pending</div>
+                            <div class="custom-select-option" data-value="approved">Approved</div>
+                            <div class="custom-select-option" data-value="received">Received</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="view_toggle">
                     <button class="view_btn active" id="listViewBtn" title="List View">
@@ -696,6 +782,61 @@ if(isset($_POST['complete'])) {
                closeModal();
            }
        }
+
+       // Custom Select Logic
+document.querySelectorAll('.custom-select').forEach(select => {
+    select.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wrapper = select.closest('.custom-select-wrapper');
+        const options = wrapper.querySelector('.custom-select-options');
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.custom-select').forEach(s => {
+            if (s !== select) {
+                s.classList.remove('open');
+                s.closest('.custom-select-wrapper').querySelector('.custom-select-options').classList.remove('open');
+            }
+        });
+
+        select.classList.toggle('open');
+        options.classList.toggle('open');
+    });
+});
+
+document.querySelectorAll('.custom-select-option').forEach(option => {
+    option.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wrapper = option.closest('.custom-select-wrapper');
+        const customSelect = wrapper.querySelector('.custom-select');
+        const targetId = customSelect.getAttribute('data-target');
+        const hiddenSelect = document.getElementById(targetId);
+
+        // Update hidden select value
+        hiddenSelect.value = option.getAttribute('data-value');
+
+        // Update display
+        customSelect.querySelector('span').textContent = option.textContent;
+
+        // Update selected class
+        wrapper.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+
+        // Close dropdown
+        customSelect.classList.remove('open');
+        wrapper.querySelector('.custom-select-options').classList.remove('open');
+
+        // Trigger change event on hidden select so filter logic still works
+        hiddenSelect.dispatchEvent(new Event('change'));
+    });
+});
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', () => {
+    document.querySelectorAll('.custom-select').forEach(s => {
+        s.classList.remove('open');
+        s.closest('.custom-select-wrapper').querySelector('.custom-select-options').classList.remove('open');
+    });
+});
    </script>
 </body>
 </html>
