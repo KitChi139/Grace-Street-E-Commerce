@@ -427,6 +427,72 @@
             confirmButtonColor: '#000'
         });
         <?php endif; ?>
+
+        const registerForm = document.querySelector('.registeruser-container form');
+        const REGISTER_DRAFT_KEY = 'grace_register_draft';
+        const registerDraftFields = [
+            'first_name',
+            'last_name',
+            'username',
+            'email',
+            'contact',
+            'address'
+        ];
+        const tosCheckboxInput = document.getElementById('tos_checkbox');
+
+        function saveRegisterDraft() {
+            const draft = {};
+            registerDraftFields.forEach((fieldId) => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    draft[fieldId] = field.value || '';
+                }
+            });
+            draft.tos_checkbox = tosCheckboxInput ? tosCheckboxInput.checked : false;
+
+            localStorage.setItem(REGISTER_DRAFT_KEY, JSON.stringify(draft));
+        }
+
+        function loadRegisterDraft() {
+            const savedDraft = localStorage.getItem(REGISTER_DRAFT_KEY);
+            if (!savedDraft) return;
+
+            try {
+                const draft = JSON.parse(savedDraft);
+                registerDraftFields.forEach((fieldId) => {
+                    const field = document.getElementById(fieldId);
+                    if (field && typeof draft[fieldId] === 'string') {
+                        field.value = draft[fieldId];
+                    }
+                });
+
+                if (tosCheckboxInput && typeof draft.tos_checkbox === 'boolean') {
+                    tosCheckboxInput.checked = draft.tos_checkbox;
+                    registerBtn.disabled = !draft.tos_checkbox;
+                }
+            } catch (error) {
+                localStorage.removeItem(REGISTER_DRAFT_KEY);
+            }
+        }
+
+        loadRegisterDraft();
+
+        registerDraftFields.forEach((fieldId) => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('input', saveRegisterDraft);
+            }
+        });
+
+        if (tosCheckboxInput) {
+            tosCheckboxInput.addEventListener('change', saveRegisterDraft);
+        }
+
+        registerForm.addEventListener('submit', saveRegisterDraft);
+
+        <?php if (isset($success_msg)): ?>
+        localStorage.removeItem(REGISTER_DRAFT_KEY);
+        <?php endif; ?>
     </script>
 </body>
 </html>

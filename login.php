@@ -172,6 +172,9 @@ if(isset($_POST['submit'])){
         // Toggle Password Visibility
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
+        const loginEmailInput = document.querySelector('#email');
+        const loginForm = document.querySelector('.loginuser-container form');
+        const LOGIN_DRAFT_KEY = 'grace_login_draft';
 
         togglePassword.addEventListener('click', function (e) {
             // toggle the type attribute
@@ -181,6 +184,30 @@ if(isset($_POST['submit'])){
             this.classList.toggle('fa-eye-slash');
             this.classList.toggle('fa-eye');
         });
+
+        function saveLoginDraft() {
+            localStorage.setItem(LOGIN_DRAFT_KEY, JSON.stringify({
+                email: loginEmailInput.value || ''
+            }));
+        }
+
+        function loadLoginDraft() {
+            const savedDraft = localStorage.getItem(LOGIN_DRAFT_KEY);
+            if (!savedDraft) return;
+
+            try {
+                const draft = JSON.parse(savedDraft);
+                if (draft.email) {
+                    loginEmailInput.value = draft.email;
+                }
+            } catch (error) {
+                localStorage.removeItem(LOGIN_DRAFT_KEY);
+            }
+        }
+
+        loadLoginDraft();
+        loginEmailInput.addEventListener('input', saveLoginDraft);
+        loginForm.addEventListener('submit', saveLoginDraft);
     </script>
 </body>
 </html>
