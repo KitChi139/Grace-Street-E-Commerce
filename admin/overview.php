@@ -74,7 +74,9 @@ $active_sellers_list = mysqli_fetch_all($active_sellers_list_query, MYSQLI_ASSOC
   <meta charset="UTF-8">
   <title>Grace Street Clothing – Admin Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles/overview.css">
+  <link rel="stylesheet" href="./styles/overview.css">\
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 </head>
 <body>
 
@@ -102,7 +104,7 @@ $active_sellers_list = mysqli_fetch_all($active_sellers_list_query, MYSQLI_ASSOC
       <div class="nav-user">AdminUser &nbsp;👤</div>
     </div>
   </nav> -->
-  <?php include 'dashboard_header.php'; ?>    
+  <?php include 'dashboard_header.php'; ?>
   <!-- MAIN CONTENT -->
   <main>
     <h1 class="page-title">Admin Dashboard</h1>

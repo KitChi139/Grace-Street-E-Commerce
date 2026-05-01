@@ -76,6 +76,7 @@ $applications = mysqli_fetch_all($apps_query, MYSQLI_ASSOC);
   <title>Grace Street Clothing – Supplier Applications</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="./styles/supplier_management.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
