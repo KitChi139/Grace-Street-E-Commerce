@@ -1,14 +1,25 @@
 <?php
-session_start();
+include('./components/connect.php');
 require 'GoogleAuthenticator.php';   // Make sure this file is in the same folder
+
+// Redirect if user is already 2FA verified
+if (isset($_SESSION['2fa_verified']) && $_SESSION['2fa_verified'] === true) {
+    $role_name = strtolower(trim($_SESSION['role'] ?? 'customer'));
+    if ($role_name === 'admin') {
+        header("Location: ./admin/overview.php");
+    } else if ($role_name === 'employee') {
+        header("Location: ./seller/dashboard.php");
+    } else {
+        header("Location: home.php");
+    }
+    exit;
+}
 
 // Redirect if user is not logged in
 if (!isset($_SESSION['user-id']) || empty($_SESSION['user-id'])) {
     header("Location: login.php");
     exit;
 }
-
-include('./components/connect.php');
 
 $GA = new PHPGangsta_GoogleAuthenticator();
 $userId = $_SESSION['user-id'];
@@ -41,9 +52,6 @@ if ($is_first_time) {
 
 $message = '';
 
-// For testing/display purposes: generate the current TOTP code (changes every 30s)
-$current_code = $GA->getCode($secret);
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     $code = trim($_POST['code']);
     
@@ -60,16 +68,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         $_SESSION['2fa_verified'] = true;
         $_SESSION['verified'] = true;
         
-        // Role-based redirection
-        $role_name = strtolower(trim($_SESSION['role'] ?? 'customer'));
-        
-        // Save session before redirect
+        // Ensure session is saved before redirect
         session_write_close();
+
+        // Role-based redirection
+        $role_name = strtolower(trim($_SESSION['role'] ?? 'user'));
         
         if ($role_name === 'admin') {
-            header("Location: admin/overview.php");
-        } else if ($role_name === 'employee' || $role_name === 'seller') {
-            header("Location: seller/dashboard.php");
+            header("Location: ./admin/overview.php");
+        } else if ($role_name === 'employee') {
+            header("Location: ./seller/dashboard.php");
         } else {
             header("Location: home.php");
         }
@@ -170,17 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
                 </div>
             <?php endif; ?>
             
-            <!-- Display current authenticator code (visible for testing) -->
-            <?php if (!empty($current_code)): ?>
-                <div style="text-align:center; margin: 12px 0;">
-                    <p style="margin:0; font-weight:600; color:#333;">Current authenticator code (visible):</p>
-                    <div style="font-size:28px; letter-spacing:8px; background:#f7f7f7; padding:10px 18px; display:inline-block; border-radius:6px; margin-top:8px;">
-                        <?= htmlspecialchars($current_code) ?>
-                    </div>
-                    <p style="font-size:12px; color:#666; margin:6px 0 0;">This code refreshes every 30 seconds.</p>
-                </div>
-            <?php endif; ?>
-
             <form method="POST" autocomplete="off">
                 <input type="text" 
                        name="code" 

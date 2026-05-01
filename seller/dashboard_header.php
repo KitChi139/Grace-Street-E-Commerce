@@ -1,5 +1,5 @@
 <?php
-include('./components/connect.php');
+include_once '../components/connect.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -12,8 +12,7 @@ if($user_id) {
         $fetch_user = mysqli_fetch_assoc($select_user);
         
         // Role check for seller module (role 'employee' is seller)
-        $current_role = strtolower(trim($fetch_user['role'] ?? ''));
-        if ($current_role !== 'employee' && $current_role !== 'seller') {
+        if (strtolower(trim($fetch_user['role'])) !== 'employee') {
             header('Location: ../login.php');
             exit();
         }
