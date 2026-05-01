@@ -236,7 +236,7 @@
                         CURLOPT_POST => true,
                         CURLOPT_HTTPHEADER => [
                             "Content-Type: application/json",
-                            "Authorization: Basic " . base64_encode("sk_test_xxxxx:")
+                            "Authorization: Basic " . base64_encode("sk_test_QTC4z9JnydE34pMzczadm82M:")
                         ],
                         CURLOPT_POSTFIELDS => json_encode([
                             "data" => [
