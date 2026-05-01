@@ -11,12 +11,11 @@ $sellerID = $_SESSION['user-id'];
 $stmt = $con->prepare(
     "SELECT
             o.orderID AS ID,
-            o.userID,
             o.sellerID,
             o.status AS Order_Status,
             o.price AS Total_Price,
-            o.time_ordered AS Placed_on,
-            o.time_received,
+            mo.created_at AS Placed_on,
+            mo.completed_at AS Completed_on,
             o.method AS Method,
             u.username AS Name,
             u.address AS Address,
@@ -29,13 +28,14 @@ $stmt = $con->prepare(
             'No items'
 ) AS Total_Products
         FROM orders o
-        JOIN grace_user u ON o.userID = u.userID
+        JOIN main_order mo ON o.mainOrderID = mo.mainOrderID
+        JOIN grace_user u ON mo.userID = u.userID
         LEFT JOIN order_items oi ON o.orderID = oi.orderID
         LEFT JOIN inventory i ON oi.inventoryID = i.inventoryID
         LEFT JOIN product p ON i.proID = p.proID
         WHERE o.sellerID = ?
         GROUP BY o.orderID
-        ORDER BY o.time_ordered DESC"
+        ORDER BY mo.created_at DESC"
 );
 $stmt->bind_param('i', $sellerID);
 $stmt->execute();

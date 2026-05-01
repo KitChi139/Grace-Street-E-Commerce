@@ -35,7 +35,7 @@ $row = $result->fetch_assoc();
 $totalApproved = $row['total_approved'] ?? 0;
 
 // Total Customers for this seller
-$stmt = $con->prepare("SELECT COUNT(DISTINCT userID) AS total_customers FROM orders WHERE sellerID = ?");
+$stmt = $con->prepare("SELECT COUNT(DISTINCT mo.userID) AS total_customers FROM orders o JOIN main_order mo ON o.mainOrderID = mo.mainOrderID WHERE o.sellerID = ?");
 $stmt->bind_param("i", $_SESSION['user-id']);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -215,12 +215,19 @@ $totalCustomers = $row['total_customers'];
                     <div class="main_dash_box">
                         <h3 style="margin-bottom:12px;">Recent Orders</h3>
                         <?php
-                            $stmt = $con->prepare("SELECT o.orderID AS ID, o.time_ordered AS Placed_on, u.username AS Name, o.price AS Total_Price, o.status AS Order_Status 
-                                          FROM orders o 
-                                          JOIN grace_user u ON o.userID = u.userID 
-                                          WHERE o.sellerID = ?
-                                          ORDER BY o.time_ordered DESC 
-                                          LIMIT 5");
+                           $stmt = $con->prepare("SELECT 
+                                        o.orderID AS ID, 
+                                        mo.created_at AS Placed_on, 
+                                        u.username AS Name, 
+                                        o.price AS Total_Price, 
+                                        o.status AS Order_Status 
+                                    FROM orders o 
+                                    JOIN main_order mo ON o.mainOrderID = mo.mainOrderID
+                                    JOIN grace_user u ON mo.userID = u.userID
+                                    WHERE o.sellerID = ?
+                                    ORDER BY mo.created_at DESC 
+                                    LIMIT 5
+                                ");
                             $stmt->bind_param("i", $_SESSION['user-id']);
                             $stmt->execute();
                             $ordersRes = $stmt->get_result();
