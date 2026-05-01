@@ -255,8 +255,8 @@
                                         "order_id" => $orderID
                                     ],
 
-                                    "success_url" => "http://localhost/success.php?order_id={$orderID}",
-                                    "cancel_url" => "http://localhost/cancel.php?order_id={$orderID}"
+                                    "success_url" => "http://localhost/GraceStreet/success.php?order_id={$orderID}",
+                                    "cancel_url" => "http://localhost/GraceStreet/cancel.php?order_id={$orderID}"
                                 ]
                             ]
                         ])
@@ -404,7 +404,7 @@
                             <select id="PaymentMethod" name="PaymentMethod" required>
                                 <option value="" disabled selected>Select Payment Method</option>
                                 <option value="paymongo">GCASH payment  </option>
-                                <option value="cod">Cash on Delivery</option>
+                                <!-- <option value="cod">Cash on Delivery</option> -->
                             </select>
 
                             <input type="hidden" name="status" value="0">

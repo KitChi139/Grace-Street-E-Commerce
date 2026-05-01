@@ -1,0 +1,42 @@
+/* Setup */
+
+.main-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-left: 300px;
+  padding: 20px;
+}
+
+/* Dashboard */
+
+/* Three-column row with boxes for dashboard */
+.col-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 30px;
+}
+.col {
+  flex: 1 1 0;
+  min-width: 200px;
+}
+.col .box {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.col .box h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+.col .box p {
+  color: #666;
+  font-size: 14px;
+}
