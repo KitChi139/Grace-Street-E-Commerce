@@ -206,8 +206,8 @@
                 foreach ($sellerGroups as $sellerID => $group) {
 
                     $stmt = $con->prepare("
-                        INSERT INTO orders (mainOrderID, sellerID, status, price, time_ordered)
-                        VALUES (?, ?, ?, ?, NOW())
+                        INSERT INTO orders (mainOrderID, sellerID, status, price)
+                        VALUES (?, ?, ?, ?)
                     ");
 
                     $stmt->bind_param("iisd", $mainOrderID, $sellerID, $status, $group['total']);

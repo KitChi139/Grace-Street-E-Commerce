@@ -155,11 +155,14 @@ if (session_status() === PHP_SESSION_NONE) {
                 if (isset($_SESSION['user-id'])) {
                     $userId = $_SESSION['user-id'];
 
-                    $sql = "SELECT o.orderID AS ID, o.time_ordered AS Placed_on, u.username AS Name, u.contact_number AS Number, e.email AS Email, u.address AS Address, o.price AS Total_Price, o.status AS Order_Status 
-                            FROM orders o 
-                            JOIN grace_user u ON o.userID = u.userID 
-                            JOIN email e ON u.emailID = e.emailID 
-                            WHERE o.userID = ?";
+                    $sql = "SELECT 
+                            mo.mainOrderID AS ID,
+                            mo.created_at AS Placed_on,
+                            mo.total_price AS Total_Price,
+                            mo.status AS Order_Status
+                        FROM main_order mo
+                        WHERE mo.userID = ?
+                        ORDER BY mo.created_at DESC";
                     $stmt = $con->prepare($sql);
                     $stmt->bind_param("i", $userId);
                     $stmt->execute();
