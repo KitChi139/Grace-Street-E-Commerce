@@ -76,25 +76,49 @@ $stmt->close();
         }
         .pagination a {
             display: inline-block;
-            padding: 10px;
-            margin: 0 5px;
-            border: 1px solid #ccc;
+            padding: 8px 14px;
+            margin: 0 4px;
+            border: 0.5px solid rgba(196,149,106,0.3);
             text-decoration: none;
-            color: #333;
-            border-radius: 5px;
+            color: rgba(247,243,238,0.6);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: 'Jost', sans-serif;
+            transition: all 0.2s;
         }
         .pagination a:hover {
-            background-color: #f0f0f0;
+            background: rgba(196,149,106,0.15);
+            color: #C4956A;
         }
         .pagination .current {
-            background-color: #333;
-            color: #fff;
+            background: #C4956A;
+            color: #F7F3EE;
+            border-color: #C4956A;
         }
         .no-products {
             text-align: center;
-            font-weight: bold;
-            color: red;
-            padding-bottom: 20px;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #B85C38;
+            padding: 30px 0;
+        }
+        .filter_box select {
+            padding: 10px 20px;
+            background: rgba(247,243,238,0.06);
+            border: 0.5px solid rgba(196,149,106,0.2);
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #F7F3EE;
+            font-family: 'Jost', sans-serif;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C4956A' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
         }
         .search_products{
             display: flex;
@@ -142,23 +166,28 @@ $stmt->close();
 }
 .view-toggle-btn {
     padding: 8px 14px;
-    border: 1px solid #ccc;
-    background: white;
+    border: 0.5px solid rgba(196,149,106,0.4);
+    background: transparent;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: 'Jost', sans-serif;
+    color: rgba(247,243,238,0.6);
     display: flex;
     align-items: center;
     gap: 6px;
     transition: all 0.2s ease;
 }
 .view-toggle-btn:hover {
-    background-color: #f0f0f0;
+    background: rgba(196,149,106,0.1);
+    color: #C4956A;
 }
 .view-toggle-btn.active {
-    background-color: #333;
-    color: white;
-    border-color: #333;
+    background-color: #C4956A !important;
+    color: #2C2825 !important;
+    border-color: #C4956A !important;
 }
 .grid-view {
     display: none;
@@ -275,6 +304,154 @@ $stmt->close();
     background: #e74c3c;
     color: white;
 }
+.productname input,
+.productname select,
+.productname-short input {
+    width: 100%;
+    padding: 10px;
+    background: rgba(247,243,238,0.06);
+    border: 0.5px solid rgba(196,149,106,0.3);
+    border-radius: 0;
+    color: #F7F3EE;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    box-sizing: border-box;
+}
+.productname input::placeholder,
+.productname-short input::placeholder {
+    color: rgba(247,243,238,0.3);
+}
+.productname select option {
+    background: #2C2825;
+    color: #F7F3EE;
+}
+.productname label,
+.productname-short label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.5);
+}
+.productname input[type="number"] {
+    height: 42px; /* match choose file height */
+    background: rgba(247,243,238,0.06) !important;
+    border: 0.5px solid rgba(196,149,106,0.3) !important;
+    color: #F7F3EE !important;
+    padding: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+input[type="file"] {
+    color: rgba(247,243,238,0.6);
+    font-size: 0.75rem;
+}
+.delete-button {
+    display: inline-block;
+    padding: 5px 10px;
+    background: transparent;
+    color: #B85C38;
+    border: 0.5px solid #B85C38;
+    text-decoration: none;
+    border-radius: 0;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s;
+}
+.delete-button:hover {
+    background: #B85C38;
+    color: #F7F3EE;
+}
+.main_products_table td {
+    padding: 12px 10px;
+    font-size: 1rem !important;
+    color: rgba(247,243,238,0.75);
+    border-bottom: 0.5px solid rgba(247,243,238,0.05);
+}
+.main_products_table th {
+    font-size: 0.78rem !important;
+    padding: 10px;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 0.2;
+    filter: invert(1);
+}
+input[type="file"]::file-selector-button {
+    background: rgba(247,243,238,0.06);
+    border: 0.5px solid rgba(196,149,106,0.3);
+    color: #F7F3EE;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+.custom-select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(247,243,238,0.06);
+    border: 0.5px solid rgba(196,149,106,0.3);
+    border-radius: 25px;
+    cursor: pointer;
+    color: rgba(247,243,238,0.7);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    user-select: none;
+}
+.custom-select i {
+    font-size: 0.7rem;
+    color: #C4956A;
+    transition: transform 0.2s;
+}
+.custom-select.open i {
+    transform: rotate(180deg);
+}
+.custom-select-options {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #3D3530;
+    border: 0.5px solid rgba(196,149,106,0.3);
+    border-radius: 8px;
+    z-index: 100;
+    overflow: hidden;
+}
+.custom-select-options.open {
+    display: block;
+}
+.custom-select-option {
+    padding: 10px 16px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(247,243,238,0.7);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.custom-select-option:hover {
+    background: rgba(196,149,106,0.15);
+    color: #C4956A;
+}
+.custom-select-option.selected {
+    color: #C4956A;
+}
+/* hide original select */
+.hidden-select {
+    display: none;
+}
     </style>
     <title>Dashboard</title>
 </head>
@@ -300,19 +477,41 @@ $stmt->close();
                     <input type="text" id="productSearch" placeholder="Search products by name, id, or description..." value="<?php echo htmlspecialchars($search); ?>">
                 </div>
                 <div class="filter_box">
-                    <select id="productStatusFilter">
-                        <option value="all">All Statuses</option>
-                        <option value="available">Available</option>
-                        <option value="unavailable">Unavailable</option>
-                    </select>
-                </div>
-                <div class="filter_box">
-                    <select id="productGenderFilter">
-                        <option value="all">All Genders</option>
-                        <option value="mens">Male</option>
-                        <option value="womens">Female</option>
-                    </select>
-                </div>
+    <select id="productStatusFilter" class="hidden-select">
+        <option value="all">All Statuses</option>
+        <option value="available">Available</option>
+        <option value="unavailable">Unavailable</option>
+    </select>
+    <div class="custom-select-wrapper">
+        <div class="custom-select" data-target="productStatusFilter">
+            <span>All Statuses</span>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="custom-select-options">
+            <div class="custom-select-option selected" data-value="all">All Statuses</div>
+            <div class="custom-select-option" data-value="available">Available</div>
+            <div class="custom-select-option" data-value="unavailable">Unavailable</div>
+        </div>
+    </div>
+</div>
+<div class="filter_box">
+    <select id="productGenderFilter" class="hidden-select">
+        <option value="all">All Genders</option>
+        <option value="mens">Male</option>
+        <option value="womens">Female</option>
+    </select>
+    <div class="custom-select-wrapper">
+        <div class="custom-select" data-target="productGenderFilter">
+            <span>All Genders</span>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="custom-select-options">
+            <div class="custom-select-option selected" data-value="all">All Genders</div>
+            <div class="custom-select-option" data-value="mens">Male</div>
+            <div class="custom-select-option" data-value="womens">Female</div>
+        </div>
+    </div>
+</div>
                 <div class="view-toggle">
                     <button class="view-toggle-btn active" onclick="setView('table')" id="tableViewBtn">
                         <i class="fa-solid fa-table"></i> Table
@@ -487,11 +686,22 @@ $stmt->close();
                         </div>
                         <div class="productname">
                             <label for="product_gender">Gender</label>
-                            <select id="product_gender" name="product_gender">
-                                <option value="" selected disabled>Gender</option>
-                                <option value="1">Male</option>
-                                <option value="2">Female</option>
-                            </select>
+                                <select id="product_gender" name="product_gender" class="hidden-select">
+                                    <option value="" selected disabled>Gender</option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
+                                </select>
+                        <div class="custom-select-wrapper">
+                                <div class="custom-select" data-target="product_gender" style="border-radius: 4px;">
+                                    <span>Gender</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="custom-select-options">
+                                    <div class="custom-select-option selected" data-value="">Gender</div>
+                                    <div class="custom-select-option" data-value="1">Male</div>
+                                    <div class="custom-select-option" data-value="2">Female</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="productname">
                             <label for="Description">Description</label>
@@ -604,7 +814,64 @@ function updateItem(productId) {
         if (statusFilter) statusFilter.addEventListener('change', filterProducts);
         if (genderFilter) genderFilter.addEventListener('change', filterProducts);
 
+
+// Custom Select Logic
+document.querySelectorAll('.custom-select').forEach(select => {
+    select.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wrapper = select.closest('.custom-select-wrapper');
+        const options = wrapper.querySelector('.custom-select-options');
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.custom-select').forEach(s => {
+            if (s !== select) {
+                s.classList.remove('open');
+                s.closest('.custom-select-wrapper').querySelector('.custom-select-options').classList.remove('open');
+            }
+        });
+
+        select.classList.toggle('open');
+        options.classList.toggle('open');
+    });
+});
+
+document.querySelectorAll('.custom-select-option').forEach(option => {
+    option.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wrapper = option.closest('.custom-select-wrapper');
+        const customSelect = wrapper.querySelector('.custom-select');
+        const targetId = customSelect.getAttribute('data-target');
+        const hiddenSelect = document.getElementById(targetId);
+
+        // Update hidden select value
+        hiddenSelect.value = option.getAttribute('data-value');
+
+        // Update display
+        customSelect.querySelector('span').textContent = option.textContent;
+
+        // Update selected class
+        wrapper.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+
+        // Close dropdown
+        customSelect.classList.remove('open');
+        wrapper.querySelector('.custom-select-options').classList.remove('open');
+
+        // Trigger change event on hidden select so filter logic still works
+        hiddenSelect.dispatchEvent(new Event('change'));
+    });
+});
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', () => {
+    document.querySelectorAll('.custom-select').forEach(s => {
+        s.classList.remove('open');
+        s.closest('.custom-select-wrapper').querySelector('.custom-select-options').classList.remove('open');
+    });
+});
 </script>
+
+
 
 </body>
 </html>
