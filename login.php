@@ -52,6 +52,9 @@ if(isset($_POST['submit'])){
             $role_name = $role_row['role'];
             $_SESSION['role'] = $role_name;
 
+            // Ensure session is saved before redirect
+            session_write_close();
+
             // Redirect all roles to 2FA verification
             header("Location: login-authenticator.php");
             exit(); 
