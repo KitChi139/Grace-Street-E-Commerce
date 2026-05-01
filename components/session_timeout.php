@@ -15,6 +15,38 @@ $timeout_duration = 1800;
 $user_id = $_SESSION['user-id'] ?? $_SESSION['user_id'] ?? null;
 
 if ($user_id) {
+    // 2FA Enforcement Logic
+    // Check if 2FA is verified for the logged-in user
+    $current_script = basename($_SERVER['SCRIPT_NAME']);
+    $is_2fa_verified = $_SESSION['2fa_verified'] ?? false;
+    
+    // Pages that are allowed even if 2FA is not yet verified
+     $allowed_pages = [
+         'login-authenticator.php', 
+         'login.php', 
+         'logout.php', 
+         'register.php', 
+         'activate.php', 
+         'resend_activation.php',
+         'forgot-password-send.php',
+         'forgot-password-verify.php',
+         'forgot-password-reset.php',
+         'captcha_gen.php',
+         'seller_register.php'
+     ];
+    
+    // If user is logged in but not 2FA verified, and trying to access a restricted page
+    if (!$is_2fa_verified && !in_array($current_script, $allowed_pages)) {
+        // Determine redirect path to login-authenticator.php
+        if (strpos($_SERVER['SCRIPT_NAME'], '/admin/') !== false || strpos($_SERVER['SCRIPT_NAME'], '/seller/') !== false) {
+            $redirect_2fa = "../login-authenticator.php";
+        } else {
+            $redirect_2fa = "login-authenticator.php";
+        }
+        header("Location: $redirect_2fa");
+        exit();
+    }
+
     // Check if last activity is set
     if (isset($_SESSION['last_activity'])) {
         $elapsed_time = time() - $_SESSION['last_activity'];

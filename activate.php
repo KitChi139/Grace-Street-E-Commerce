@@ -71,19 +71,20 @@ if (isset($_POST['submit_otp'])) {
         .activate-container {
             max-width: 500px;
             margin: 100px auto;
-            background: #fff;
+            background: rgba(247, 243, 238, 0.85);
             padding: 40px;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(44, 40, 37, 1);
             text-align: center;
         }
-        .activate-container h1 { margin-bottom: 20px; color: #333; }
+        .activate-container h1 { text-align: center;font-family: 'Cormorant Garamond', serif; font-weight: bold; margin-bottom: 20px; color: #333; }
         .activate-container p { margin-bottom: 30px; color: #666; font-size: 16px; }
         .box {
             width: 100%;
             padding: 15px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
+            border: 0.5px solid #E8DED2;
+            background-color: rgba(232, 222, 210, 0.3);
             border-radius: 5px;
             box-sizing: border-box;
             font-size: 16px;

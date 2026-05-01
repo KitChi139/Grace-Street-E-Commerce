@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grace Street/Cart</title>
     <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <?php include 'additional/header.php'; ?>
     <section>
         <div class="cart-container">
-            <h1 style="text-align: center;">Shopping Cart</h1>
+            <h1 style="text-align: center;font-family: 'Cormorant Garamond', serif;">Shopping Cart</h1>
             <div class="cart-content">
                 <div class="cart-product">
                     <?php
@@ -67,7 +67,7 @@
                         ?>
                         <div style="text-align: center;">
                             <p>Please log in to view your cart.</p>
-                            <a href="Login.php"><button style="cursor: pointer;  width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
+                            <a href="Login.php"><button style="cursor: pointer; width: 25vh; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Login</button></a>
                         </div>
                         <?php
                     }
@@ -81,11 +81,11 @@
                 
                 <div class="cart-btn">
                     <?php if (isset($result) && $result->num_rows > 0) { ?>
-                        <a href="checkout.php"><button style="cursor: pointer;">Proceed To Checkout</button></a>
+                        <a href="checkout.php"><button style="cursor: pointer; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Proceed To Checkout</button></a>
                     <?php } else { ?>
                         <button disabled>Proceed To Checkout</button>
                     <?php } ?>
-                    <button onclick="deleteAllItems()" style="cursor: pointer; background-color: white;">Delete All</button>
+                    <button onclick="deleteAllItems()" onmouseover="this.style.backgroundColor='#2C2825';this.style.color='#F7F3EE';" onmouseout="this.style.backgroundColor='transparent';this.style.color='#2C2825';" style="cursor: pointer; border: 0.5px solid #2C2825; padding: 15px 30px; background-color: transparent; color: #2C2825; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Delete All</button>
                 </div>  
                 <?php endif; ?>
             </div>

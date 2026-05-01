@@ -127,7 +127,6 @@
    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -136,10 +135,7 @@
     .registeruser-container {
         max-width: 700px; /* Increased width to accommodate grid */
         margin: 50px auto;
-        background: #fff;
         padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     .form-row {
         display: flex;
@@ -249,7 +245,7 @@
             <div class="form-row">
                 <div class="form-group full-width">
                     <label for="address">Address:</label>
-                    <textarea id="address" name="address" required placeholder="Enter your complete address" class="box" style="height: 100px;"></textarea>
+                    <textarea style="background-color: rgba(232, 222, 210, 0.3);" id="address" name="address" required placeholder="Enter your complete address" class="box" style="height: 100px;"></textarea>
                 </div>
             </div>
 

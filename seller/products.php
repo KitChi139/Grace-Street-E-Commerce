@@ -395,7 +395,7 @@ $stmt->close();
                          data-id="<?php echo $row['proID']; ?>">
                         <img class="product-card-image" src="../uploads/images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>">
                         <div class="product-card-name"><?php echo $row['name']; ?></div>
-                        <div class="product-card-price">$<?php echo number_format($row['price'], 2); ?></div>
+                        <div class="product-card-price">₱<?php echo number_format($row['price'], 2); ?></div>
                         <div class="product-card-stock">
                             <span>S: <?php echo $s; ?></span>
                             <span>M: <?php echo $m; ?></span>
@@ -419,7 +419,7 @@ $stmt->close();
             </div>
             <!-- Pagination links -->
             <?php
-                // Count total pages for pagination'
+                // Count total pages for pagination
                 $stmt = $con->prepare("SELECT COUNT(DISTINCT p.proID) AS total FROM product p LEFT JOIN inventory i ON p.proID = i.proID LEFT JOIN sizes s ON i.sizeID = s.sizeID WHERE p.name LIKE ?");
                 $stmt->bind_param("s", $search_param);
                 $stmt->execute();

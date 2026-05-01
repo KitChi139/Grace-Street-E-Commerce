@@ -46,6 +46,7 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Reviews - Grace Street</title>
     <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         .reviews-container {
             max-width: 1200px;
@@ -53,11 +54,11 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
             padding: 20px;
         }
         .review-form {
-            background: #f9f9f9;
+            background: rgba(247, 243, 238, 0.85); /* soft cream card */
             padding: 30px;
             border-radius: 10px;
             margin-bottom: 50px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(44, 40, 37, 1);
         }
         .review-form h2 {
             margin-bottom: 20px;
@@ -66,17 +67,26 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
+            border: 0.5px solid #E8DED2;
             border-radius: 5px;
+            background-color: rgba(232, 222, 210, 0.3); /* warm tint instead of grey */ /* warm tint instead of grey */
         }
         .review-form input[type="submit"] {
-            background: black;
-            color: white;
+            background-color: #2C2825;
+            color: #F7F3EE;
             border: none;
-            padding: 10px 30px;
+            padding: 15px 30px;
             cursor: pointer;
-            border-radius: 5px;
-        }
+            font-family: 'Jost', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: background-color 0.25s;
+            border-radius: 0;
+}
+.review-form input[type="submit"]:hover {
+    background-color: #8B6F56;
+}
         .reviews-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -114,7 +124,8 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
     <?php include 'additional/header.php'; ?>
 
     <div class="reviews-container">
-        <h1 style="text-align: center; margin-bottom: 40px;">Customer Reviews & Feedbacks</h1>
+        <h1 style="text-align: center; margin-bottom: 40px;font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;">Customer Reviews & Feedbacks</h1>
 
         <?php if ($message): ?>
             <div style="text-align: center; padding: 15px; background: #e8f5e9; color: #2e7d32; border-radius: 5px; margin-bottom: 30px;">

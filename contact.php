@@ -8,8 +8,6 @@
 
     <!-- css connection -->
     <link rel="stylesheet" href="css/style.css">
-    <!-- jQuery UI CSS -->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -63,7 +61,7 @@
             if(!isset($_SESSION['user-id'])) {
                 echo '<div style="text-align: center;">
                     <p>Please log in to contact us.</p>
-                    <a href="login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
+                    <a href="login.php"><button style="cursor: pointer; width: 25vh; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Login</button></a>
                 </div>';
             } else {
                 // Fetch email from email table using user-id session

@@ -60,7 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         $_SESSION['2fa_verified'] = true;
         $_SESSION['verified'] = true;
         
-        header("Location: home.php");
+        // Role-based redirection
+        $role_name = $_SESSION['role'] ?? 'customer';
+        
+        if ($role_name === 'admin') {
+            header("Location: ./admin/overview.php");
+        } else if ($role_name === 'employee') {
+            header("Location: ./seller/dashboard.php");
+        } else {
+            header("Location: home.php");
+        }
         exit;
     } else {
         $message = '<p class="error">Invalid code! Please try again.</p>';
@@ -77,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     
     <!-- CSS -->
     <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     
     <style>
         .error {
@@ -90,10 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             text-align: center;
             max-width: 400px;
             margin: 40px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 40px;
+            background: rgba(247, 243, 238, 0.85);
+            border-radius: 12px;
+            border: 0.5px solid #D4C5B0;
+            box-shadow: 0 8px 24px rgba(44, 40, 37, 1);
         }
         .qr-section {
             margin-bottom: 20px;
@@ -118,16 +127,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         }
         .verify-btn {
             width: 100%;
-            padding: 12px;
-            background: #000;
-            color: #fff;
+            padding: 15px;
+            background: #2C2825;
+            color: #F7F3EE;
             border: none;
-            border-radius: 5px;
+            border-radius: 0;
             cursor: pointer;
-            font-size: 16px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: background-color 0.25s;
         }
         .verify-btn:hover {
-            background: #333;
+            background: #8B6F56;
         }
     </style>
 </head>

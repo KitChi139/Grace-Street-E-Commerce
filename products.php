@@ -2,7 +2,7 @@
 include('./components/connect.php');
 
 if (!isset($_SESSION['user-id'])) {
-    header("Location: ../login.php");
+    header("Location: ./login.php");
     exit();
 }
 
@@ -107,7 +107,7 @@ if(isset($_POST['search'])) {
                 <div style="margin: 5vh 0;">
                     <form method="POST" action="" onsubmit="return false;">
                         <p style="margin:0 5px;">Search:</p>
-                        <input type="text" id="searchInput" placeholder="Type Item Name" name="search" style="padding: 10px; font-size: 13px; width: 28vh; border: none; background-color: #e8e8e8;">
+                        <input type="text" id="searchInput" placeholder="Type Item Name" name="search" style="padding: 10px; font-size: 13px; width: 100%; border: none; background-color: #e8e8e8; box-sizing: border-box;">
                         <button type="submit" style="display: none;"></button>
                     </form>
                 </div>
@@ -166,7 +166,7 @@ if(isset($_POST['search'])) {
                                                 if ($fetch_product['product_stock_s'] > 0) {
                                                     echo $fetch_product['product_stock_s'] . '<span> in stock</span>';
                                                 } else {
-                                                    echo '<span style="background-color: red; color: white; padding: 3px;">Out of stock</span>';
+                                                    echo '<span style="background-color: #B85C38; color: #F7F3EE; padding: 3px 8px; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: Jost, sans-serif;">Out of Stock</span>';
                                                 }
                                                 ?>
                                             </p>

@@ -50,17 +50,11 @@ if(isset($_POST['submit'])){
             $role_query = mysqli_query($con, "SELECT role FROM roles WHERE roleID = '$role_id'");
             $role_row = mysqli_fetch_assoc($role_query);
             $role_name = $role_row['role'];
+            $_SESSION['role'] = $role_name;
 
-            if ($role_name === 'admin') {
-                header('Location: ./admin/overview.php');
-                exit(); 
-            }else if($role_name === 'employee'){
-                header('Location: ./seller/dashboard.php');
-                exit(); 
-            } else {
-                header("Location: login-authenticator.php");
-                exit(); 
-            }
+            // Redirect all roles to 2FA verification
+            header("Location: login-authenticator.php");
+            exit(); 
         } else {
             // Fetch max attempts from settings
             $setting_query = mysqli_query($con, "SELECT setting_value FROM system_settings WHERE setting_key = 'max_login_attempts'");
@@ -103,7 +97,6 @@ if(isset($_POST['submit'])){
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -131,7 +124,8 @@ if(isset($_POST['submit'])){
     .password-container .box {
         margin-bottom: 0;
         padding-right: 40px;
-        width: 89.6%;
+        width: 100%; /* was 89.6% */
+        box-sizing: border-box;
     }
     .toggle-password {
         position: absolute;

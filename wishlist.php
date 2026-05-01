@@ -6,7 +6,6 @@
     <title>Wishlist</title>
     <link rel="stylesheet" href="css/style.css">
     <!-- jQuery UI CSS -->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
@@ -95,7 +94,7 @@
                             if($result->num_rows > 0){
                                 while($row = $result->fetch_assoc()){
                                     ?>
-                                    <div class="cart-item" style="padding: 10px; border: 1px solid #ccc;  height: 328px;">
+                                    <div class="cart-item" style="padding: 16px; border: 0.5px solid #E8DED2; border-radius: 12px; background: rgba(247,243,238,0.85); box-shadow: 0 12px 40px rgba(44,40,37,0.5); height: auto; min-height: 328px;">
                                         <form action="" method="post">
                                             <input type="hidden" name="productId" value="<?php echo $row['ID']; ?>">
                                             <input type="hidden" name="productImage" value="<?php echo $row['Wishlist_Image']; ?>">
@@ -111,9 +110,9 @@
                                                 <p style="font-size: 14px; text-align: right; margin-right:45px; color: #bababa;">Quantity:</p>
                                                 <input type="number" name="productQuantity" value="1" min="1" max="1000" style="width: 50px;">
                                             </div>
-                                            <div class="wishlist-btn" style="display: flex; flex-direction: column; margin-top: 10px;">
-                                                <button type="submit" name="addToCart" style="cursor: pointer; padding: 10px; background-color: black; color: white; font-size: 12px; border: none; border-radius: 5px; margin-bottom: 5px;">Add To Cart</button>
-                                                <button type="button" onclick="removeFromWishlist(<?php echo $row['ID']; ?>)" style="cursor: pointer; padding: 10px; background-color: white; border: 1px solid black; color: black; border-radius: 5px;">Remove From Wishlist</button>
+                                            <div class="wishlist-btn" style="display: flex; flex-direction: column; margin-top: 10px; gap: 8px;">
+                                                <button type="submit" name="addToCart" style="cursor: pointer; padding: 12px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; border: none; width: 100%; transition: background-color 0.25s;" onmouseover="this.style.backgroundColor='#8B6F56'" onmouseout="this.style.backgroundColor='#2C2825'">Add To Cart</button>
+                                                <button type="button" onclick="removeFromWishlist(<?php echo $row['ID']; ?>)" style="cursor: pointer; padding: 12px; background-color: transparent; border: 0.5px solid #2C2825; color: #2C2825; font-family: Jost, sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; width: 100%; transition: background-color 0.25s;" onmouseover="this.style.backgroundColor='#2C2825';this.style.color='#F7F3EE'" onmouseout="this.style.backgroundColor='transparent';this.style.color='#2C2825'">Remove From Wishlist</button>
                                             </div>
                                         </form>
                                     </div>
@@ -124,9 +123,9 @@
                             }
                         } else {
                             echo '<div style="text-align: center;">
-                                  <p>Please log in to view your wishlist.</p>
-                                  <a href="login.php"><button style="cursor: pointer; width: 25vh; border: none; border-radius: 5px; padding: 10px 30px; background-color: black; color: white;">Login</button></a>
-                                  </div>';
+                                <p>Please log in to view your wishlist.</p>
+                                <a href="login.php"><button style="cursor: pointer; width: 25vh; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Login</button></a>
+                            </div>';
                         }
                     ?>
                 </div>

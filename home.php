@@ -14,44 +14,44 @@
     <?php include 'chat.php'; ?>
 
     <section>
-        <div class="home-content">
-            <!-- imageslider -->
-            <div class="slider-container">
-                <div class="slider-text">
-                    <h1>Welcome to <br><span style="font-size: 50px;">GRACE STREET</span></br> <span style="font-weight: 300;">Clothing Shop</span></h1>
-                </div>
-                <div class="slider">
-                    <img src="uploads/images/1.jpg" alt="Image 1">
-                    <img src="uploads/images/2.jpg" alt="Image 2">
-                    <img src="uploads/images/5.jpg" alt="Image 3">
-                    <img src="uploads/images/6.jpg" alt="Image 4">
-                </div>
-            </div>
+  <div class="home-content">
 
-            <!-- Advertisement Section -->
-            <div class="advertise-container">
-                <div class="advertise-content">
-                    <div class="ads" style="background-image: url(img/Products.jpg); background-size: contain; background-repeat: no-repeat;">
-                        
-                        <h1>All Products</h1>
-                        <p>Get 20% OFF on slected products.</p>
-                        <a href=""><button>Shop now</button></a>
-                    </div>
+    <!-- Slider -->
+    <div class="slider-container">
+      <div class="slider-text">
+        <h1>GRACE STREET<br><span style="font-weight:300;font-size:1rem;letter-spacing:0.2em;">Clothing Shop</span></h1>
+      </div>
+      <div class="slider">
+        <img src="uploads/images/1.jpg" alt="Collection 1">
+        <img src="uploads/images/2.jpg" alt="Collection 2">
+        <img src="uploads/images/5.jpg" alt="Collection 3">
+        <img src="uploads/images/6.jpg" alt="Collection 4">
+      </div>
+    </div>
 
-                    <div class="ads" style="background-image: url(img/Mens.jpg); background-size: contain; background-repeat: no-repeat;">
-                        <h1>Men's Clothing</h1>
-                        <p>Style for every occasion.</p>
-                        <a href=""><button>Shop now</button></a>
-                    </div>
-                    <div class="ads" style="background-image: url(img/Womens.jpg); background-size: contain; background-repeat: no-repeat;">
-                        <h1>Women's Clothing</h1>
-                        <p>Find your perfect fit.</p>
-                        <a href=""><button>Shop now</button></a>
-                    </div>
-                </div>
-            </div>
+    <!-- Category Boxes -->
+    <div class="advertise-container">
+      <div class="advertise-content">
+        <div class="ads" style="background-image:url(img/Products.jpg);">
+          <h1>All Products</h1>
+          <p>Get 20% OFF on selected products.</p>
+          <a href="products.php"><button>Shop now</button></a>
         </div>
-    </section>
+        <div class="ads" style="background-image:url(img/Mens.jpg);">
+          <h1>Men's Clothing</h1>
+          <p>Style for every occasion.</p>
+          <a href="products.php?category=mens"><button>Shop now</button></a>
+        </div>
+        <div class="ads" style="background-image:url(img/Womens.jpg);">
+          <h1>Women's Clothing</h1>
+          <p>Find your perfect fit.</p>
+          <a href="products.php?category=womens"><button>Shop now</button></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
 
     <?php include 'additional/footer.php'; ?>
     <script src="js/home.js"></script>
