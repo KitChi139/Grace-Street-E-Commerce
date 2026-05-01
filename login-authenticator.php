@@ -58,12 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         $_SESSION['verified'] = true;
         
         // Role-based redirection
-        $role_name = $_SESSION['role'] ?? 'customer';
+        $role_name = strtolower(trim($_SESSION['role'] ?? 'customer'));
+        
+        // Save session before redirect
+        session_write_close();
         
         if ($role_name === 'admin') {
-            header("Location: ./admin/overview.php");
-        } else if ($role_name === 'employee') {
-            header("Location: ./seller/dashboard.php");
+            header("Location: admin/overview.php");
+        } else if ($role_name === 'employee' || $role_name === 'seller') {
+            header("Location: seller/dashboard.php");
         } else {
             header("Location: home.php");
         }

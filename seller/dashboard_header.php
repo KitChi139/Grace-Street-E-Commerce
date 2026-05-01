@@ -7,10 +7,23 @@ $user_id = isset($_SESSION['user-id']) ? $_SESSION['user-id'] : null;
 
 $fetch_user = null;
 if($user_id) {
-    $select_user = mysqli_query($con, "SELECT * FROM grace_user WHERE userID = '$user_id'") or die("query failed");
+    $select_user = mysqli_query($con, "SELECT u.*, r.role FROM grace_user u JOIN roles r ON u.roleID = r.roleID WHERE u.userID = '$user_id'") or die("query failed");
     if(mysqli_num_rows($select_user) > 0){
         $fetch_user = mysqli_fetch_assoc($select_user);
+        
+        // Role check for seller module (role 'employee' is seller)
+        $current_role = strtolower(trim($fetch_user['role'] ?? ''));
+        if ($current_role !== 'employee' && $current_role !== 'seller') {
+            header('Location: ../login.php');
+            exit();
+        }
+    } else {
+        header('Location: ../login.php');
+        exit();
     }
+} else {
+    header('Location: ../login.php');
+    exit();
 }
 
 function getCartItemCount($user_id, $con) {

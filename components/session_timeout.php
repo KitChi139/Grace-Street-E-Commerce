@@ -21,22 +21,32 @@ if ($user_id) {
     $is_2fa_verified = $_SESSION['2fa_verified'] ?? false;
     
     // Pages that are allowed even if 2FA is not yet verified
-     $allowed_pages = [
-         'login-authenticator.php', 
-         'login.php', 
-         'logout.php', 
-         'register.php', 
-         'activate.php', 
-         'resend_activation.php',
-         'forgot-password-send.php',
-         'forgot-password-verify.php',
-         'forgot-password-reset.php',
-         'captcha_gen.php',
-         'seller_register.php'
-     ];
+    $allowed_pages = [
+        'login-authenticator.php', 
+        'login.php', 
+        'logout.php', 
+        'register.php', 
+        'activate.php', 
+        'resend_activation.php',
+        'forgot-password-send.php',
+        'forgot-password-verify.php',
+        'forgot-password-reset.php',
+        'captcha_gen.php',
+        'seller_register.php',
+        'admin_login.php'
+    ];
+    
+    // Normalize current script name to handle subdirectories correctly for the check
+    $is_allowed = false;
+    foreach ($allowed_pages as $page) {
+        if (strpos($_SERVER['SCRIPT_NAME'], $page) !== false) {
+            $is_allowed = true;
+            break;
+        }
+    }
     
     // If user is logged in but not 2FA verified, and trying to access a restricted page
-    if (!$is_2fa_verified && !in_array($current_script, $allowed_pages)) {
+    if (!$is_2fa_verified && !$is_allowed) {
         // Determine redirect path to login-authenticator.php
         if (strpos($_SERVER['SCRIPT_NAME'], '/admin/') !== false || strpos($_SERVER['SCRIPT_NAME'], '/seller/') !== false) {
             $redirect_2fa = "../login-authenticator.php";

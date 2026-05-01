@@ -15,7 +15,8 @@ if (!$user_id) {
 $user_query = mysqli_query($con, "SELECT u.*, r.role FROM grace_user u JOIN roles r ON u.roleID = r.roleID WHERE u.userID = '$user_id'");
 $user_data = mysqli_fetch_assoc($user_query);
 
-if (!$user_data || strtolower(trim($user_data['role'])) !== 'admin') {
+$current_role = strtolower(trim($user_data['role'] ?? ''));
+if (!$user_data || $current_role !== 'admin') {
     header('Location: ../login.php');
     exit();
 }
