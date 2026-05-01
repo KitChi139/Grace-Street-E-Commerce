@@ -1,5 +1,5 @@
 <?php
-include('./components/connect.php');
+include_once '../components/connect.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -12,8 +12,7 @@ if($user_id) {
         $fetch_user = mysqli_fetch_assoc($select_user);
         
         // Role check for admin module
-        $current_role = strtolower(trim($fetch_user['role'] ?? ''));
-        if ($current_role !== 'admin') {
+        if (strtolower(trim($fetch_user['role'])) !== 'admin') {
             header('Location: ../login.php');
             exit();
         }

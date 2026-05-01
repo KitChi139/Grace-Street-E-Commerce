@@ -40,6 +40,8 @@ if(isset($_POST['submit'])){
 
             $_SESSION['user-id'] = $row['userID'];
             $_SESSION['user-email'] = $email;
+            $_SESSION['2fa_verified'] = false; // Force 2FA verification on new login
+            $_SESSION['verified'] = false;
             
             // Log successful login
             include_once './components/audit_logger.php';

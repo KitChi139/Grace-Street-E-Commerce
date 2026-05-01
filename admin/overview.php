@@ -15,8 +15,7 @@ if (!$user_id) {
 $user_query = mysqli_query($con, "SELECT u.*, r.role FROM grace_user u JOIN roles r ON u.roleID = r.roleID WHERE u.userID = '$user_id'");
 $user_data = mysqli_fetch_assoc($user_query);
 
-$current_role = strtolower(trim($user_data['role'] ?? ''));
-if (!$user_data || $current_role !== 'admin') {
+if (!$user_data || strtolower(trim($user_data['role'])) !== 'admin') {
     header('Location: ../login.php');
     exit();
 }
@@ -75,9 +74,7 @@ $active_sellers_list = mysqli_fetch_all($active_sellers_list_query, MYSQLI_ASSOC
   <meta charset="UTF-8">
   <title>Grace Street Clothing – Admin Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles/overview.css">\
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+  <link rel="stylesheet" href="./styles/overview.css">
 </head>
 <body>
 
@@ -105,7 +102,7 @@ $active_sellers_list = mysqli_fetch_all($active_sellers_list_query, MYSQLI_ASSOC
       <div class="nav-user">AdminUser &nbsp;👤</div>
     </div>
   </nav> -->
-  <?php include 'dashboard_header.php'; ?>
+  <?php include 'dashboard_header.php'; ?>    
   <!-- MAIN CONTENT -->
   <main>
     <h1 class="page-title">Admin Dashboard</h1>

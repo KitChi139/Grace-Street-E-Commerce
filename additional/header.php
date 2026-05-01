@@ -11,9 +11,8 @@ if($user_id) {
     if(mysqli_num_rows($select_user) > 0){
         $fetch_user = mysqli_fetch_assoc($select_user);
         
-        // Role check for customer module
-        $current_role = strtolower(trim($fetch_user['role'] ?? ''));
-        if ($current_role !== 'customer' && $current_role !== 'user') {
+        // Role check for customer module (role 'user')
+        if (strtolower(trim($fetch_user['role'])) !== 'user') {
             header('Location: ./login.php');
             exit();
         }
