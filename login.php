@@ -52,6 +52,7 @@ if(isset($_POST['submit'])){
             $role_query = mysqli_query($con, "SELECT role FROM roles WHERE roleID = '$role_id'");
             $role_row = mysqli_fetch_assoc($role_query);
             $role_name = $role_row['role'];
+            $_SESSION['role'] = $role_name;
 
             if ($role_name === 'admin') {
                 header('Location: ./admin/overview.php');

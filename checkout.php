@@ -146,7 +146,7 @@
                 if (!isset($_SESSION['user-id'])) {
                     throw new Exception("User not logged in");
                 }
-                $paymentMethod = $_POST['PaymentMethod'];
+                $paymentMethod = htmlspecialchars($_POST['PaymentMethod']);
                 $allowedMethods = ['paymongo', 'cod'];
                 if (!in_array($paymentMethod, $allowedMethods)) {
                     throw new Exception("Invalid payment method");
@@ -167,6 +167,9 @@
                 $result = $stmt->get_result();
 
                 $sellerGroups = [];
+                if ($result->num_rows === 0) {
+                    throw new Exception("Cart is empty");
+                }
 
                 while ($row = $result->fetch_assoc()) {
 
@@ -184,21 +187,30 @@
                     $totalSubtotal += $group['total'];
                 }
                 $_SESSION['checkout_total'] = $totalSubtotal;
-                if (empty($sellerGroups)) {
-                    throw new Exception("Cart is empty");
-                }
+
 
                 // 2. Insert ONE order
+
+                // 2. Create BULK ORDER (customer_orders)
+                $stmt = $con->prepare("
+                    INSERT INTO main_order (userID, total_price, status, created_at)
+                    VALUES (?, ?, ?, NOW())
+                ");
+
+                $stmt->bind_param("ids", $userId, $totalSubtotal, $status);
+                $stmt->execute();
+
+                $mainOrderID = $stmt->insert_id;
                 $orderIDs = [];
 
                 foreach ($sellerGroups as $sellerID => $group) {
 
                     $stmt = $con->prepare("
-                        INSERT INTO orders (userID, sellerID, status, price, time_ordered)
+                        INSERT INTO orders (mainOrderID, sellerID, status, price, time_ordered)
                         VALUES (?, ?, ?, ?, NOW())
                     ");
 
-                    $stmt->bind_param("iisd", $userId, $sellerID, $status, $group['total']);
+                    $stmt->bind_param("iisd", $mainOrderID, $sellerID, $status, $group['total']);
                     $stmt->execute();
 
                     $orderIDs[$sellerID] = $stmt->insert_id;
@@ -242,7 +254,7 @@
                             "data" => [
                                 "attributes" => [
                                     "line_items" => [[
-                                        "name" => "Order #{$orderID}",  
+                                        "name" => "Order #{$mainOrderID}",
                                         "amount" => $amount,
                                         "currency" => "PHP",
                                         "quantity" => 1
@@ -252,11 +264,11 @@
 
                                     // ✅ VERY IMPORTANT (for webhook)
                                     "metadata" => [
-                                        "order_id" => $orderID
+                                        "customer_order_id" => $mainOrderID
                                     ],
 
-                                    "success_url" => "http://localhost/GraceStreet/success.php?order_id={$orderID}",
-                                    "cancel_url" => "http://localhost/GraceStreet/cancel.php?order_id={$orderID}"
+                                    "success_url" => "http://localhost/GraceStreet/success.php?order_id={$mainOrderID}",
+                                    "cancel_url" => "http://localhost/GraceStreet/cancel.php?order_id={$mainOrderID}"
                                 ]
                             ]
                         ])
@@ -273,7 +285,7 @@
                     }
 
                     $checkoutUrl = $paymongo['data']['attributes']['checkout_url'];
-                    $_SESSION['pending_order_id'] = $orderID;
+                    $_SESSION['pending_order_id'] = $mainOrderID;
                     // ✅ Commit BEFORE redirect
                     $con->commit();
 

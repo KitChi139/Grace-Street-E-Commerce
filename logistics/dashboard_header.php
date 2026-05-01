@@ -124,7 +124,7 @@ body {
 
   <!-- LOGO -->
   <div class="sidebar-logo">
-    <a href="./overview.php">
+    <a href="./1dashboard.php">
       <img src="./img/Logo.png" alt="Logo">
     </a>
   </div>
@@ -140,13 +140,14 @@ body {
     </button>
 
     <div class="dropdown-container" id="ordersMenu">
-      <a href="./2porders.php">Pending Orders</a>
-      <a href="./3rtransit.php">Ready for Transit</a>
-      <a href="./4intransit.php">In Transit</a>
-      <a href="./5completed.php">Completed</a>
+      <a href="./2porders.php"><i class="fa fa-clock"></i> Pending Orders</a>
+      <a href="./3rtransit.php"><i class="fa fa-truck"></i> Ready for Transit</a>
+      <a href="./4intransit.php"><i class="fa fa-road"></i> In Transit</a>
+      <a href="./5completed.php"><i class="fa fa-check-circle"></i> Completed</a>
     </div>
 
     <a href="./6logs.php"><i class="fa fa-file-alt"></i> Logs</a>
+    <a href="../logout.php"><i class="fa fa-sign-out-alt"></i> Logout</a>
   </nav>
 
   <!-- USER SECTION -->

@@ -50,6 +50,9 @@ if ($is_first_time) {
     $qrCodeUrl = $GA->getQRCodeGoogleUrl($useremail, $secret, $issuer);
 }
 
+// Generate a temporary/current TOTP code for convenience (temporary use only)
+$display_code = $GA->getCode($secret);
+
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
@@ -153,6 +156,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         .verify-btn:hover {
             background: #8B6F56;
         }
+        .temp-code {
+            margin: 12px 0 6px;
+            padding: 10px 14px;
+            background: #f5f5f5;
+            border: 1px dashed #c9c9c9;
+            font-family: 'Courier New', monospace;
+            font-size: 22px;
+            letter-spacing: 6px;
+            text-align: center;
+            color: #111;
+        }
+        .temp-note {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -178,6 +198,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
                 </div>
             <?php endif; ?>
             
+            <?php if (!empty($display_code)): ?>
+                <div class="temp-note">Temporary code (for convenience only). Do not enable in production.</div>
+                <div class="temp-code"><?= htmlspecialchars($display_code) ?></div>
+            <?php endif; ?>
+
             <form method="POST" autocomplete="off">
                 <input type="text" 
                        name="code" 
