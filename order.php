@@ -184,7 +184,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             if ($row['Order_Status'] == 'Pending') {
                                 $statusDisplay = '<span style="color: orange;">Pending</span>';
                             } else if ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
-                                $statusDisplay = '<span style="color: green;">Approved</span>';
+                                $statusDisplay = '<span style="color: green;">Paid</span>';
                             } else if ($row['Order_Status'] == 'Completed') {
                                 $statusDisplay = '<span style="color: blue;">Received</span>';
                             } else if ($row['Order_Status'] == 'Canceled') {
