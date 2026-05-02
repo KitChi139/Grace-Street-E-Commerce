@@ -115,7 +115,7 @@
     <section>
         <div class="update-container">
             <form action="" method="post">
-                <h1 style="text-align: center;">Update profile</h1>
+                <h1 style="text-align: center; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 3rem;">Update profile</h1>
 
                 <label for="first_name">First Name</label>
                 <input type="text" id="first_name" name="first_name" required placeholder="Enter your first name" maxlength="50" class="box" value="<?= $fetch_user["first_name"]; ?>">

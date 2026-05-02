@@ -149,9 +149,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_user'])) {
               <td><?php echo htmlspecialchars($user['email']); ?></td>
               <td><?php echo htmlspecialchars($user['role']); ?></td>
               <?php if ($user['is_active'] == 1): ?>
-                <td style='color:green;'>Active</td>
+                <td style='color:#C4956A; font-size:0.9rem; letter-spacing:0.05em;'>Active</td>
               <?php else: ?>
-                <td style='color:red;'>Locked</td>
+                <td style='color:rgba(247,243,238,0.35); font-size:0.9rem; letter-spacing:0.05em;'>Locked</td>
               <?php endif; ?>
               <td><?php echo htmlspecialchars($user['joined_date'] ?? 'N/A'); ?></td>
               <td>
@@ -201,8 +201,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_user'])) {
           </select>
         </div>
         <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
-          <button type="button" onclick="closeEditModal()" style="background-color: #95a5a6; padding: 8px 16px;">Cancel</button>
-          <button type="submit" name="edit_user" style="background-color: #3498db; padding: 8px 16px;">Save Changes</button>
+          <button type="button" onclick="closeEditModal()" style="padding:8px 16px; background:transparent; border:1px solid rgba(255,255,255,0.08); color:rgba(247,243,238,0.6); font-family:'DM Sans',sans-serif; font-size:0.75rem; letter-spacing:0.07em; text-transform:uppercase; border-radius:6px; cursor:pointer;">Cancel</button>
+          <button type="submit" name="edit_user" style="padding:8px 16px; background:#C4956A; border:none; color:#F7F3EE; font-family:'DM Sans',sans-serif; font-size:0.75rem; letter-spacing:0.07em; text-transform:uppercase; border-radius:6px; cursor:pointer;">Save Changes</button>
         </div>
       </form>
     </div>

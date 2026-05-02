@@ -211,24 +211,41 @@ if(isset($_POST['complete'])) {
             font-size: 25px;
             cursor: pointer;
         }
-        .printbtn{
+        .printbtn {
             text-decoration: none;
-            background-color: darkgreen;
+            background: transparent;
+            border: 0.5px solid rgba(247,243,238,0.2);
             padding: 5px 12px;
-            border-radius: 10px;
-            color: white;
-            font-size: 13px;
+            border-radius: 4px;
+            color: rgba(247,243,238,0.6);
+            font-size: 0.72rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            font-family: 'Jost', sans-serif;
             margin-left: 6px;
             display: inline-block;
+            transition: all 0.15s;
+        }
+        .printbtn:hover {
+            border-color: rgba(247,243,238,0.4);
+            color: #F7F3EE;
         }
         .details-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
+            background: transparent;
+            color: #C4956A;
+            border: 0.5px solid #C4956A;
             padding: 5px 12px;
-            border-radius: 10px;
-            font-size: 13px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            font-family: 'Jost', sans-serif;
             cursor: pointer;
+            transition: all 0.15s;
+        }
+        .details-btn:hover {
+            background: #C4956A;
+            color: #F7F3EE;
         }
         .order-view td{
             font-size: 14px;
@@ -524,13 +541,13 @@ if(isset($_POST['complete'])) {
                                 $status_class = '';
                                 if ($row['Order_Status'] == 'Pending') {
                                     $status_text = 'Pending';
-                                    $status_class = 'orange';
+                                    $status_class = '#C4956A';
                                 } elseif ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
                                     $status_text = 'Approved';
-                                    $status_class = 'green';
+                                    $status_class = 'rgba(147,197,153,0.9)';
                                 } elseif ($row['Order_Status'] == 'Completed') {
                                     $status_text = 'Received';
-                                    $status_class = 'blue';
+                                    $status_class = 'rgba(247,243,238,0.5)';
                                 }
                             ?>
                             <tr class="order-view" data-status="<?php echo strtolower($status_text); ?>" 

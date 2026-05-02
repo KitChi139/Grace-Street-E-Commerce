@@ -102,6 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     <link rel="stylesheet" href="Css/style.css">
     
     <style>
+        form {
+            width: 100%;
+        }
         .error {
             color: red;
             font-weight: bold;
@@ -111,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         .loginuser-container1 {
             text-align: center;
             max-width: 400px;
-            margin: 40px auto;
+            margin: 40px auto 175px;
             padding: 40px;
             background: rgba(247, 243, 238, 0.85);
             border-radius: 12px;
@@ -131,13 +134,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         }
         .code-input {
             width: 100%;
+            box-sizing: border-box;
             padding: 12px;
             font-size: 18px;
             text-align: center;
             letter-spacing: 5px;
-            border: 1px solid #ddd;
+            border: 0.5px solid #E8DED2;
             border-radius: 5px;
             margin: 15px 0;
+            background: rgba(232,222,210,0.2);
+            color: #2C2825;
+            font-family: 'Jost', sans-serif;
         }
         .verify-btn {
             width: 100%;
@@ -152,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             letter-spacing: 0.1em;
             text-transform: uppercase;
             transition: background-color 0.25s;
+            box-sizing: border-box;
         }
         .verify-btn:hover {
             background: #8B6F56;
@@ -159,19 +167,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         .temp-code {
             margin: 12px 0 6px;
             padding: 10px 14px;
-            background: #f5f5f5;
-            border: 1px dashed #c9c9c9;
+            background: rgba(232,222,210,0.3) !important;
+            border: 0.5px dashed #D4C5B0 !important;
             font-family: 'Courier New', monospace;
             font-size: 22px;
             letter-spacing: 6px;
             text-align: center;
-            color: #111;
+            color: #2C2825 !important;;
+            border-radius: 6px;
         }
         .temp-note {
             font-size: 12px;
-            color: #666;
+            color: #A09486;
             text-align: center;
             margin-bottom: 8px;
+        }
+        .loginuser-container1 form {
+            width: 100%;
+            box-sizing: border-box;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
         }
     </style>
 </head>

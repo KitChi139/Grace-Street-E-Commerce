@@ -57,6 +57,7 @@ $current_max = $settings['max_login_attempts'] ?? 5;
 <head>
     <meta charset="UTF-8">
     <title>System Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="./styles/user_management.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -67,7 +68,7 @@ $current_max = $settings['max_login_attempts'] ?? 5;
         <p class="page-subtitle">Configure global platform parameters</p>
 
         <?php if ($message): ?>
-            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <div class="settings-message">
                 <?php echo $message; ?>
             </div>
         <?php endif; ?>
@@ -76,7 +77,7 @@ $current_max = $settings['max_login_attempts'] ?? 5;
             <div class="panel-header">
                 <div class="panel-title">Security & Password Policy</div>
             </div>
-            <form method="post" style="padding: 20px;">
+            <form method="post" class="settings-form" style="padding: 20px;">
                 <div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
                     <label style="display: block; margin-bottom: 10px; font-weight: 600;">Maximum Login Attempts</label>
                     <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Failed attempts before account lock.</p>

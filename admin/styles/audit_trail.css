@@ -1,22 +1,27 @@
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --surface: #ffffff;
-      --border: #e8e8e8;
-      --text-primary: #1a1a1a;
-      --text-secondary: #6b6b6b;
-      --text-muted: #9e9e9e;
-      --accent: #1a1a1a;
-      --radius: 12px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-    }
+:root {
+  --navy: #1B2A3B;
+  --navy-light: #243447;
+  --navy-border: rgba(255,255,255,0.08);
+  --cream: #F7F3EE;
+  --gold: #C4956A;
+  --surface: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.08);
+  --text-primary: #F7F3EE;
+  --text-secondary: rgba(247,243,238,0.6);
+  --text-muted: rgba(247,243,238,0.35);
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text-primary);
-      min-height: 100vh;
-    }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(180deg, #243D57 0%, #162233 50%, #0D1520 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+}
 /* Pop up style */
 .pop-container {
   background-color: white;
@@ -293,7 +298,7 @@ nav a {
     }
 
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #fafafa; }
+    tbody tr:hover { background: rgba(255,255,255,0.04); }
 
     tbody td {
       padding: 15px 24px;
@@ -326,18 +331,98 @@ nav a {
     }
 
     .badge-critical {
-      background: #e03535;
-      color: #fff;
-    }
+  background: rgba(210,130,100,0.15);
+  color: rgba(210,130,100,0.9);
+  border: 1px solid rgba(210,130,100,0.3);
+}
+.badge-warning {
+  background: rgba(196,149,106,0.12);
+  color: var(--gold);
+  border: 1px solid rgba(196,149,106,0.25);
+}
+.badge-info {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
 
-    .badge-warning {
-      background: #f0f0f0;
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-    }
+/* ── HEADER NAVY OVERRIDE ── */
+.header-container {
+  width: 100%;
+  padding: 0 2.5rem;
+  border-bottom: 1px solid var(--navy-border);
+  background: rgba(27, 42, 59, 0.95);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 0;
+}
+nav a {
+  font-size: 0.8rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+  margin: 0 1rem;
+  transition: color 0.2s;
+}
+nav a:hover { color: var(--cream); }
+.header-logo img { filter: invert(1); }
+.user-display-name {
+  font-size: 0.85rem !important;
+  color: var(--text-secondary) !important;
+  margin-right: 12px !important;
+}
+.pop-container {
+  background: var(--navy-light);
+  border: 1px solid var(--navy-border);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  padding: 16px;
+  width: 180px;
+  position: absolute;
+  z-index: 200;
+  right: 0;
+  top: 40px;
+  display: none;
+}
+.pop-container .pop-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.pop-content button {
+  width: 100% !important;
+  padding: 10px !important;
+  margin: 0 !important;
+  border: none;
+  background: var(--gold);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: opacity 0.2s;
+}
+.pop-content button:hover { opacity: 0.85; }
+.pop-content button.logBtn {
+  background: transparent;
+  border: 1px solid var(--navy-border);
+  color: var(--text-secondary);
+}
 
-    .badge-info {
-      background: #f0f0f0;
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-    }
+/* ── LOCKED BADGE ── */
+.badge-critical {
+  background: rgba(210,130,100,0.15) !important;
+  color: rgba(210,130,100,0.9) !important;
+  border: 1px solid rgba(210,130,100,0.3) !important;
+}

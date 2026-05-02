@@ -80,8 +80,7 @@ $applications = mysqli_fetch_all($apps_query, MYSQLI_ASSOC);
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
-    .badge-rejected { background: #ff7675; color: white; }
-    .badge-approved { background: #55efc4; color: #2d3436; }
+
 </style>
 <body>
   <?php include 'dashboard_header.php'; ?>    
