@@ -11,7 +11,7 @@
     <?php include 'additional/header.php'; ?>
     <section>
         <div class="cart-container">
-            <h1 style="text-align: center;font-family: 'Cormorant Garamond', serif;">Shopping Cart</h1>
+            <h1 style="text-align: center; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 3.8rem; letter-spacing: 0.04em; color: #2C2825;">Shopping Cart</h1>
             <div class="cart-content">
                 <div class="cart-product">
                     <?php
@@ -54,7 +54,7 @@
                                         <button onclick="editQuantity(<?php echo $product['ID']; ?>)" style="height: 25px; padding:2.50px; border-radius: 2px; width: fit-content; background-color: black; margin-left: 2px; cursor: pointer; border: 1px solid black;"><i class="fa-solid fa-pen-to-square" style="color: white; font-size: 14px;"></i></button>
                                     </div>
                                     <p style="font-size: 14px;">Subtotal: <?php echo htmlspecialchars($subtotal); ?></p>
-                                    <button class="remove-btn" style="cursor: pointer;" onclick="removeFromCart(<?php echo $product['ID']; ?>)">Remove from cart</button>
+                                    <button class="remove-btn" onclick="removeFromCart(<?php echo $product['ID']; ?>)" style="cursor:pointer; border:0.5px solid #2C2825; background:transparent; color:#2C2825; font-family:'Jost',sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; padding:8px 0; width:100%; transition:background-color 0.25s, color 0.25s;" onmouseover="this.style.backgroundColor='#2C2825';this.style.color='#F7F3EE';" onmouseout="this.style.backgroundColor='transparent';this.style.color='#2C2825';">Remove</button>
                                 </div>
                                 <?php
                             }

@@ -319,120 +319,121 @@
         <title>Grace Street/Checkout</title>
         <link rel="stylesheet" href="Css/style.css">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body>
-        <?php include 'additional/header.php'; ?>
-        <section>
-            <div class="checkout_container">
-                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" onsubmit="return confirm('Are you sure you want to place the order?');">
-                    <div class="checkout_content">
-                        <div class="checkout_header">
-                            <div style="background-color: black; color: white; padding: 10px;">
-                                <h1 class="color: white; padding: 20px;">Your orders</h1>
-                            </div>
-                            <div class="checkout_orders" style="padding-bottom: 20px; padding: 20px;">
-                                <div class="checkout_item" >
-                                    <?php
-                                    
-                                    if(isset($_SESSION['user-id'])) {
-                                        // Fetch data from the database
-                                        $userId = $_SESSION['user-id'];
-                                        $query = "SELECT cart.*, product.name, product.price, product.image 
-                                                FROM cart 
-                                                JOIN inventory ON cart.inventoryID = inventory.inventoryID 
-                                                JOIN product ON inventory.proID = product.proID 
-                                                WHERE cart.userID = ?";
-                                        $stmt = $con->prepare($query);
-                                        $stmt->bind_param("i", $userId);
-                                        $stmt->execute();
-                                        $result = $stmt->get_result();
+    <?php include 'additional/header.php'; ?>
+    <section>
+        <div class="checkout_container" style="max-width: 1100px; margin: 0 auto; padding: 3rem 2.5rem;">
+            <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 3.8rem; text-align: center; margin-bottom: 2.5rem; color: #2C2825; letter-spacing: 0.04em;">Checkout</h1>
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" onsubmit="return confirm('Are you sure you want to place the order?');">
+                <div style="display: flex; gap: 2.5rem; align-items: flex-start; flex-wrap: nowrap;">
 
-                                        // Initialize total subtotal
-                                        $totalSubtotal = 0;
-
-                                        if ($result->num_rows > 0) {
-                                            while ($row = $result->fetch_assoc()) {
-
-                                                $productName = $row['name'];
-                                                $productPrice = $row['price'];
-                                                $productQuantity = $row['quantity'];
-                                                $productImage = $row['image'];
-
-                                                $subtotal = $productPrice * $productQuantity;
-                                                $totalSubtotal += $subtotal;
-
-                                                echo '<div class="order_product">';
-                                                echo '<div class="order_image">';
-
-                                                $imagePath = 'uploads/images/' . $productImage;
-                                                if (file_exists($imagePath)) {
-                                                    echo '<img src="' . $imagePath . '" alt="Product Image">';
-                                                } else {
-                                                    echo '<p>Image not found</p>';
-                                                }
-
-                                                echo '</div>';
-                                                echo '<div class="order_content">';
-                                                echo '<h1>' . $productName . '</h1>';
-                                                echo '<p>PHP ' . number_format($productPrice, 2) . ' (' . $productQuantity . ')</p>';
-                                                echo '<p style="font-size: 13px;">SUBTOTAL PHP ' . number_format($subtotal, 2) . '</p>';
-                                                echo '</div>';
-                                                echo '</div>';
-                                            }
-                                        } else {
-                                            // If no rows are returned, display a message
-                                            echo 'No products found.';
-                                        }
-                                    } else {
-                                        echo "<p>Please log in to view your cart.</p>";
-                                    }
-
-                                    ?>
-                                </div>
-                                <div class="order_total">
-                                    <p>Total Price:</p>
-                                    <h1>PHP <?php echo number_format($_SESSION['checkout_total'] ?? 0, 2); ?></h1>
-                                </div>
-                            </div>
+                    <!-- LEFT: Order Summary -->
+                    <div style="flex: 1; min-width: 280px; background: rgba(247,243,238,0.85); border: 0.5px solid #E8DED2; border-radius: 12px; box-shadow: 0 8px 24px rgba(44,40,37,0.10); overflow: hidden;">
+                        <div style="padding: 1.2rem 1.5rem; border-bottom: 0.5px solid #E8DED2;">
+                            <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 1.5rem; margin: 0; color: #2C2825; letter-spacing: 0.04em;">Your Orders</h2>
                         </div>
-                        <div class="checkout_placeorder">
-                            <div class="placeorder_header" style="background-color: black; color:white; padding: 10px;">
-                                    <h1>Place your orders</h1> 
-                                </div>
-                        <div class="checkout_inputs">
-                            <label for="YourName">Your Name:</label><br>
-                            <input type="text" id="YourName" name="YourName" required placeholder="e.g. John Doe" value="<?php echo htmlspecialchars($userName); ?>">
-                            
-                            <label for="YourEmail">Your Email:</label><br>
-                            <input type="text" id="YourEmail" name="YourEmail" required placeholder="e.g. john@example.com" value="<?php echo htmlspecialchars($userEmail); ?>">
-                            
-                            <label for="YourNumber">Your Number:</label><br>
-                            <input type="text" id="YourNumber" name="YourNumber" required placeholder="e.g. 123-456-7890" value="<?php echo htmlspecialchars($userNumber); ?>">
-                            
-                            <label for="Address">Address:</label><br>
-                            <input type="text" id="Address" name="Address" required placeholder="e.g. 123 Main Street, New York, NY 12345" value="<?php echo htmlspecialchars($userAddress); ?>">
-                            
-                            <label for="PaymentMethod">Payment Method:</label><br>
-                            <select id="PaymentMethod" name="PaymentMethod" required>
-                                <option value="" disabled selected>Select Payment Method</option>
-                                <option value="paymongo">GCASH payment  </option>
-                                <!-- <option value="cod">Cash on Delivery</option> -->
-                            </select>
+                        <div class="checkout_item" style="padding: 1.2rem; display: flex; flex-direction: column; gap: 0.75rem; max-height: 400px; overflow-y: auto;">
+                            <?php
+                            if(isset($_SESSION['user-id'])) {
+                                $userId = $_SESSION['user-id'];
+                                $query = "SELECT cart.*, product.name, product.price, product.image 
+                                        FROM cart 
+                                        JOIN inventory ON cart.inventoryID = inventory.inventoryID 
+                                        JOIN product ON inventory.proID = product.proID 
+                                        WHERE cart.userID = ?";
+                                $stmt = $con->prepare($query);
+                                $stmt->bind_param("i", $userId);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $totalSubtotal = 0;
 
-                            <input type="hidden" name="status" value="0">
-
-                            <input type="submit" value="Submit" style="cursor: pointer;">
+                                if ($result->num_rows > 0) {
+                                    while ($row = $result->fetch_assoc()) {
+                                        $productName = $row['name'];
+                                        $productPrice = $row['price'];
+                                        $productQuantity = $row['quantity'];
+                                        $productImage = $row['image'];
+                                        $subtotal = $productPrice * $productQuantity;
+                                        $totalSubtotal += $subtotal;
+                                        echo '
+                                        <div style="display:flex; align-items:center; gap:1rem; background:rgba(247,243,238,1); border:0.5px solid #E8DED2; border-radius:8px; padding:0.75rem;">
+                                            <div style="width:60px; height:60px; flex-shrink:0; border-radius:6px; overflow:hidden;">
+                                                <img src="uploads/images/' . $productImage . '" alt="' . htmlspecialchars($productName) . '" style="width:100%; height:100%; object-fit:cover;">
+                                            </div>
+                                            <div style="flex:1; min-width:0;">
+                                                <p style="margin:0; font-family:\'Jost\',sans-serif; font-size:0.85rem; font-weight:500; color:#2C2825; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' . htmlspecialchars($productName) . '</p>
+                                                <p style="margin:0; font-size:0.75rem; color:#A09486;">PHP ' . number_format($productPrice, 2) . ' &times; ' . $productQuantity . '</p>
+                                            </div>
+                                            <p style="margin:0; font-size:0.85rem; font-weight:500; color:#2C2825; white-space:nowrap;">PHP ' . number_format($subtotal, 2) . '</p>
+                                        </div>';
+                                    }
+                                } else {
+                                    echo '<p style="color:#A09486; font-size:0.85rem; text-align:center; padding: 1rem 0;">No products found.</p>';
+                                }
+                            } else {
+                                echo '<p style="color:#A09486; font-size:0.85rem;">Please log in to view your cart.</p>';
+                            }
+                            ?>
+                        </div>
+                        <div style="padding: 1rem 1.5rem; border-top: 0.5px solid #E8DED2; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-family:'Jost',sans-serif; font-size:0.8rem; letter-spacing:0.08em; text-transform:uppercase; color:#A09486;">Total</span>
+                            <span style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:#2C2825;">PHP <?php echo number_format($_SESSION['checkout_total'] ?? 0, 2); ?></span>
                         </div>
                     </div>
-                </form>
-            </div>
-        </section>
-        <?php include 'additional/footer.php'; ?>
 
-        <script>
-            <?php if (!empty($successMessage)): ?>
-                alert("<?php echo $successMessage; ?>");
-            <?php endif; ?>
-        </script>
-    </body>
+                    <!-- RIGHT: Place Order Form -->
+                    <div style="flex: 1; min-width: 280px; background: rgba(247,243,238,0.85); border: 0.5px solid #E8DED2; border-radius: 12px; box-shadow: 0 8px 24px rgba(44,40,37,0.10); overflow: hidden;">
+                        <div style="padding: 1.2rem 1.5rem; border-bottom: 0.5px solid #E8DED2;">
+                            <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 1.5rem; margin: 0; color: #2C2825; letter-spacing: 0.04em;">Place Your Order</h2>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-family:'Jost',sans-serif; font-size:0.75rem; letter-spacing:0.08em; text-transform:uppercase; color:#A09486; display:block; margin-bottom:0.4rem;">Your Name</label>
+                                <input type="text" id="YourName" name="YourName" required placeholder="e.g. John Doe" value="<?php echo htmlspecialchars($userName); ?>"
+                                    style="width:100%; box-sizing:border-box; padding:12px 14px; border:0.5px solid #E8DED2; background:rgba(232,222,210,0.3); font-family:'Jost',sans-serif; font-size:0.85rem; color:#2C2825; outline:none;">
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-family:'Jost',sans-serif; font-size:0.75rem; letter-spacing:0.08em; text-transform:uppercase; color:#A09486; display:block; margin-bottom:0.4rem;">Your Email</label>
+                                <input type="text" id="YourEmail" name="YourEmail" required placeholder="e.g. john@example.com" value="<?php echo htmlspecialchars($userEmail); ?>"
+                                    style="width:100%; box-sizing:border-box; padding:12px 14px; border:0.5px solid #E8DED2; background:rgba(232,222,210,0.3); font-family:'Jost',sans-serif; font-size:0.85rem; color:#2C2825; outline:none;">
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-family:'Jost',sans-serif; font-size:0.75rem; letter-spacing:0.08em; text-transform:uppercase; color:#A09486; display:block; margin-bottom:0.4rem;">Your Number</label>
+                                <input type="text" id="YourNumber" name="YourNumber" required placeholder="e.g. 123-456-7890" value="<?php echo htmlspecialchars($userNumber); ?>"
+                                    style="width:100%; box-sizing:border-box; padding:12px 14px; border:0.5px solid #E8DED2; background:rgba(232,222,210,0.3); font-family:'Jost',sans-serif; font-size:0.85rem; color:#2C2825; outline:none;">
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-family:'Jost',sans-serif; font-size:0.75rem; letter-spacing:0.08em; text-transform:uppercase; color:#A09486; display:block; margin-bottom:0.4rem;">Address</label>
+                                <input type="text" id="Address" name="Address" required placeholder="e.g. 123 Main Street" value="<?php echo htmlspecialchars($userAddress); ?>"
+                                    style="width:100%; box-sizing:border-box; padding:12px 14px; border:0.5px solid #E8DED2; background:rgba(232,222,210,0.3); font-family:'Jost',sans-serif; font-size:0.85rem; color:#2C2825; outline:none;">
+                            </div>
+                            <div style="margin-bottom: 1.5rem;">
+                                <label style="font-family:'Jost',sans-serif; font-size:0.75rem; letter-spacing:0.08em; text-transform:uppercase; color:#A09486; display:block; margin-bottom:0.4rem;">Payment Method</label>
+                                <select id="PaymentMethod" name="PaymentMethod" required
+                                    style="width:100%; box-sizing:border-box; padding:12px 14px; border:0.5px solid #E8DED2; background:rgba(232,222,210,0.3); font-family:'Jost',sans-serif; font-size:0.85rem; color:#2C2825; outline:none; appearance:none; cursor:pointer;">
+                                    <option value="" disabled selected>Select Payment Method</option>
+                                    <option value="paymongo">GCash Payment</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="status" value="0">
+                            <input type="submit" value="Place Order"
+                                style="width:100%; padding:14px; background:#2C2825; color:#F7F3EE; border:none; font-family:'Jost',sans-serif; font-size:0.8rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:background-color 0.25s;"
+                                onmouseover="this.style.backgroundColor='#8B6F56'" onmouseout="this.style.backgroundColor='#2C2825'">
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </section>
+    <?php include 'additional/footer.php'; ?>
+
+    <script>
+        <?php if (!empty($successMessage)): ?>
+            alert("<?php echo $successMessage; ?>");
+        <?php endif; ?>
+    </script>
+</body>
     </html>

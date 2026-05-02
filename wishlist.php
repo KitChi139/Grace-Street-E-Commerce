@@ -13,7 +13,7 @@
 
     <section>
         <div class="wishlist-container" style="text-align: center; padding: 18px;">
-            <h2>Your Wishlist</h2>
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 3.8rem; letter-spacing: 0.04em; color: #2C2825;">Your Wishlist</h2>
             <div style="display: flex; flex-wrap: wrap; justify-content: center;">
                 <div class="cart-product" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; max-width: 1000px;">
                     <?php
@@ -94,7 +94,7 @@
                             if($result->num_rows > 0){
                                 while($row = $result->fetch_assoc()){
                                     ?>
-                                    <div class="cart-item" style="padding: 16px; border: 0.5px solid #E8DED2; border-radius: 12px; background: rgba(247,243,238,0.85); box-shadow: 0 12px 40px rgba(44,40,37,0.5); height: auto; min-height: 328px;">
+                                    <div class="cart-item" style="padding: 16px; border: 0.5px solid #E8DED2; border-radius: 12px; background: rgba(247,243,238,0.85); box-shadow: 0 8px 24px rgba(44,40,37,0.5); height: auto; min-height: 328px;">
                                         <form action="" method="post">
                                             <input type="hidden" name="productId" value="<?php echo $row['ID']; ?>">
                                             <input type="hidden" name="productImage" value="<?php echo $row['Wishlist_Image']; ?>">

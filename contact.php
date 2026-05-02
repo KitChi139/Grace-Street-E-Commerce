@@ -74,7 +74,7 @@
                 }
 
                 echo '<form action="" method="post">
-                    <h1 style="text-align: center;">Get in touch</h1>
+                    <h1 style="text-align: center;font-weight: 600">Get in touch</h1>
                     <label for="email">Your Email:</label>
                     <input type="email" name="email" value="' . $user_email . '" class="box" readonly>
                     <label for="msg">Message:</label>

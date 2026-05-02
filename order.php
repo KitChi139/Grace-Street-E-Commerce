@@ -20,118 +20,134 @@ if (session_status() === PHP_SESSION_NONE) {
     <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
     <style>
         .orders-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 14px;
-            background-color: #fff;
-        }
-        .orders-table th, .orders-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        .orders-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #333;
-        }
-        .orders-table tr:hover {
-            background-color: #f5f5f5;
-        }
-        .orders-table .status-cell {
-            font-weight: 500;
-        }
-        .orders-table .actions-cell {
-            white-space: nowrap;
-        }
-        .orders-table .received-order, .orders-table .cancel-btn, .orders-table .remove-order {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-right: 5px;
-        }
-        .orders-table .received-order {
-            background-color: #28a745;
-            color: white;
-        }
-        .orders-table .cancel-btn {
-            background-color: #dc3545;
-            color: white;
-        }
-        .orders-table .remove-order {
-            background-color: #6c757d;
-            color: white;
-        }
-        .orders-table .print-link {
-            display: inline-block;
-            padding: 8px 15px;
-            background-color: black;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 13px;
-        }
-        .orders-table .print-link:hover {
-            background-color: #333;
-        }
-        .no-orders {
-            text-align: center;
-            padding: 40px;
-            font-size: 16px;
-            color: #666;
-        }
-        .no-results {
-            text-align: center;
-            padding: 20px;
-            font-size: 16px;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .search-container {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-        }
-        .search-container input[type="text"] {
-            padding: 12px 20px;
-            width: 400px;
-            border: 1px solid #ccc;
-            border-radius: 25px 0 0 25px;
-            font-size: 16px;
-            outline: none;
-        }
-        .search-container button {
-            padding: 12px 25px;
-            border: 1px solid #ccc;
-            border-left: none;
-            border-radius: 0 25px 25px 0;
-            background-color: black;
-            color: white;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .search-container button:hover {
-            background-color: #333;
-        }
-
-        @media (max-width: 768px) {
-            .orders-table {
-                font-size: 12px;
-            }
-            .orders-table th, .orders-table td {
-                padding: 10px 8px;
-            }
-            .orders-table .received-order, .orders-table .cancel-btn, .orders-table .remove-order, .orders-table .print-link {
-                padding: 6px 10px;
-                font-size: 11px;
-                display: block;
-                margin-bottom: 5px;
-            }
-        }
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        font-family: 'Jost', sans-serif;
+    }
+    .orders-table th, .orders-table td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 0.5px solid #E8DED2;
+    }
+    .orders-table th {
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #A09486;
+        font-weight: 400;
+        background: transparent;
+    }
+    .orders-table tr:hover td {
+        background-color: rgba(232,222,210,0.2);
+    }
+    .orders-table .received-order, 
+    .orders-table .cancel-btn, 
+    .orders-table .remove-order {
+        padding: 7px 14px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.7rem;
+        font-family: 'Jost', sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-right: 5px;
+        transition: background-color 0.25s, color 0.25s;
+    }
+    .orders-table .received-order {
+        background-color: transparent;
+        color: #2C2825;
+        border: 0.5px solid #2C2825;
+    }
+    .orders-table .received-order:hover {
+        background-color: #2C2825;
+        color: #F7F3EE;
+    }
+    .orders-table .cancel-btn {
+        background-color: transparent;
+        color: #B85C38;
+        border: 0.5px solid #B85C38;
+    }
+    .orders-table .cancel-btn:hover {
+        background-color: #B85C38;
+        color: #F7F3EE;
+    }
+    .orders-table .remove-order {
+        background-color: transparent;
+        color: #A09486;
+        border: 0.5px solid #A09486;
+    }
+    .orders-table .remove-order:hover {
+        background-color: #A09486;
+        color: #F7F3EE;
+    }
+    .orders-table .print-link {
+        display: inline-block;
+        padding: 7px 14px;
+        background-color: #2C2825;
+        color: #F7F3EE;
+        text-decoration: none;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        transition: background-color 0.25s;
+    }
+    .orders-table .print-link:hover {
+        background-color: #8B6F56;
+    }
+    .no-orders {
+        text-align: center;
+        padding: 40px;
+        font-size: 0.9rem;
+        color: #A09486;
+        font-family: 'Jost', sans-serif;
+    }
+    .no-results {
+        text-align: center;
+        padding: 20px;
+        font-size: 0.9rem;
+        color: #A09486;
+        font-family: 'Jost', sans-serif;
+    }
+    .search-container {
+        margin: 20px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+    }
+    .search-container input[type="text"] {
+        padding: 12px 20px;
+        width: 400px;
+        border: 0.5px solid #E8DED2;
+        background: rgba(232,222,210,0.3);
+        font-family: 'Jost', sans-serif;
+        font-size: 0.85rem;
+        color: #2C2825;
+        outline: none;
+        border-radius: 0;
+    }
+    .search-container button {
+        padding: 12px 20px;
+        border: none;
+        background-color: #2C2825;
+        color: #F7F3EE;
+        cursor: pointer;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: background-color 0.25s;
+        border-radius: 0;
+    }
+    .search-container button:hover {
+        background-color: #8B6F56;
+    }
+    #viewAllBtn {
+        margin-left: 8px !important;
+        border-radius: 0 !important;
+    }
     </style>
 </head>
 <body>
@@ -139,7 +155,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <?php include 'chat.php'; ?>
     <section>
         <div class="invoice_container">
-            <div class="invoice_content">
+            <div class="invoice_content" style="background: rgba(247,243,238,0.85); border: 0.5px solid #E8DED2; border-radius: 12px; box-shadow: 0 8px 24px rgba(44,40,37,0.08); padding: 2rem; max-width: 1100px; margin: 0 auto;">
                 <div class="invoice_header">
                     <h1>Placed Orders</h1>
                 </div>           
