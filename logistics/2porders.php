@@ -112,9 +112,6 @@ while ($row = $result->fetch_assoc()) {
                     </table>
                 </div>
                 <hr>
-                <button id="markReady" disabled style="opacity:0.5; cursor:not-allowed;">
-                    Mark as Ready
-                </button>
             </div>  
         </div>
         <script>
@@ -125,7 +122,6 @@ while ($row = $result->fetch_assoc()) {
     const modalStatus = document.getElementById('modalStatus');
     const modalTotal = document.getElementById('modalTotal');
     const modalItems = document.getElementById('modalItems');
-    const markReadyBtn = document.getElementById('markReady');
 
     let currentOrderId = null; // ✅ store active order
 
@@ -134,11 +130,6 @@ while ($row = $result->fetch_assoc()) {
 
             const orderId = this.dataset.orderId;
             currentOrderId = orderId; // ✅ store it
-
-            // Reset button every open
-            markReadyBtn.disabled = true;
-            markReadyBtn.style.opacity = "0.5";
-            markReadyBtn.style.cursor = "not-allowed";
 
             modalItems.innerHTML = '';
 
@@ -165,10 +156,6 @@ while ($row = $result->fetch_assoc()) {
 
                     data.sellers.forEach((seller) => {
 
-                        if (seller.status.toLowerCase() !== 'completed') {
-                            allCompleted = false;
-                        }
-
                         seller.items.forEach(item => {
                             const row = document.createElement('tr');
 
@@ -185,13 +172,6 @@ while ($row = $result->fetch_assoc()) {
                         });
                     });
 
-                    // ✅ ENABLE / DISABLE BUTTON (INSIDE .then)
-                    if (allCompleted) {
-                        markReadyBtn.disabled = false;
-                        markReadyBtn.style.opacity = "1";
-                        markReadyBtn.style.cursor = "pointer";
-                    }
-
                 })
                 .catch(err => {
                     console.error(err);
@@ -201,30 +181,6 @@ while ($row = $result->fetch_assoc()) {
             modal.style.display = 'block';
         });
     });
-
-    // ✅ MARK READY BUTTON
-    markReadyBtn.onclick = function() {
-
-        if (!currentOrderId) return;
-
-        fetch(`update_order_ready.php`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `id=${currentOrderId}`
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                alert('Order marked as ready!');
-                location.reload();
-            } else {
-                alert('Failed to update order.');
-            }
-        })
-        .catch(err => console.error(err));
-    };
 
     // CLOSE MODAL
     closeBtn.onclick = () => modal.style.display = 'none';

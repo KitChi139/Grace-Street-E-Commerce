@@ -71,20 +71,44 @@ $totalRows = $rowc['total_rows'];
 if(isset($_POST['complete'])) {
     $orderId = intval($_POST['order_id']);
 
-    $updateStmt = $con->prepare("
-        UPDATE orders 
-        SET status = 'Completed'
-        WHERE orderID = ? AND sellerID = ?
-    ");
-    $updateStmt->bind_param('ii', $orderId, $sellerID);
-    $success = $updateStmt->execute();
+    $con->begin_transaction();
+    try {
+        // 1. Update the sub-order status to Completed
+        $updateStmt = $con->prepare("
+            UPDATE orders 
+            SET status = 'Completed'
+            WHERE orderID = ? AND sellerID = ?
+        ");
+        $updateStmt->bind_param('ii', $orderId, $sellerID);
+        $updateStmt->execute();
 
-    if($success) {
-        echo "<script>alert('Order marked as Completed');</script>";
+        // 2. Get the mainOrderID for this order
+        $mainOrderQuery = $con->prepare("SELECT mainOrderID FROM orders WHERE orderID = ?");
+        $mainOrderQuery->bind_param('i', $orderId);
+        $mainOrderQuery->execute();
+        $mainOrderResult = $mainOrderQuery->get_result()->fetch_assoc();
+        $mainOrderID = $mainOrderResult['mainOrderID'];
+
+        // 3. Check if all sub-orders for this mainOrderID are Completed
+        $checkStmt = $con->prepare("SELECT COUNT(*) as pending_count FROM orders WHERE mainOrderID = ? AND status != 'Completed'");
+        $checkStmt->bind_param('i', $mainOrderID);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result()->fetch_assoc();
+
+        if ($checkResult['pending_count'] == 0) {
+            // 4. All sub-orders are done, update main_order to 'Ready'
+            $updateMainStmt = $con->prepare("UPDATE main_order SET status = 'Ready' WHERE mainOrderID = ?");
+            $updateMainStmt->bind_param('i', $mainOrderID);
+            $updateMainStmt->execute();
+        }
+
+        $con->commit();
+        echo "<script>alert('Order marked as Completed. Main order status updated if all items ready.');</script>";
         echo "<script>setTimeout(function(){ window.location.href = '{$_SERVER['PHP_SELF']}'; }, 800);</script>";
         exit();
-    } else {
-        echo "Error updating order: " . $con->error;
+    } catch (Exception $e) {
+        $con->rollback();
+        echo "Error updating order: " . $e->getMessage();
     }
 }
 ?>

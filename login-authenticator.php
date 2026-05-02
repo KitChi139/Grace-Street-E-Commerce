@@ -9,6 +9,8 @@ if (isset($_SESSION['2fa_verified']) && $_SESSION['2fa_verified'] === true) {
         header("Location: ./admin/overview.php");
     } else if ($role_name === 'employee') {
         header("Location: ./seller/dashboard.php");
+    } else if ($role_name === 'courier') {
+        header("Location: ./courier_dashboard.php");
     } else {
         header("Location: home.php");
     }
@@ -81,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             header("Location: ./admin/overview.php");
         } else if ($role_name === 'employee') {
             header("Location: ./seller/dashboard.php");
+        } else if ($role_name === 'courier') {
+            header("Location: ./courier_dashboard.php");
         } else {
             header("Location: home.php");
         }

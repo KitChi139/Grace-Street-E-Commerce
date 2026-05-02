@@ -1,3 +1,21 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include_once __DIR__ . '/../components/connect.php';
+
+$footerRole = '';
+if (isset($_SESSION['user-id'])) {
+    $u_id = $_SESSION['user-id'];
+    $res = mysqli_query($con, "SELECT r.role FROM grace_user u JOIN roles r ON u.roleID = r.roleID WHERE u.userID = '$u_id'");
+    if ($res && mysqli_num_rows($res) > 0) {
+        $row = mysqli_fetch_assoc($res);
+        $footerRole = strtolower(trim($row['role']));
+    }
+}
+
+if ($footerRole !== 'courier'):
+?>
 <footer>
     <section>
         <div class="footer-container">
@@ -51,3 +69,4 @@
         </div>
     </section>
 </footer>
+<?php endif; ?>

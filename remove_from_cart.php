@@ -3,7 +3,7 @@ include 'components/connect.php';
 
 if(isset($_GET['productId'])) {
     $productId = $_GET['productId'];
-    $deleteQuery = $con->prepare("DELETE FROM cart WHERE ID = ?");
+    $deleteQuery = $con->prepare("DELETE FROM cart WHERE cartID = ?");
     $deleteQuery->bind_param("i", $productId);
     $success = $deleteQuery->execute();
     $deleteQuery->close();

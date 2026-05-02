@@ -267,8 +267,8 @@
                                         "customer_order_id" => $mainOrderID
                                     ],
 
-                                    "success_url" => "http://localhost/GraceStreet/success.php?order_id={$mainOrderID}",
-                                    "cancel_url" => "http://localhost/GraceStreet/cancel.php?order_id={$mainOrderID}"
+                                    "success_url" => "success.php?order_id={$mainOrderID}",
+                                    "cancel_url" => "cancel.php?order_id={$mainOrderID}"
                                 ]
                             ]
                         ])

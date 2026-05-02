@@ -197,6 +197,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_user'])) {
           <select name="role" id="edit_role" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
             <option value="admin">Admin</option>
             <option value="employee">Employee</option>
+            <option value="Courier">Courier</option>
             <option value="user">User</option>
           </select>
         </div>

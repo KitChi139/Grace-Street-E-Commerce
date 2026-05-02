@@ -7,7 +7,9 @@ $queries = [
     "ALTER TABLE `grace_user` CHANGE `password` `password` VARCHAR(255) NOT NULL",
     "ALTER TABLE `grace_user` ADD `is_active` TINYINT(1) NOT NULL DEFAULT 0",
     "ALTER TABLE `grace_user` ADD `activation_token` VARCHAR(255) NULL",
-    "UPDATE `grace_user` SET `is_active` = 1"
+    "UPDATE `grace_user` SET `is_active` = 1",
+    "ALTER TABLE `main_order` ADD COLUMN `courierID` INT NULL DEFAULT NULL",
+    "ALTER TABLE `main_order` ADD COLUMN `delivery_proof_image` VARCHAR(255) NULL DEFAULT NULL"
 ];
 
 foreach ($queries as $query) {

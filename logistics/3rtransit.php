@@ -112,9 +112,6 @@ while ($row = $result->fetch_assoc()) {
                     </table>
                 </div>
                 <hr>
-                <button id="markCompleteBtn" disabled style="opacity:0.5; cursor:not-allowed;">
-                    Mark as Complete
-                </button>
             </div>  
         </div>
         <script>
@@ -125,7 +122,6 @@ while ($row = $result->fetch_assoc()) {
     const modalStatus = document.getElementById('modalStatus');
     const modalTotal = document.getElementById('modalTotal');
     const modalItems = document.getElementById('modalItems');
-    const markCompleteBtn = document.getElementById('markCompleteBtn');
 
     let currentOrderId = null; // ✅ store active order
 
@@ -134,11 +130,6 @@ while ($row = $result->fetch_assoc()) {
 
             const orderId = this.dataset.orderId;
             currentOrderId = orderId; // ✅ store it
-
-            // Reset button every open
-            markCompleteBtn.disabled = true;
-            markCompleteBtn.style.opacity = "0.5";
-            markCompleteBtn.style.cursor = "not-allowed";
 
             modalItems.innerHTML = '';
 
@@ -165,10 +156,6 @@ while ($row = $result->fetch_assoc()) {
 
                     data.sellers.forEach((seller) => {
 
-                        if (seller.status.toLowerCase() !== 'completed') {
-                            allCompleted = false;
-                        }
-
                         seller.items.forEach(item => {
                             const row = document.createElement('tr');
 
@@ -185,13 +172,6 @@ while ($row = $result->fetch_assoc()) {
                         });
                     });
 
-                    // ✅ ENABLE / DISABLE BUTTON (INSIDE .then)
-                    if (allCompleted) {
-                        markCompleteBtn.disabled = false;
-                        markCompleteBtn.style.opacity = "1";
-                        markCompleteBtn.style.cursor = "pointer";
-                    }
-
                 })
                 .catch(err => {
                     console.error(err);
@@ -201,30 +181,6 @@ while ($row = $result->fetch_assoc()) {
             modal.style.display = 'block';
         });
     });
-
-    // ✅ MARK COMPLETE BUTTON
-    markCompleteBtn.onclick = function() {
-
-        if (!currentOrderId) return;
-
-        fetch(`mark_complete.php`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `id=${currentOrderId}`
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                alert('Order marked as completed!');
-                location.reload();
-            } else {
-                alert('Failed to update order.');
-            }
-        })
-        .catch(err => console.error(err));
-    };
 
     // CLOSE MODAL
     closeBtn.onclick = () => modal.style.display = 'none';

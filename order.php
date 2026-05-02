@@ -41,6 +41,9 @@ if (session_status() === PHP_SESSION_NONE) {
     .orders-table tr:hover td {
         background-color: rgba(232,222,210,0.2);
     }
+    .orders-table tr.order-row {
+        cursor: pointer;
+    }
     .orders-table .received-order, 
     .orders-table .cancel-btn, 
     .orders-table .remove-order {
@@ -175,8 +178,14 @@ if (session_status() === PHP_SESSION_NONE) {
                             mo.mainOrderID AS ID,
                             mo.created_at AS Placed_on,
                             mo.total_price AS Total_Price,
-                            mo.status AS Order_Status
+                            mo.status AS Order_Status,
+                            u.first_name,
+                            u.last_name,
+                            u.username,
+                            u.address AS Address,
+                            u.contact_number AS Number
                         FROM main_order mo
+                        JOIN grace_user u ON mo.userID = u.userID
                         WHERE mo.userID = ?
                         ORDER BY mo.created_at DESC";
                     $stmt = $con->prepare($sql);
@@ -199,21 +208,30 @@ if (session_status() === PHP_SESSION_NONE) {
                             <tbody>
                         <?php
                         while ($row = $result->fetch_assoc()) {
+                            // Construct the full name for the invoice
+                            $fullName = trim($row['first_name'] . ' ' . $row['last_name']);
+                            if (empty($fullName)) {
+                                $fullName = $row['username'];
+                            }
                             $statusDisplay = '';
                             if ($row['Order_Status'] == 'Pending') {
                                 $statusDisplay = '<span style="color: orange;">Pending</span>';
                             } else if ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
                                 $statusDisplay = '<span style="color: green;">Paid</span>';
                             } else if ($row['Order_Status'] == 'Ready') {
-                                $statusDisplay = '<span style="color: blue;">Ready for Transit</span>';
+                                $statusDisplay = '<span style="color: blue;">Ready for Pickup</span>';
+                            } else if ($row['Order_Status'] == 'In Transit') {
+                                $statusDisplay = '<span style="color: #8B6F56;">On Route</span>';
+                            } else if ($row['Order_Status'] == 'Completed') {
+                                $statusDisplay = '<span style="color: green;">Delivered</span>';
                             } else if ($row['Order_Status'] == 'Canceled') {
                                 $statusDisplay = '<span style="color: red;">Canceled</span>';
                             } else {
                                 $statusDisplay = '<span>' . $row['Order_Status'] . '</span>';
                             }
                             ?>
-                            <tr class="order-row" data-id="<?php echo $row['ID']; ?>">
-                                <td>#<?php echo $row['ID']; ?></td>
+                            <tr class="order-row" data-id="<?php echo $row['ID']; ?>" title="Open shipment tracking">
+                                <td><a href="logistics_tracking.php?id=<?php echo (int) $row['ID']; ?>" class="track-order-link" style="color:inherit;text-decoration:none;">#<?php echo $row['ID']; ?></a></td>
                                 <td><?php echo $row['Placed_on']; ?></td>
                                 <td>PHP <?php echo number_format($row['Total_Price'], 2); ?></td>
                                 <td class="status-cell"><?php echo $statusDisplay; ?></td>
@@ -223,7 +241,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                             <?php if ($row['Order_Status'] != 'Ready'): ?>
                                                 <button class="received-order" data-id="<?php echo $row['ID']; ?>">Received</button>
                                             <?php endif; ?>
-                                            <a class="print-link" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>">Invoice</a>
+                                            <a class="print-link" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($fullName); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_price=<?php echo urlencode((string)$row['Total_Price']); ?>">Invoice</a>
                                             <button class="remove-order" data-id="<?php echo $row['ID']; ?>">Remove</button>
                                         <?php endif; ?>
                                     <?php else: ?>
@@ -258,6 +276,14 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <script>
         $(document).ready(function() {
+            $('.order-row').on('click', function(e) {
+                if ($(e.target).closest('button, a').length) {
+                    return;
+                }
+                var id = $(this).data('id');
+                window.location.href = 'logistics_tracking.php?id=' + id;
+            });
+
             function filterOrders() {
                 var searchText = $('#searchOrders').val().toLowerCase();
                 var hasResults = false;
