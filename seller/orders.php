@@ -73,7 +73,7 @@ if(isset($_POST['complete'])) {
 
     $updateStmt = $con->prepare("
         UPDATE orders 
-        SET status = 'Completed', time_received = NOW()
+        SET status = 'Completed'
         WHERE orderID = ? AND sellerID = ?
     ");
     $updateStmt->bind_param('ii', $orderId, $sellerID);
@@ -496,7 +496,7 @@ if(isset($_POST['complete'])) {
                         <option value="all">All Statuses</option>
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
-                        <option value="received">Received</option>
+                        <option value="received">Completed</option>
                     </select>
                     <div class="custom-select-wrapper">
                         <div class="custom-select" data-target="statusFilter">
@@ -507,7 +507,7 @@ if(isset($_POST['complete'])) {
                             <div class="custom-select-option selected" data-value="all">All Statuses</div>
                             <div class="custom-select-option" data-value="pending">Pending</div>
                             <div class="custom-select-option" data-value="approved">Approved</div>
-                            <div class="custom-select-option" data-value="received">Received</div>
+                            <div class="custom-select-option" data-value="received">Completed</div>
                         </div>
                     </div>
                 </div>
@@ -546,7 +546,7 @@ if(isset($_POST['complete'])) {
                                     $status_text = 'Approved';
                                     $status_class = 'rgba(147,197,153,0.9)';
                                 } elseif ($row['Order_Status'] == 'Completed') {
-                                    $status_text = 'Received';
+                                    $status_text = 'Completed';
                                     $status_class = 'rgba(247,243,238,0.5)';
                                 }
                             ?>
@@ -592,7 +592,7 @@ if(isset($_POST['complete'])) {
                                 $status_color = '#2ecc71';
                                 $status_bg = '#e8f8f0';
                             } elseif ($row['Order_Status'] == 'Completed') {
-                                $status_text = 'Received';
+                                $status_text = 'Completed';
                                 $status_color = '#3498db';
                                 $status_bg = '#ebf5fb';
                             }

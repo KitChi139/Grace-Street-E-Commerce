@@ -204,8 +204,8 @@ if (session_status() === PHP_SESSION_NONE) {
                                 $statusDisplay = '<span style="color: orange;">Pending</span>';
                             } else if ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
                                 $statusDisplay = '<span style="color: green;">Paid</span>';
-                            } else if ($row['Order_Status'] == 'Completed') {
-                                $statusDisplay = '<span style="color: blue;">Received</span>';
+                            } else if ($row['Order_Status'] == 'Ready') {
+                                $statusDisplay = '<span style="color: blue;">Ready for Transit</span>';
                             } else if ($row['Order_Status'] == 'Canceled') {
                                 $statusDisplay = '<span style="color: red;">Canceled</span>';
                             } else {
@@ -220,7 +220,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <td class="actions-cell">
                                     <?php if ($row['Order_Status'] != 'Pending'): ?>
                                         <?php if ($row['Order_Status'] != 'Cancelled' && $row['Order_Status'] != 'Canceled'): ?>
-                                            <?php if ($row['Order_Status'] != 'Completed'): ?>
+                                            <?php if ($row['Order_Status'] != 'Ready'): ?>
                                                 <button class="received-order" data-id="<?php echo $row['ID']; ?>">Received</button>
                                             <?php endif; ?>
                                             <a class="print-link" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($row['Name']); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_price=<?php echo urlencode($row['Total_Price']); ?>">Invoice</a>
