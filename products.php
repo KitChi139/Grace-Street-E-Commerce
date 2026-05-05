@@ -142,7 +142,7 @@ if(isset($_POST['search'])) {
                             }
                     ?>
                     <form id="productForm<?= $fetch_product['proID']; ?>">
-                            <div class="items-product">
+                            <div class="items-product" onclick="window.location.href='quick_view.php?pid=<?= $fetch_product['proID']; ?>';" style="cursor: pointer;">
                                 <div class="product_table">
                                     <div class="items-content">
                                         <div class="quick_view">
@@ -153,7 +153,7 @@ if(isset($_POST['search'])) {
                                                 data-product-name="<?= htmlspecialchars($fetch_product['name']); ?>" 
                                                 data-product-price="<?= $fetch_product['price']; ?>" 
                                                 data-discounted-price="<?= $discounted_price; ?>" 
-                                                onclick="addToWishlist(event)"></a>
+                                                onclick="event.stopPropagation(); addToWishlist(event)"></a>
                                         </div>
                                         <input type="hidden" name="pid" value="<?= $fetch_product['proID']; ?>">
                                         <div class="product_images">
@@ -175,7 +175,7 @@ if(isset($_POST['search'])) {
                                             <?php endif; ?>
                                         </div>
                                         <div class="itembottom-content">
-                                            <button type="button" class="add-btn" <?php echo ($fetch_product['product_stock_s'] > 0) ? '' : 'disabled'; ?> onclick="addToCart(<?php echo $fetch_product['proID']; ?>, '<?php echo addslashes($fetch_product['image']); ?>', '<?php echo addslashes($fetch_product['name']); ?>', '<?php echo $fetch_product['price'];  ?>' , '<?php echo $discounted_price  ?>')">Add to cart</button>
+                                            <a href="quick_view.php?pid=<?= $fetch_product['proID']; ?>" class="add-btn" style="text-decoration: none; text-align: center; display: block; width: 100%;" <?php echo ($fetch_product['product_stock_s'] > 0) ? '' : 'style="pointer-events: none; opacity: 0.5;"'; ?> onclick="event.stopPropagation();">Select Size</a>
                                             <span style="margin: 0; color:#8c8989; font-size: 12px;">PHP
                                                 <?php if ($fetch_product['discount'] > 0): ?>
                                                     <p class="product-price" style="color: green; font-size: 16px; margin: 0; text-decoration: line-through;">

@@ -29,13 +29,17 @@ function encrypt_data($data) {
 function decrypt_data($data) {
     if (empty($data)) return $data;
     
-    $decoded = base64_decode($data);
+    $decoded = base64_decode($data, true);
+    if ($decoded === false) return $data; // Not base64, likely legacy data
+    
     $iv_length = openssl_cipher_iv_length(ENCRYPTION_METHOD);
+    if (strlen($decoded) < $iv_length) return $data; // Too short to contain IV, likely legacy
     
     $iv = substr($decoded, 0, $iv_length);
     $encrypted = substr($decoded, $iv_length);
     
-    $decrypted = openssl_decrypt($encrypted, ENCRYPTION_METHOD, ENCRYPTION_KEY, 0, $iv);
+    // Suppress warning for legacy data that might look like base64 but isn't encrypted
+    $decrypted = @openssl_decrypt($encrypted, ENCRYPTION_METHOD, ENCRYPTION_KEY, 0, $iv);
     
     // If decryption fails, it might be unencrypted data (legacy)
     return ($decrypted === false) ? $data : $decrypted;

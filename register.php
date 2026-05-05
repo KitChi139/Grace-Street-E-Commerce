@@ -240,7 +240,7 @@
                 </div>
                 <div class="form-group">
                     <label for="contact">Contact Number:</label>
-                    <input type="text" id="contact" name="contact" required placeholder="Enter your contact number" maxlength="20" class="box">
+                    <input type="text" id="contact" name="contact" required placeholder="Enter your contact number" class="box">
                 </div>
             </div>
 

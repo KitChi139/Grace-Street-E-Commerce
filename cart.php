@@ -18,10 +18,11 @@
                     include 'components/connect.php';
                     if(isset($_SESSION['user-id'])) {
                         $userId = $_SESSION['user-id'];
-                        $query = "SELECT cart.*, product.name, product.price, product.image, cart.quantity AS Product_Quantity, cart.cartID AS ID 
+                        $query = "SELECT cart.*, product.name, product.price, product.image, cart.quantity AS Product_Quantity, cart.cartID AS ID, sizes.sizes 
                                   FROM cart 
                                   JOIN inventory ON cart.inventoryID = inventory.inventoryID 
                                   JOIN product ON inventory.proID = product.proID 
+                                  JOIN sizes ON inventory.sizeID = sizes.sizeID
                                   WHERE cart.userID = ?";
                         $stmt = $con->prepare($query);
                         $stmt->bind_param("i", $userId);
@@ -35,7 +36,10 @@
                                 $subtotal = $originalprice * $product['Product_Quantity'];
                                 $totalPrice += $subtotal;
                                 ?>  
-                                <div class="cart-item" data-product-id="<?php echo $product['ID']; ?>">
+                                <div class="cart-item" data-product-id="<?php echo $product['ID']; ?>" data-price="<?php echo $originalprice; ?>">
+                                    <div style="position: absolute; top: 10px; left: 10px; z-index: 10;">
+                                        <input type="checkbox" class="item-checkbox" checked value="<?php echo $product['ID']; ?>" style="width: 20px; height: 20px; cursor: pointer;">
+                                    </div>
                                     <div class="cart-img">
                                         <?php
                                         $imagePath = 'uploads/images/' . $product['image'];
@@ -47,6 +51,7 @@
                                         <?php } ?>
                                     </div>
                                     <h2 style="font-size: 15px; margin-top:5px;"><?php echo htmlspecialchars($product['name']); ?></h2>
+                                    <p style="font-size: 13px; color: #8c8b8b; margin: 3px 0;">Size: <span style="color: #2C2825; font-weight: 500;"><?php echo htmlspecialchars($product['sizes']); ?></span></p>
                                     <p class="item-price" style="font-size: 14px;">PHP <?php echo htmlspecialchars($product['price']); ?></p>
                                     <div class="input-group" style="width: 100%; padding: 3px; display: flex; align-items: center;">
                                         <p style="font-size: 12px; margin-right:5px; color: #adadad;">Qty: </p>
@@ -81,7 +86,7 @@
                 
                 <div class="cart-btn">
                     <?php if (isset($result) && $result->num_rows > 0) { ?>
-                        <a href="checkout.php"><button style="cursor: pointer; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Proceed To Checkout</button></a>
+                        <button id="checkoutBtn" style="cursor: pointer; border: none; padding: 15px 30px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background-color 0.25s;">Proceed To Checkout</button>
                     <?php } else { ?>
                         <button disabled>Proceed To Checkout</button>
                     <?php } ?>
@@ -94,6 +99,45 @@
     <?php include 'additional/footer.php'; ?>
     <script src="scripts/cart_functions.js"></script>
     <script>
+        function updateTotalPrice() {
+            let total = 0;
+            const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+            checkedItems.forEach(checkbox => {
+                const cartItem = checkbox.closest('.cart-item');
+                const price = parseFloat(cartItem.getAttribute('data-price'));
+                const quantity = parseInt(cartItem.querySelector('.quantity-input').value);
+                total += price * quantity;
+            });
+            document.getElementById('totalPriceDisplay').textContent = 'PHP ' + total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            if (checkoutBtn) {
+                checkoutBtn.disabled = checkedItems.length === 0;
+                checkoutBtn.style.opacity = checkedItems.length === 0 ? '0.5' : '1';
+                checkoutBtn.style.cursor = checkedItems.length === 0 ? 'not-allowed' : 'pointer';
+            }
+        }
+
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateTotalPrice);
+        });
+
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('input', updateTotalPrice);
+        });
+
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+                if (selectedIds.length > 0) {
+                    window.location.href = 'checkout.php?selected_items=' + selectedIds.join(',');
+                } else {
+                    alert('Please select at least one item to checkout.');
+                }
+            });
+        }
+
         function editQuantity(productId) {
             var newQuantity = document.querySelector('[data-product-id="' + productId + '"] .quantity-input').value;
             var xhr = new XMLHttpRequest();

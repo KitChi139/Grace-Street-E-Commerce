@@ -19,7 +19,8 @@ $stmt = $con->prepare(
     "SELECT mo.mainOrderID, mo.status, mo.total_price, mo.created_at,
             mo.delivery_proof_image,
             mo.courierID,
-            c.first_name AS courier_first, c.last_name AS courier_last
+            c.first_name AS courier_first, c.last_name AS courier_last,
+            c.username AS courier_user
      FROM main_order mo
      LEFT JOIN grace_user c ON mo.courierID = c.userID
      WHERE mo.mainOrderID = ? AND mo.userID = ?"
@@ -54,8 +55,13 @@ if ($allComplete) {
 }
 
 $courierName = '';
-if (!empty($row['courierID']) && ($row['courier_first'] !== null || $row['courier_last'] !== null)) {
-    $courierName = trim((string) $row['courier_first'] . ' ' . (string) $row['courier_last']);
+if (!empty($row['courierID'])) {
+    if ($row['courier_first'] !== null || $row['courier_last'] !== null) {
+        $courierName = trim((string) $row['courier_first'] . ' ' . (string) $row['courier_last']);
+    }
+    if ($courierName === '' && !empty($row['courier_user'])) {
+        $courierName = (string) $row['courier_user'];
+    }
 }
 
 $proofRel = $row['delivery_proof_image'] ?? '';

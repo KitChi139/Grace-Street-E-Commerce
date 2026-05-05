@@ -147,6 +147,14 @@
                 if (!isset($_SESSION['user-id'])) {
                     throw new Exception("User not logged in");
                 }
+                
+                $selected_items_str = $_POST['selected_items_list'] ?? '';
+                if (empty($selected_items_str)) {
+                    throw new Exception("No items selected for checkout");
+                }
+                $selected_items_arr = explode(',', $selected_items_str);
+                $placeholders = implode(',', array_fill(0, count($selected_items_arr), '?'));
+
                 $paymentMethod = htmlspecialchars($_POST['PaymentMethod']);
                 $allowedMethods = ['paymongo', 'cod'];
                 if (!in_array($paymentMethod, $allowedMethods)) {
@@ -157,19 +165,22 @@
 
                 $con->begin_transaction();
 
-                // 1. Get cart items
-                $stmt = $con->prepare("SELECT cart.*, product.price, inventory.inventoryID, product.sellerID
-                                    FROM cart 
-                                    JOIN inventory ON cart.inventoryID = inventory.inventoryID 
-                                    JOIN product ON inventory.proID = product.proID 
-                                    WHERE cart.userID = ?");
-                $stmt->bind_param("i", $userId);
+                // 1. Get ONLY selected cart items
+                $query = "SELECT cart.*, product.price, inventory.inventoryID, product.sellerID
+                          FROM cart 
+                          JOIN inventory ON cart.inventoryID = inventory.inventoryID 
+                          JOIN product ON inventory.proID = product.proID 
+                          WHERE cart.userID = ? AND cart.cartID IN ($placeholders)";
+                
+                $stmt = $con->prepare($query);
+                $types = "i" . str_repeat("i", count($selected_items_arr));
+                $stmt->bind_param($types, $userId, ...$selected_items_arr);
                 $stmt->execute();
                 $result = $stmt->get_result();
 
                 $sellerGroups = [];
                 if ($result->num_rows === 0) {
-                    throw new Exception("Cart is empty");
+                    throw new Exception("Cart is empty or items not found");
                 }
 
                 while ($row = $result->fetch_assoc()) {
@@ -197,56 +208,43 @@
                     INSERT INTO main_order (userID, total_price, status, created_at)
                     VALUES (?, ?, ?, NOW())
                 ");
-
                 $stmt->bind_param("ids", $userId, $totalSubtotal, $status);
                 $stmt->execute();
-
                 $mainOrderID = $stmt->insert_id;
-                $orderIDs = [];
 
+                // 3. Create SELLER ORDERS (orders)
                 foreach ($sellerGroups as $sellerID => $group) {
-
                     $stmt = $con->prepare("
-                        INSERT INTO orders (mainOrderID, sellerID, status, price)
-                        VALUES (?, ?, ?, ?)
+                        INSERT INTO orders (mainOrderID, userID, sellerID, status, price, time_ordered)
+                        VALUES (?, ?, ?, ?, ?, NOW())
                     ");
-
-                    $stmt->bind_param("iisd", $mainOrderID, $sellerID, $status, $group['total']);
+                    $stmt->bind_param("iiisd", $mainOrderID, $userId, $sellerID, $status, $group['total']);
                     $stmt->execute();
+                    $orderID = $stmt->insert_id;
 
-                    $orderIDs[$sellerID] = $stmt->insert_id;
-                }
-
-                // 3. Insert order_items
-                $stmt = $con->prepare("INSERT INTO order_items (orderID, inventoryID, quantity, price) 
-                                    VALUES (?, ?, ?, ?)");
-
-                foreach ($sellerGroups as $sellerID => $group) {
-
-                    $orderID = $orderIDs[$sellerID];
-
+                    // 4. Create ITEMS (order_items)
                     foreach ($group['items'] as $item) {
-                        $stmt->bind_param(
-                            "iiid",
-                            $orderID,
-                            $item['inventoryID'],
-                            $item['quantity'],
-                            $item['price']
-                        );
+                        $stmt = $con->prepare("
+                            INSERT INTO order_items (orderID, inventoryID, quantity, price)
+                            VALUES (?, ?, ?, ?)
+                        ");
+                        $stmt->bind_param("iiid", $orderID, $item['inventoryID'], $item['quantity'], $item['price']);
                         $stmt->execute();
                     }
                 }
 
                 if ($paymentMethod == "paymongo") {
-
-                    $amount = (int) round($totalSubtotal * 100); 
+                    $amount = $totalSubtotal * 100; // centavos
 
                     $curl = curl_init();
-
                     curl_setopt_array($curl, [
                         CURLOPT_URL => "https://api.paymongo.com/v1/checkout_sessions",
                         CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_POST => true,
+                        CURLOPT_ENCODING => "",
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 30,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => "POST",
                         CURLOPT_HTTPHEADER => [
                             "Content-Type: application/json",
                             "Authorization: Basic " . base64_encode("sk_test_QTC4z9JnydE34pMzczadm82M:")
@@ -294,8 +292,8 @@
                     header("Location: " . $checkoutUrl);
                     exit;
                 } else {    
-                    $stmt = $con->prepare("DELETE FROM cart WHERE userID = ?");
-                    $stmt->bind_param("i", $userId);
+                    $stmt = $con->prepare("DELETE FROM cart WHERE userID = ? AND cartID IN ($placeholders)");
+                    $stmt->bind_param($types, $userId, ...$selected_items_arr);
                     if ($stmt->execute()) {
                         $successMessage = "Order placed successfully!";
                         $con->commit();
@@ -339,39 +337,50 @@
                             <?php
                             if(isset($_SESSION['user-id'])) {
                                 $userId = $_SESSION['user-id'];
-                                $query = "SELECT cart.*, product.name, product.price, product.image 
-                                        FROM cart 
-                                        JOIN inventory ON cart.inventoryID = inventory.inventoryID 
-                                        JOIN product ON inventory.proID = product.proID 
-                                        WHERE cart.userID = ?";
-                                $stmt = $con->prepare($query);
-                                $stmt->bind_param("i", $userId);
-                                $stmt->execute();
-                                $result = $stmt->get_result();
+                                $selected_items_url = $_GET['selected_items'] ?? '';
                                 $totalSubtotal = 0;
 
-                                if ($result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        $productName = $row['name'];
-                                        $productPrice = $row['price'];
-                                        $productQuantity = $row['quantity'];
-                                        $productImage = $row['image'];
-                                        $subtotal = $productPrice * $productQuantity;
-                                        $totalSubtotal += $subtotal;
-                                        echo '
-                                        <div style="display:flex; align-items:center; gap:1rem; background:rgba(247,243,238,1); border:0.5px solid #E8DED2; border-radius:8px; padding:0.75rem;">
-                                            <div style="width:60px; height:60px; flex-shrink:0; border-radius:6px; overflow:hidden;">
-                                                <img src="uploads/images/' . $productImage . '" alt="' . htmlspecialchars($productName) . '" style="width:100%; height:100%; object-fit:cover;">
-                                            </div>
-                                            <div style="flex:1; min-width:0;">
-                                                <p style="margin:0; font-family:\'Jost\',sans-serif; font-size:0.85rem; font-weight:500; color:#2C2825; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' . htmlspecialchars($productName) . '</p>
-                                                <p style="margin:0; font-size:0.75rem; color:#A09486;">PHP ' . number_format($productPrice, 2) . ' &times; ' . $productQuantity . '</p>
-                                            </div>
-                                            <p style="margin:0; font-size:0.85rem; font-weight:500; color:#2C2825; white-space:nowrap;">PHP ' . number_format($subtotal, 2) . '</p>
-                                        </div>';
+                                if (!empty($selected_items_url)) {
+                                    $selected_ids = explode(',', $selected_items_url);
+                                    $placeholders = implode(',', array_fill(0, count($selected_ids), '?'));
+                                    
+                                    $query = "SELECT cart.*, product.name, product.price, product.image 
+                                            FROM cart 
+                                            JOIN inventory ON cart.inventoryID = inventory.inventoryID 
+                                            JOIN product ON inventory.proID = product.proID 
+                                            WHERE cart.userID = ? AND cart.cartID IN ($placeholders)";
+                                    
+                                    $stmt = $con->prepare($query);
+                                    $types = "i" . str_repeat("i", count($selected_ids));
+                                    $stmt->bind_param($types, $userId, ...$selected_ids);
+                                    $stmt->execute();
+                                    $result = $stmt->get_result();
+
+                                    if ($result->num_rows > 0) {
+                                        while ($row = $result->fetch_assoc()) {
+                                            $productName = $row['name'];
+                                            $productPrice = $row['price'];
+                                            $productQuantity = $row['quantity'];
+                                            $productImage = $row['image'];
+                                            $subtotal = $productPrice * $productQuantity;
+                                            $totalSubtotal += $subtotal;
+                                            echo '
+                                            <div style="display:flex; align-items:center; gap:1rem; background:rgba(247,243,238,1); border:0.5px solid #E8DED2; border-radius:8px; padding:0.75rem;">
+                                                <div style="width:60px; height:60px; flex-shrink:0; border-radius:6px; overflow:hidden;">
+                                                    <img src="uploads/images/' . $productImage . '" alt="' . htmlspecialchars($productName) . '" style="width:100%; height:100%; object-fit:cover;">
+                                                </div>
+                                                <div style="flex:1; min-width:0;">
+                                                    <p style="margin:0; font-family:\'Jost\',sans-serif; font-size:0.85rem; font-weight:500; color:#2C2825; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' . htmlspecialchars($productName) . '</p>
+                                                    <p style="margin:0; font-size:0.75rem; color:#A09486;">PHP ' . number_format($productPrice, 2) . ' &times; ' . $productQuantity . '</p>
+                                                </div>
+                                                <p style="margin:0; font-size:0.85rem; font-weight:500; color:#2C2825; white-space:nowrap;">PHP ' . number_format($subtotal, 2) . '</p>
+                                            </div>';
+                                        }
+                                    } else {
+                                        echo '<p style="color:#A09486; font-size:0.85rem; text-align:center; padding: 1rem 0;">No products found.</p>';
                                     }
                                 } else {
-                                    echo '<p style="color:#A09486; font-size:0.85rem; text-align:center; padding: 1rem 0;">No products found.</p>';
+                                    echo '<p style="color:#A09486; font-size:0.85rem; text-align:center; padding: 1rem 0;">No items selected for checkout.</p>';
                                 }
                             } else {
                                 echo '<p style="color:#A09486; font-size:0.85rem;">Please log in to view your cart.</p>';
@@ -380,7 +389,7 @@
                         </div>
                         <div style="padding: 1rem 1.5rem; border-top: 0.5px solid #E8DED2; display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-family:'Jost',sans-serif; font-size:0.8rem; letter-spacing:0.08em; text-transform:uppercase; color:#A09486;">Total</span>
-                            <span style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:#2C2825;">PHP <?php echo number_format($_SESSION['checkout_total'] ?? 0, 2); ?></span>
+                            <span style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:#2C2825;">PHP <?php echo number_format($totalSubtotal, 2); ?></span>
                         </div>
                     </div>
 
@@ -418,6 +427,7 @@
                                     <option value="paymongo">GCash Payment</option>
                                 </select>
                             </div>
+                            <input type="hidden" name="selected_items_list" value="<?php echo htmlspecialchars($_GET['selected_items'] ?? ''); ?>">
                             <input type="hidden" name="status" value="0">
                             <input type="submit" value="Place Order"
                                 style="width:100%; padding:14px; background:#2C2825; color:#F7F3EE; border:none; font-family:'Jost',sans-serif; font-size:0.8rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:background-color 0.25s;"
