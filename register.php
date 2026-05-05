@@ -1,6 +1,7 @@
 <?php
     include('./components/connect.php');
     include('./components/password_validation.php');
+    include('./components/encryption.php');
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -56,8 +57,11 @@
         }
 
         if (isset($captcha_valid) && $captcha_valid) {
-
-            $select = mysqli_query($con, "SELECT grace_user.*, email.email FROM grace_user JOIN email ON grace_user.emailID = email.emailID WHERE grace_user.username = '$username' OR email.email = '$email'") or die('Query failed');
+            // Verify TOS and Cookie consent
+            if (!isset($_POST['tos_consent']) || !isset($_POST['cookie_consent'])) {
+                $error_msg = "You must agree to the Terms and Cookie Policy to register.";
+            } else {
+                $select = mysqli_query($con, "SELECT grace_user.*, email.email FROM grace_user JOIN email ON grace_user.emailID = email.emailID WHERE grace_user.username = '$username' OR email.email = '$email'") or die('Query failed');
 
             if (mysqli_num_rows($select) > 0) {
                 $error_msg = "User already exists";
@@ -68,11 +72,15 @@
 
                 $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
 
+                // Encrypt sensitive data
+                $encrypted_contact = encrypt_data($contact);
+                $encrypted_address = encrypt_data($address);
+
                 // Generate a 6-digit OTP
                 $activation_token = sprintf("%06d", mt_rand(1, 999999));
                 
                 $insert_query = "INSERT INTO grace_user (first_name, last_name, username, emailID, password, contact_number, address, is_active, activation_token, roleID) 
-                                 VALUES ('$first_name', '$last_name', '$username', '$emailID', '$hashed_pass', '$contact', '$address', 0, '$activation_token', 3)"; // Assuming 3 is 'user' role
+                                 VALUES ('$first_name', '$last_name', '$username', '$emailID', '$hashed_pass', '$encrypted_contact', '$encrypted_address', 0, '$activation_token', 3)"; // Assuming 3 is 'user' role
                 
                 if(mysqli_query($con, $insert_query)){
                     
@@ -99,19 +107,14 @@
                         $success_msg = "Registered successfully! Please check your email for the 6-digit activation code.";
                         $redirect_to = "activate.php?email=" . urlencode($email);
                     } else {
-                        $success_msg = "Registered successfully, but email could not be sent. Your activation code is: $activation_token";
-                        $redirect_to = "activate.php?email=" . urlencode($email);
+                        $success_msg = "Registered successfully! But we couldn't send the activation email. Please contact support.";
+                        $redirect_to = "login.php";
                     }
-                } else {
-                    $error_msg = "Registration failed. Please try again.";
                 }
             }
         }
-        
-        // Reset captcha on failure
-        unset($_SESSION['captcha_phrase']);
-        unset($_SESSION['captcha_answer']);
     }
+}
 ?>
 
 <!DOCTYPE html>
@@ -300,9 +303,18 @@
                 </div>
             <?php endif; ?>
 
-            <div class="tos-container">
-                <input type="checkbox" id="tos_checkbox">
-                <label for="tos_checkbox">I agree to the Terms of Service and Privacy Policy</label>
+            <div class="tos-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 14px;">
+                <input type="checkbox" id="tos_checkbox" name="tos_consent" required style="width: 18px; height: 18px; cursor: pointer;">
+                <label for="tos_checkbox" style="cursor: pointer;">
+                    I agree to the <a href="privacy_policy.php" target="_blank" style="color: #8B6F56; text-decoration: underline;">Terms of Service and Privacy Policy</a>
+                </label>
+            </div>
+
+            <div class="cookie-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 14px;">
+                <input type="checkbox" id="cookie_checkbox" name="cookie_consent" required style="width: 18px; height: 18px; cursor: pointer;">
+                <label for="cookie_checkbox" style="cursor: pointer;">
+                    I consent to the use of cookies for a better shopping experience
+                </label>
             </div>
 
             <input type="submit" value="Register now" class="btn" name="submit" id="register_btn" disabled>
@@ -334,13 +346,17 @@
         setupPasswordToggle('togglePassword', 'password');
         setupPasswordToggle('toggleConfirmPassword', 'confirm_password');
 
-        // TOS Checkbox logic
+        // TOS and Cookie Consent check logic
         const tosCheckbox = document.getElementById('tos_checkbox');
+        const cookieCheckbox = document.getElementById('cookie_checkbox');
         const registerBtn = document.getElementById('register_btn');
         
-        tosCheckbox.addEventListener('change', function() {
-            registerBtn.disabled = !this.checked;
-        });
+        function updateRegisterButton() {
+            registerBtn.disabled = !(tosCheckbox.checked && cookieCheckbox.checked);
+        }
+
+        tosCheckbox.addEventListener('change', updateRegisterButton);
+        cookieCheckbox.addEventListener('change', updateRegisterButton);
 
         const passwordInput = document.getElementById('password');
         const lengthReq = document.getElementById('length-req');

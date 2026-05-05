@@ -42,6 +42,7 @@
     
 <?php
     include('./components/connect.php');
+    include('./components/encryption.php');
 
     $user_id = $_SESSION['user-id'] ?? $_SESSION['user_id'] ?? null;
     if (!$user_id) {

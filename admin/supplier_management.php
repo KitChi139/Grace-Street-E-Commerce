@@ -1,5 +1,6 @@
 <?php
 include('../components/connect.php');
+include('../components/encryption.php');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

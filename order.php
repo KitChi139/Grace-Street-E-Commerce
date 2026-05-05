@@ -170,6 +170,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
                 <?php
                 include('./components/connect.php');
+                include('./components/encryption.php');
 
                 if (isset($_SESSION['user-id'])) {
                     $userId = $_SESSION['user-id'];
@@ -213,6 +214,8 @@ if (session_status() === PHP_SESSION_NONE) {
                             if (empty($fullName)) {
                                 $fullName = $row['username'];
                             }
+                            $decryptedAddress = decrypt_data($row['Address']);
+                            $decryptedNumber = decrypt_data($row['Number']);
                             $statusDisplay = '';
                             if ($row['Order_Status'] == 'Pending') {
                                 $statusDisplay = '<span style="color: orange;">Pending</span>';
@@ -241,7 +244,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                             <?php if ($row['Order_Status'] != 'Ready'): ?>
                                                 <button class="received-order" data-id="<?php echo $row['ID']; ?>">Received</button>
                                             <?php endif; ?>
-                                            <a class="print-link" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($fullName); ?>&address=<?php echo urlencode($row['Address']); ?>&number=<?php echo urlencode($row['Number']); ?>&total_price=<?php echo urlencode((string)$row['Total_Price']); ?>">Invoice</a>
+                                            <a class="print-link" href="generate_invoice.php?id=<?php echo $row['ID']; ?>&name=<?php echo urlencode($fullName); ?>&address=<?php echo urlencode($decryptedAddress); ?>&number=<?php echo urlencode($decryptedNumber); ?>&total_price=<?php echo urlencode((string)$row['Total_Price']); ?>">Invoice</a>
                                             <button class="remove-order" data-id="<?php echo $row['ID']; ?>">Remove</button>
                                         <?php endif; ?>
                                     <?php else: ?>

@@ -3,6 +3,7 @@
 
     @session_start(); // Suppress "session_start() already active" notice
     include 'components/connect.php';
+    include 'components/encryption.php';
 
     // $successMessage = "";
 
@@ -135,8 +136,8 @@
                 $userName = $user_row['username'];
             }
             $userEmail = $user_row['email'];
-            $userNumber = $user_row['contact_number'];
-            $userAddress = $user_row['address'];
+            $userNumber = decrypt_data($user_row['contact_number']);
+            $userAddress = decrypt_data($user_row['address']);
         }
         $user_stmt->close();
     }

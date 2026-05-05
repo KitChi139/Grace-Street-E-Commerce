@@ -1,6 +1,7 @@
 <?php
 include('components/connect.php');
 include('components/password_validation.php');
+include('components/encryption.php');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -62,8 +63,13 @@ if (isset($_POST['submit'])) {
         }
 
         if ($captcha_valid) {
-            // Check if email already exists in applications or users
-            $check_email = mysqli_query($con, "SELECT email.email FROM email WHERE email.email = '$email'");
+            // Verify TOS and Cookie consent
+            if (!isset($_POST['tos_consent']) || !isset($_POST['cookie_consent'])) {
+                $message = "You must agree to the Terms and Cookie Policy to apply.";
+                $status = "error";
+            } else {
+                // Check if email already exists in applications or users
+                $check_email = mysqli_query($con, "SELECT email.email FROM email WHERE email.email = '$email'");
             if (mysqli_num_rows($check_email) > 0) {
                 $message = "Email already registered or application pending!";
                 $status = "error";
@@ -90,22 +96,26 @@ if (isset($_POST['submit'])) {
                             // Hash password
                             $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
 
+                            // Encrypt sensitive data
+                            $encrypted_contact = encrypt_data($contact);
+                            $encrypted_address = encrypt_data($address);
+
                             // Insert into email table first
                             mysqli_query($con, "INSERT INTO email (email) VALUES ('$email')");
                             $emailID = mysqli_insert_id($con);
 
                             // Insert into seller_applications
                             $stmt = $con->prepare("INSERT INTO seller_applications (owner_name, username, emailID, password, contact_number, address, document_path) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                            $stmt->bind_param("ssissss", $owner_name, $username, $emailID, $hashed_pass, $contact, $address, $target_path);
+                            $stmt->bind_param("ssissss", $owner_name, $username, $emailID, $hashed_pass, $encrypted_contact, $encrypted_address, $target_path);
                             
                             if ($stmt->execute()) {
-                                $message = "Application submitted successfully! Please wait for admin approval.";
+                                $message = "Application submitted successfully! We will review your documents and contact you via email.";
                                 $status = "success";
                                 // Reset captcha
                                 unset($_SESSION['captcha_phrase']);
                                 unset($_SESSION['captcha_answer']);
                             } else {
-                                $message = "Failed to submit application. Please try again.";
+                                $message = "Error submitting application. Please try again.";
                                 $status = "error";
                             }
                         } else {
@@ -306,9 +316,18 @@ if (isset($_POST['submit'])) {
                     </div>
                 <?php endif; ?>
 
-                <div class="tos-container">
-                    <input type="checkbox" id="tos_checkbox">
-                    <label for="tos_checkbox">I agree to the Terms of Service and Privacy Policy</label>
+                <div class="tos-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 14px;">
+                    <input type="checkbox" id="tos_checkbox" name="tos_consent" required style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="tos_checkbox" style="cursor: pointer;">
+                        I agree to the <a href="privacy_policy.php" target="_blank" style="color: #8B6F56; text-decoration: underline;">Terms of Service and Privacy Policy</a>
+                    </label>
+                </div>
+
+                <div class="cookie-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 14px;">
+                    <input type="checkbox" id="cookie_checkbox" name="cookie_consent" required style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="cookie_checkbox" style="cursor: pointer;">
+                        I consent to the use of cookies for a better shopping experience
+                    </label>
                 </div>
 
                 <input type="submit" value="Apply as Seller" name="submit" class="btn" id="register_btn" disabled>
@@ -327,13 +346,17 @@ if (isset($_POST['submit'])) {
             document.getElementById('captcha-img').src = 'captcha_gen.php?' + Math.random();
         }
 
-        // TOS Checkbox logic
+        // TOS and Cookie Consent check logic
         const tosCheckbox = document.getElementById('tos_checkbox');
+        const cookieCheckbox = document.getElementById('cookie_checkbox');
         const registerBtn = document.getElementById('register_btn');
         
-        tosCheckbox.addEventListener('change', function() {
-            registerBtn.disabled = !this.checked;
-        });
+        function updateRegisterButton() {
+            registerBtn.disabled = !(tosCheckbox.checked && cookieCheckbox.checked);
+        }
+
+        tosCheckbox.addEventListener('change', updateRegisterButton);
+        cookieCheckbox.addEventListener('change', updateRegisterButton);
 
         const passwordInput = document.querySelector('input[name="pass"]');
         const lengthReq = document.getElementById('length-req');

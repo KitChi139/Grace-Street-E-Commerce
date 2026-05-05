@@ -1,5 +1,6 @@
 <?php
 include('../components/connect.php');
+include('../components/encryption.php');
 
 if (!isset($_SESSION['user-id'])) {
     header('Location: ../login.php');
@@ -561,6 +562,10 @@ if(isset($_POST['complete'])) {
                         <?php if(mysqli_num_rows($result) > 0): 
                             mysqli_data_seek($result, 0); // Reset result pointer
                             while($row = mysqli_fetch_assoc($result)): 
+                                // Decrypt sensitive data
+                                $row['Address'] = decrypt_data($row['Address']);
+                                $row['Number'] = decrypt_data($row['Number']);
+
                                 $status_text = '';
                                 $status_class = '';
                                 if ($row['Order_Status'] == 'Pending') {
@@ -605,6 +610,10 @@ if(isset($_POST['complete'])) {
                     if(mysqli_num_rows($result) > 0): 
                         mysqli_data_seek($result, 0); // Reset result pointer
                         while($row = mysqli_fetch_assoc($result)): 
+                            // Decrypt sensitive data
+                            $row['Address'] = decrypt_data($row['Address']);
+                            $row['Number'] = decrypt_data($row['Number']);
+
                             $status_text = '';
                             $status_color = '';
                             if ($row['Order_Status'] == 'Pending') {

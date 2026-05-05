@@ -69,4 +69,47 @@ if ($footerRole !== 'courier'):
         </div>
     </section>
 </footer>
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-banner" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(44, 40, 37, 0.95); color: #F7F3EE; padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999; border: 1px solid #D4C5B0; backdrop-filter: blur(10px);">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+            <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; margin: 0 0 10px 0; color: #D4C5B0; letter-spacing: 0.05em;">Cookie Consent</h3>
+            <p style="font-family: 'Jost', sans-serif; font-size: 0.9rem; margin: 0; line-height: 1.5; color: rgba(247, 243, 238, 0.85);">
+                We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies. Read our <a href="privacy_policy.php" style="color: #D4C5B0; text-decoration: underline;">Privacy Policy</a> for more details.
+            </p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button id="accept-cookies" style="padding: 12px 24px; background: #D4C5B0; color: #2C2825; border: none; border-radius: 6px; font-family: 'Jost', sans-serif; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.3s ease;">Accept All</button>
+            <button id="decline-cookies" style="padding: 12px 24px; background: transparent; color: #F7F3EE; border: 1px solid rgba(212, 197, 176, 0.3); border-radius: 6px; font-family: 'Jost', sans-serif; font-size: 0.85rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.3s ease;">Decline</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cookieBanner = document.getElementById('cookie-banner');
+        const acceptBtn = document.getElementById('accept-cookies');
+        const declineBtn = document.getElementById('decline-cookies');
+
+        // Check if user has already made a choice
+        if (!localStorage.getItem('cookieConsent')) {
+            setTimeout(() => {
+                cookieBanner.style.display = 'block';
+            }, 1000);
+        }
+
+        acceptBtn.addEventListener('click', function() {
+            localStorage.setItem('cookieConsent', 'accepted');
+            cookieBanner.style.opacity = '0';
+            setTimeout(() => { cookieBanner.style.display = 'none'; }, 500);
+        });
+
+        declineBtn.addEventListener('click', function() {
+            localStorage.setItem('cookieConsent', 'declined');
+            cookieBanner.style.opacity = '0';
+            setTimeout(() => { cookieBanner.style.display = 'none'; }, 500);
+        });
+    });
+</script>
 <?php endif; ?>
