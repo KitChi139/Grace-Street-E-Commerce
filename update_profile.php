@@ -14,17 +14,20 @@
 
     <!-- jQuery UI CSS -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
     .password-container {
         position: relative;
         margin-bottom: 20px;
-        width: 96.6%;
+        width: 100%;
     }
     .password-container .box {
         margin-bottom: 0;
-        padding-right: 40px;
-        width: 92.6%;
+        padding-right: 45px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .toggle-password {
         position: absolute;
@@ -34,6 +37,15 @@
         cursor: pointer;
         color: #666;
         z-index: 10;
+    }
+    .swal-cancel-styled {
+    border: 0.5px solid #2C2825 !important;
+    color: #2C2825 !important;
+    background-color: #F7F3EE !important;
+    }
+    .swal-cancel-styled:hover {
+        background-color: #2C2825 !important;
+        color: #F7F3EE !important;
     }
 </style>
 <body>
@@ -80,21 +92,20 @@
                     $pw_check = validatePassword($new_pass, $con);
 
                     if(!$pw_check['valid']) {
-                        echo "<script>alert('" . $pw_check['message'] . "');</script>";
+                        echo "<script>Swal.fire({ title: 'Invalid Password', text: '" . addslashes($pw_check['message']) . "', icon: 'error', confirmButtonColor: '#2C2825' });</script>";
                     } elseif ($new_pass !== $confirm_pass) {
-                        echo "<script>alert('New password and confirm password do not match!');</script>";
+                        echo "<script>Swal.fire({ title: 'Password Mismatch', text: 'New password and confirm password do not match!', icon: 'error', confirmButtonColor: '#2C2825' });</script>";
                     } else {
                         $hashed_pass = password_hash($new_pass, PASSWORD_DEFAULT);
                         mysqli_query($con, "UPDATE grace_user SET password = '$hashed_pass' WHERE userID = '$user_id'") or die('Query failed');
-                        echo "<script>alert('Profile and password updated successfully!');</script>";
+                        echo "<script>Swal.fire({ title: 'Profile Updated!', text: 'Profile and password updated successfully!', icon: 'success', confirmButtonColor: '#2C2825', timer: 2000, showConfirmButton: false }).then(() => { window.location.href = 'update_profile.php'; });</script>";
                     }
                 } else {
-                    echo "<script>alert('Profile updated successfully!');</script>";
+                    echo "<script>Swal.fire({ title: 'Profile Updated!', text: 'Profile updated successfully!', icon: 'success', confirmButtonColor: '#2C2825', timer: 2000, showConfirmButton: false }).then(() => { window.location.href = 'update_profile.php'; });</script>";
                 }
-                echo "<script>window.location.href = 'update_profile.php';</script>";
                 exit();
             } else {
-                echo "<script>alert('Old password is incorrect!');</script>";
+                echo "<script>Swal.fire({ title: 'Incorrect Password', text: 'Old password is incorrect!', icon: 'error', confirmButtonColor: '#2C2825' });</script>";
             }
         }
     }

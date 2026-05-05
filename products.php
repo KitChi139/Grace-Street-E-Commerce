@@ -204,8 +204,91 @@ if(isset($_POST['search'])) {
                 </div>
             </div>
         </div>
+        <!-- Pagination -->
+        <div id="pagination" style="display: flex; justify-content: center; align-items: center; gap: 8px; padding: 2rem 0 3rem;"></div>
     </section>
-    <?php include 'additional/footer.php'; ?>
+
+<?php include 'additional/footer.php'; ?>
+
+<script>
+    const allItems = document.querySelectorAll('.items-product');
+    const perPage = 12;
+    let currentPage = 1;
+
+    function getTotalPages() {
+        const visible = [...allItems].filter(i => i.style.display !== 'none' || i.getAttribute('data-hidden') !== 'filter');
+        return Math.ceil(allItems.length / perPage);
+    }
+
+    function showPage(page) {
+        currentPage = page;
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+
+        allItems.forEach((item, i) => {
+            item.style.display = (i >= start && i < end) ? '' : 'none';
+        });
+
+        renderPagination();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderPagination() {
+        const total = Math.ceil(allItems.length / perPage);
+        const container = document.getElementById('pagination');
+        container.innerHTML = '';
+
+        if (total <= 1) return;
+
+        // Prev button
+        const prev = document.createElement('button');
+        prev.textContent = '←';
+        prev.disabled = currentPage === 1;
+        applyBtnStyle(prev, currentPage === 1);
+        prev.onclick = () => showPage(currentPage - 1);
+        container.appendChild(prev);
+
+        // Page numbers
+        for (let i = 1; i <= total; i++) {
+            const btn = document.createElement('button');
+            btn.textContent = i;
+            applyBtnStyle(btn, false, i === currentPage);
+            btn.onclick = () => showPage(i);
+            container.appendChild(btn);
+        }
+
+        // Next button
+        const next = document.createElement('button');
+        next.textContent = '→';
+        next.disabled = currentPage === total;
+        applyBtnStyle(next, currentPage === total);
+        next.onclick = () => showPage(currentPage + 1);
+        container.appendChild(next);
+    }
+
+    function applyBtnStyle(btn, disabled = false, active = false) {
+        btn.style.cssText = `
+            padding: 8px 14px;
+            border: 0.5px solid #2C2825;
+            background: ${active ? '#2C2825' : 'transparent'};
+            color: ${active ? '#F7F3EE' : '#2C2825'};
+            font-family: 'Jost', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            cursor: ${disabled ? 'not-allowed' : 'pointer'};
+            opacity: ${disabled ? '0.35' : '1'};
+            transition: all 0.2s;
+            border-radius: 4px;
+        `;
+        if (!active && !disabled) {
+            btn.onmouseover = () => { btn.style.background = '#2C2825'; btn.style.color = '#F7F3EE'; };
+            btn.onmouseout = () => { btn.style.background = 'transparent'; btn.style.color = '#2C2825'; };
+        }
+    }
+
+    // Init
+    showPage(1);
+</script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>

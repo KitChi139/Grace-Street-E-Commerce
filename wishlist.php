@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="css/style.css">
     <!-- jQuery UI CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+        .swal-cancel-styled {
+        border: 0.5px solid #2C2825 !important;
+        color: #2C2825 !important;
+        background-color: #F7F3EE !important;
+        }
+        .swal-cancel-styled:hover {
+            background-color: #2C2825 !important;
+            color: #F7F3EE !important;
+        }
+</style>
 </head>
 <body>
     <?php include 'additional/header.php'; ?>
@@ -21,7 +35,7 @@
 
                         if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             if (!isset($_SESSION['user-id'])) {
-                                echo "<script>alert('You must log in first'); window.location='login.php';</script>";
+                                echo "<script>window.location='login.php?error=1';</script>";
                                 exit;
                             } else {
                                 if (isset($_POST['productId'], $_POST['productImage'], $_POST['productName'], $_POST['productPrice'], $_POST['productQuantity'])) {
@@ -73,7 +87,7 @@
                                     $deleteStmt->execute();
                                     $deleteStmt->close();
                     
-                                    echo "<script>alert('Data saved successfully!'); window.location='cart.php';</script>";
+                                    echo "<script>window.location='cart.php?success=1';</script>";
                                     exit;
                                 }
                             }
@@ -137,9 +151,23 @@
 
     <script>
         function removeFromWishlist(ID) {
-            if(confirm("Are you sure you want to remove this item from your wishlist?")) {
-                window.location.href = "remove_from_wishlist.php?ID=" + ID;
-            }
+            Swal.fire({
+                title: 'Remove item?',
+                text: 'Are you sure you want to remove this from your wishlist?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#2C2825',
+                cancelButtonColor: '#F7F3EE',
+                confirmButtonText: 'Yes, remove it',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    cancelButton: 'swal-cancel-styled'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "remove_from_wishlist.php?ID=" + ID;
+                }
+            });
         }
     </script>
 </body>

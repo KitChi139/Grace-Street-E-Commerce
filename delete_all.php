@@ -7,18 +7,11 @@ if (isset($_GET['confirmation']) && $_GET['confirmation'] === 'yes') {
     $deleteQuery->close();
 
     if ($success) {
-        echo "<script>
-            alert('All items successfully removed from the cart.');
-            window.location.href = 'cart.php';
-        </script>";
-        exit();
+        header("Location: cart.php?deleted_all=1");
     } else {
-        echo "<script>
-            alert('Error deleting all items from the cart.');
-            window.location.href = 'cart.php';
-        </script>";
-        exit();
+        header("Location: cart.php?deleted_all=0");
     }
+    exit();
 } else {
     header("Location: cart.php");
     exit();

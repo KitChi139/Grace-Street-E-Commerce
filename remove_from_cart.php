@@ -9,18 +9,11 @@ if(isset($_GET['productId'])) {
     $deleteQuery->close();
     
     if ($success) {
-        echo "<script>
-            alert('Item successfully removed from the cart.');
-            window.location.href = 'cart.php';
-        </script>";
-        exit();
+        header("Location: cart.php?removed=1");
     } else {
-        echo "<script>
-            alert('Error removing item from cart.');
-            window.location.href = 'cart.php';
-        </script>";
-        exit();
+        header("Location: cart.php?removed=0");
     }
+    exit();
 } else {
     header("Location: cart.php");
     exit();

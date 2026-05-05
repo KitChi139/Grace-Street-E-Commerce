@@ -319,13 +319,26 @@
         <link rel="stylesheet" href="Css/style.css">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <style>
+            .swal-cancel-styled {
+                border: 0.5px solid #2C2825 !important;
+                color: #2C2825 !important;
+                background-color: #F7F3EE !important;
+            }
+            .swal-cancel-styled:hover {
+                background-color: #2C2825 !important;
+                color: #F7F3EE !important;
+            }
+        </style>
     </head>
     <body>
     <?php include 'additional/header.php'; ?>
     <section>
         <div class="checkout_container" style="max-width: 1100px; margin: 0 auto; padding: 3rem 2.5rem;">
             <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 3.8rem; text-align: center; margin-bottom: 2.5rem; color: #2C2825; letter-spacing: 0.04em;">Checkout</h1>
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" onsubmit="return confirm('Are you sure you want to place the order?');">
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div style="display: flex; gap: 2.5rem; align-items: flex-start; flex-wrap: nowrap;">
 
                     <!-- LEFT: Order Summary -->
@@ -443,8 +456,35 @@
 
     <script>
         <?php if (!empty($successMessage)): ?>
-            alert("<?php echo $successMessage; ?>");
-        <?php endif; ?>
+        Swal.fire({
+            title: 'Order Placed!',
+            text: '<?php echo $successMessage; ?>',
+            icon: 'success',
+            confirmButtonColor: '#2C2825',
+            timer: 2000,
+            showConfirmButton: false
+        }).then(() => window.location.href = 'invoice.php');
+    <?php endif; ?>
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        Swal.fire({
+            title: 'Place your order?',
+            text: 'Are you sure you want to proceed?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2C2825',
+            cancelButtonColor: '#F7F3EE',
+            confirmButtonText: 'Yes, place it',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-cancel-styled'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) form.submit();
+        });
+    });
     </script>
 </body>
     </html>

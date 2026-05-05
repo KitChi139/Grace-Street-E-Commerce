@@ -6,7 +6,20 @@
     <title>Grace Street/Cart</title>
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+<style>
+    .swal-cancel-styled {
+        border: 0.5px solid #2C2825 !important;
+        color: #2C2825 !important;
+        background-color: #F7F3EE !important;
+    }
+    .swal-cancel-styled:hover {
+        background-color: #2C2825 !important;
+        color: #F7F3EE !important;
+    }
+</style>
 <body>
     <?php include 'additional/header.php'; ?>
     <section>
@@ -99,79 +112,156 @@
     <?php include 'additional/footer.php'; ?>
     <script src="scripts/cart_functions.js"></script>
     <script>
-        function updateTotalPrice() {
-            let total = 0;
-            const checkedItems = document.querySelectorAll('.item-checkbox:checked');
-            checkedItems.forEach(checkbox => {
-                const cartItem = checkbox.closest('.cart-item');
-                const price = parseFloat(cartItem.getAttribute('data-price'));
-                const quantity = parseInt(cartItem.querySelector('.quantity-input').value);
-                total += price * quantity;
-            });
-            document.getElementById('totalPriceDisplay').textContent = 'PHP ' + total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            
-            const checkoutBtn = document.getElementById('checkoutBtn');
-            if (checkoutBtn) {
-                checkoutBtn.disabled = checkedItems.length === 0;
-                checkoutBtn.style.opacity = checkedItems.length === 0 ? '0.5' : '1';
-                checkoutBtn.style.cursor = checkedItems.length === 0 ? 'not-allowed' : 'pointer';
-            }
-        }
-
-        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', updateTotalPrice);
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('removed') === '1') {
+    Swal.fire({
+        title: 'Item Removed',
+        icon: 'success',
+        confirmButtonColor: '#2C2825',
+        timer: 2000,
+        showConfirmButton: false
+    });
+}
+if (params.get('deleted_all') === '1') {
+    Swal.fire({
+        title: 'All items deleted!',
+        icon: 'success',
+        confirmButtonColor: '#2C2825',
+        timer: 2000,
+        showConfirmButton: false
+    });
+}
+if (params.get('deleted_all') === '0') {
+    Swal.fire({
+        title: 'Something went wrong',
+        text: 'Error deleting items from cart.',
+        icon: 'error',
+        confirmButtonColor: '#2C2825',
+    });
+}
+if (params.get('removed') === '0') {
+    Swal.fire({
+        title: 'Something went wrong',
+        text: 'Error removing item from cart.',
+        icon: 'error',
+        confirmButtonColor: '#2C2825',
+    });
+}
+    if (params.get('success') === '1') {
+        Swal.fire({
+            title: 'Added to Cart!',
+            icon: 'success',
+            confirmButtonColor: '#2C2825',
+            timer: 2000,
+            showConfirmButton: false
         });
+    }
 
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            input.addEventListener('input', updateTotalPrice);
+    function updateTotalPrice() {
+        let total = 0;
+        const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+        checkedItems.forEach(checkbox => {
+            const cartItem = checkbox.closest('.cart-item');
+            const price = parseFloat(cartItem.getAttribute('data-price'));
+            const quantity = parseInt(cartItem.querySelector('.quantity-input').value);
+            total += price * quantity;
         });
-
+        document.getElementById('totalPriceDisplay').textContent = 'PHP ' + total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
         const checkoutBtn = document.getElementById('checkoutBtn');
         if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', function() {
-                const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
-                if (selectedIds.length > 0) {
-                    window.location.href = 'checkout.php?selected_items=' + selectedIds.join(',');
-                } else {
-                    alert('Please select at least one item to checkout.');
-                }
-            });
+            checkoutBtn.disabled = checkedItems.length === 0;
+            checkoutBtn.style.opacity = checkedItems.length === 0 ? '0.5' : '1';
+            checkoutBtn.style.cursor = checkedItems.length === 0 ? 'not-allowed' : 'pointer';
         }
+    }
 
-        function editQuantity(productId) {
-            var newQuantity = document.querySelector('[data-product-id="' + productId + '"] .quantity-input').value;
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "update_quantity.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    if (xhr.responseText.trim() === "success") {
-                        window.location.href="cart.php";
-                    } else {
-                        window.location.href="cart.php";
-                    }
-                }
-            };
-            xhr.send("productId=" + productId + "&quantity=" + newQuantity);
-        }
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateTotalPrice);
+    });
 
-        function removeFromCart(productId) {
-            var confirmation = confirm("Are you sure you want to remove this item from the cart?");
-            if (confirmation) {
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('input', updateTotalPrice);
+    });
+
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', function() {
+            const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+            if (selectedIds.length > 0) {
+                window.location.href = 'checkout.php?selected_items=' + selectedIds.join(',');
+            } else {
+                Swal.fire({
+                    title: 'No items selected',
+                    text: 'Please select at least one item to checkout.',
+                    icon: 'warning',
+                    confirmButtonColor: '#2C2825',
+                });
+            }
+        });
+    }
+
+    function editQuantity(productId) {
+        var newQuantity = document.querySelector('[data-product-id="' + productId + '"] .quantity-input').value;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "update_quantity.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                window.location.href = "cart.php";
+            }
+        };
+        xhr.send("productId=" + productId + "&quantity=" + newQuantity);
+    }
+
+    function removeFromCart(productId) {
+        Swal.fire({
+            title: 'Remove item?',
+            text: 'Are you sure you want to remove this item from the cart?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2C2825',
+            cancelButtonColor: '#F7F3EE',
+            confirmButtonText: 'Yes, remove it',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-cancel-styled'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
                 window.location.href = "remove_from_cart.php?productId=" + productId;
             }
-        }
-        
-        function deleteAllItems() {
-            var confirmation = confirm("Are you sure you want to delete all items from the cart?");
-            if (confirmation) {
+        });
+    }
+
+    function deleteAllItems() {
+        Swal.fire({
+            title: 'Delete everything?',
+            text: 'Are you sure you want to delete all items from the cart?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2C2825',
+            cancelButtonColor: '#F7F3EE',
+            confirmButtonText: 'Yes, delete all',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-cancel-styled'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
                 window.location.href = "delete_all.php?confirmation=yes";
             }
-        }
+        });
+    }
 
-        function calculateTotal() {
-            alert("Total Price: PHP <?php echo number_format($totalPrice, 2); ?>");
-        }
+    function calculateTotal() {
+        Swal.fire({
+            title: 'Total Price',
+            text: 'PHP <?php echo number_format($totalPrice, 2); ?>',
+            icon: 'info',
+            confirmButtonColor: '#2C2825',
+        });
+    }
     </script>
 </body>
 </html>

@@ -158,7 +158,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <?php include 'chat.php'; ?>
     <section>
         <div class="invoice_container">
-            <div class="invoice_content" style="background: rgba(247,243,238,0.85); border: 0.5px solid #E8DED2; border-radius: 12px; box-shadow: 0 8px 24px rgba(44,40,37,0.08); padding: 2rem; max-width: 1100px; margin: 0 auto;">
+            <div class="invoice_content" style="background: rgba(247,243,238,0.85); border: 0.5px solid #E8DED2; border-radius: 12px; box-shadow: 0 8px 24px rgba(44,40,37,0.50); padding: 2rem; max-width: 1100px; margin: 0 auto;">
                 <div class="invoice_header">
                     <h1>Placed Orders</h1>
                 </div>           

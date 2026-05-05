@@ -11,6 +11,19 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Add JavaScript for alert -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    .swal-cancel-styled {
+        border: 0.5px solid #2C2825 !important;
+        color: #2C2825 !important;
+        background-color: #F7F3EE !important;
+    }
+    .swal-cancel-styled:hover {
+        background-color: #2C2825 !important;
+        color: #F7F3EE !important;
+    }
+</style>
 </head>
 <body>
     <?php include 'additional/header.php'; ?>
@@ -22,7 +35,7 @@
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (!isset($_SESSION['user-id'])) {
-                echo "<script>alert('You must log in first'); window.location='login.php';</script>";
+                echo "<script>document.addEventListener('DOMContentLoaded', function() { Swal.fire({ icon: 'warning', title: 'Login Required', text: 'You must log in first.', confirmButtonColor: '#2C2825' }); }); window.location='login.php';</script>";
                 exit;
             } else {
                 if (isset($_POST['pid'], $_POST['productImage'], $_POST['productName'], $_POST['productPrice'], $_POST['quantity'], $_POST['size'])) {
@@ -55,7 +68,7 @@
                             $success = $updateQuery->execute();
                             $updateQuery->close();
 
-                            echo "<script>alert('Product added to cart!'); window.location='cart.php';</script>";
+                            echo "<script>window.location='cart.php?success=1';</script>";
                             exit;
                         } else {
                             $sql = "INSERT INTO cart (userID, inventoryID, quantity) VALUES (?, ?, ?)";
@@ -64,11 +77,11 @@
                             $success = $stmt->execute();
                             $stmt->close();
 
-                            echo "<script>alert('Product added to cart!'); window.location='cart.php';</script>";
+                            echo "<script>window.location='cart.php?success=1';</script>";
                             exit;
                         }
                     } else {
-                        echo "<script>alert('Selected size is currently unavailable.'); history.back();</script>";
+                        echo "<script>document.addEventListener('DOMContentLoaded', function() { Swal.fire({ icon: 'warning', title: 'Unavailable', text: 'Selected size is currently unavailable.', confirmButtonColor: '#2C2825' }); });</script>";
                         exit;
                     }
                 }
@@ -88,7 +101,7 @@
       $select_products->bind_result($id, $name, $image, $price,$description);
       while($select_products->fetch()){
    ?>
-        <form action=""  method="POST" class="box" onsubmit="showAlert()">
+        <form action="" method="POST" class="box">
             <div class="view-container">
                 <div class="view-item">
                     <input type="hidden" name="pid" value="<?= $id; ?>">

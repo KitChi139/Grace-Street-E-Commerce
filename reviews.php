@@ -47,77 +47,116 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
     <title>Customer Reviews - Grace Street</title>
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .reviews-container {
-            max-width: 1200px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-        .review-form {
-            background: rgba(247, 243, 238, 0.85); /* soft cream card */
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 50px;
-            box-shadow: 0 8px 24px rgba(44, 40, 37, 1);
-        }
-        .review-form h2 {
-            margin-bottom: 20px;
-        }
-        .review-form select, .review-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 0.5px solid #E8DED2;
-            border-radius: 5px;
-            background-color: rgba(232, 222, 210, 0.3); /* warm tint instead of grey */ /* warm tint instead of grey */
-        }
-        .review-form input[type="submit"] {
-            background-color: #2C2825;
-            color: #F7F3EE;
-            border: none;
-            padding: 15px 30px;
-            cursor: pointer;
-            font-family: 'Jost', sans-serif;
-            font-size: 0.8rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            transition: background-color 0.25s;
-            border-radius: 0;
+            .reviews-container {
+        max-width: 1200px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+    .review-form {
+        background: rgba(247, 243, 238, 0.85);
+        padding: 30px;
+        border-radius: 16px;
+        margin-bottom: 50px;
+        box-shadow: 0 8px 24px rgba(44, 40, 37, 0.50);
+        border: 0.5px solid #E8DED2;
+    }
+    .review-form h2 {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 400;
+        font-size: 2rem;
+        color: #2C2825;
+        margin-bottom: 20px;
+    }
+    .review-form label {
+        font-family: 'Jost', sans-serif;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #A09486;
+        display: block;
+        margin-bottom: 6px;
+    }
+    .review-form select, .review-form textarea {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 0.5px solid #E8DED2;
+        border-radius: 6px;
+        background-color: rgba(232, 220, 210, 0.3);
+        font-family: 'Jost', sans-serif;
+        font-size: 0.85rem;
+        color: #2C2825;
+        outline: none;
+    }
+    .review-form input[type="submit"] {
+        background-color: #2C2825;
+        color: #F7F3EE;
+        border: none;
+        padding: 14px 30px;
+        cursor: pointer;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: background-color 0.25s;
+        border-radius: 0;
+    }
+    .review-form input[type="submit"]:hover {
+        background-color: #8B6F56;
+    }
+    .reviews-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    .review-card {
+        background: rgba(247, 243, 238, 0.85);
+        padding: 22px;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(44, 40, 37, 0.08);
+        border: 0.5px solid #E8DED2;
+        transition: transform 0.25s, box-shadow 0.25s;
+        height: 180px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .review-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(44, 40, 37, 0.13);
+    }
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .review-username {
+        font-family: 'Jost', sans-serif;
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: #2C2825;
+    }
+    .review-rating { color: #C4956A; }
+    .review-date {
+        font-size: 0.75rem;
+        color: #A09486;
+        margin-bottom: 12px;
+        font-family: 'Jost', sans-serif;
+    }
+    .review-comment {
+    line-height: 1.6;
+    font-size: 0.88rem;
+    color: #2C2825;
+    font-family: 'Jost', sans-serif;
+    overflow-y: auto;
+    flex: 1;
 }
-.review-form input[type="submit"]:hover {
-    background-color: #8B6F56;
-}
-        .reviews-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .review-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-        }
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .review-username {
-            font-weight: bold;
-        }
-        .review-rating {
-            color: #f39c12;
-        }
-        .review-date {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 10px;
-        }
-        .review-comment {
-            line-height: 1.6;
-        }
+
+.review-comment::-webkit-scrollbar { display: none; }
+.review-comment { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body>
@@ -125,12 +164,19 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
 
     <div class="reviews-container">
         <h1 style="text-align: center; margin-bottom: 40px;font-family: 'Cormorant Garamond', serif;
-  font-size: 2.5rem;">Customer Reviews & Feedbacks</h1>
+  font-size: 3.5rem;">Customer Reviews & Feedbacks</h1>
 
         <?php if ($message): ?>
-            <div style="text-align: center; padding: 15px; background: #e8f5e9; color: #2e7d32; border-radius: 5px; margin-bottom: 30px;">
-                <?= $message; ?>
-            </div>
+        <script>
+            window.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thank you!',
+                    text: '<?= $message ?>',
+                    confirmButtonColor: '#2C2825'
+                });
+            });
+        </script>
         <?php endif; ?>
 
         <div class="review-form">
@@ -152,7 +198,7 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
             </form>
         </div>
 
-        <div class="reviews-list">
+        <div class="reviews-list" id="reviewsList">
             <?php if (mysqli_num_rows($select_reviews) > 0): ?>
                 <?php while ($review = mysqli_fetch_assoc($select_reviews)): ?>
                     <div class="review-card">
@@ -172,7 +218,35 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
             <?php endif; ?>
         </div>
     </div>
+<div style="text-align: center; margin-top: 2rem; margin-bottom: 4rem;">
+    <button id="showMoreBtn" onclick="showMore()" style="padding: 12px 32px; background: transparent; border: 0.5px solid #2C2825; color: #2C2825; font-family: 'Jost', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.25s;" onmouseover="this.style.backgroundColor='#2C2825';this.style.color='#F7F3EE';" onmouseout="this.style.backgroundColor='transparent';this.style.color='#2C2825';">Show More</button>
+</div>
 
+<script>
+    const cards = document.querySelectorAll('.review-card');
+    const perPage = 6;
+    let shown = perPage;
+
+    // hide cards beyond first 6
+    cards.forEach((card, i) => {
+        if (i >= perPage) card.style.display = 'none';
+    });
+
+    // hide button if 6 or fewer
+    if (cards.length <= perPage) {
+        document.getElementById('showMoreBtn').style.display = 'none';
+    }
+
+    function showMore() {
+        for (let i = shown; i < shown + perPage && i < cards.length; i++) {
+            cards[i].style.display = 'flex';
+        }
+        shown += perPage;
+        if (shown >= cards.length) {
+            document.getElementById('showMoreBtn').style.display = 'none';
+        }
+    }
+</script>
     <?php include 'additional/footer.php'; ?>
 </body>
 </html>

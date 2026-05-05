@@ -85,6 +85,7 @@ section {
   overflow-x: auto;
   overflow-y: hidden;
   flex-wrap: nowrap;
+  justify-content: center;
 }
 .cart-product .cart-item {
   background: rgba(247,243,238,0.85);
@@ -488,14 +489,20 @@ nav a:hover { color: #2C2825; }
   font-size: 2rem;
 }
 
-
 .products-table {
   padding: 0 20px;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 20px; /* ← tweak gap between cards here */
-  /* card size is controlled by grid-template-columns above */
-  /* change repeat(4, 1fr) to repeat(3, 1fr) for bigger cards etc. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.products-table form {
+  display: contents;
+}
+
+.items-product {
+  width: 100%;
 }
 
 /* contact style */
@@ -576,6 +583,9 @@ nav a:hover { color: #2C2825; }
 .products {
   flex-grow: 1;
   padding: 20px;
+  min-width: 0;
+  width: 100%;
+  min-height: 70vh;
 }
 .filter-nav {
   text-align: left;
@@ -683,12 +693,6 @@ nav a:hover { color: #2C2825; }
   color: white; /* Set text color to white */
   margin: 10px 0;
 }
-.products-table {
-  padding: 0 20px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
 .add-btn {
   font-size: 10px;
 }
@@ -768,7 +772,7 @@ nav a:hover { color: #2C2825; }
   border-radius: 16px;
   border: 0.5px solid #D4C5B0;
   background: rgba(247, 243, 238, 0.85);
-  box-shadow: 0 8px 24px rgba(44, 40, 37, 0.08);
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 0.50);
   padding: 3rem;
   width: 100%;
   max-width: 600px;
@@ -1200,7 +1204,7 @@ footer section {
 }
 
 .view-item {
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  box-shadow: 0 8px 32px rgba(44, 40, 37, 0.50);
   display: flex;
   background-color: white;
   padding: 30px;
@@ -1208,10 +1212,10 @@ footer section {
   width: 100%;
   max-width: 800px;
   min-height: 450px;
-  display: flex;
   justify-content: center;
   align-items: stretch;
   gap: 30px;
+  border-radius: 16px;
 }
 
 .view-image {

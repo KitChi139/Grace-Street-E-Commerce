@@ -134,6 +134,7 @@ if (isset($_POST['submit'])) {
     unset($_SESSION['captcha_phrase']);
     unset($_SESSION['captcha_answer']);
 }
+} //added this to patch the red thing, if this is removed an error at the very end appears
 ?>
 
 <!DOCTYPE html>

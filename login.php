@@ -78,14 +78,41 @@ if(isset($_POST['submit'])){
                 $username_locked = $row['username'];
                 mysqli_query($con, "UPDATE grace_user SET login_attempts = $new_attempts, is_active = 0 WHERE userID = '$user_id_actual'");
                 mysqli_query($con, "INSERT INTO locked_accounts (username, tries) VALUES ('$username_locked', $new_attempts)");
-                echo "<script>alert('Your account has been locked. Please contact support.');</script>";
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Account Locked',
+                            text: 'Your account has been locked. Please contact support.',
+                            confirmButtonColor: '#2C2825'
+                        });
+                    });
+                </script>";
             } else {
                 mysqli_query($con, "UPDATE grace_user SET login_attempts = $new_attempts WHERE userID = '$user_id_actual'");
-                echo "<script>alert('Incorrect password or email');</script>";
-            }
-        }
-    }else{
-        echo "<script>alert('Incorrect password or email');</script>";
+                echo "<script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Login Failed',
+                                text: 'Incorrect password or email.',
+                                confirmButtonColor: '#2C2825'
+                            });
+                        });
+                    </script>";
+                            }
+                        }
+                    }else{
+                        echo "<script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Login Failed',
+                                    text: 'Incorrect password or email.',
+                                    confirmButtonColor: '#2C2825'
+                                });
+                            });
+                        </script>";
     }
 }
 
