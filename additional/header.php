@@ -87,7 +87,7 @@ if(isset($_GET['logout'])){
                               echo '<div class="pop-content" style="text-align: center;">
                                       <h2>Welcome<br><span>' . htmlspecialchars($displayName) . '</span></h2>
                                       <a href="./update_profile.php"><button onclick="updateProfile()">Update Profile</button></a>
-                                      <a href="home.php?logout=' . $user_id . '" onclick="return confirm(\'Are you sure you want to logout?\')"><button class="logBtn">Log out</button></a>
+                                      <a href="#" onclick="confirmLogout(' . $user_id . ')"><button class="logBtn">Log out</button></a>
                                     </div>';
                           } else {
                               echo '<div class="pop-content" style="text-align: center;">
@@ -105,6 +105,25 @@ if(isset($_GET['logout'])){
         </section>
 
   <script>
+    function confirmLogout(userId) {
+    Swal.fire({
+        title: 'Log out?',
+        text: 'Are you sure you want to log out?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#2C2825',
+        cancelButtonColor: '#F7F3EE',
+        confirmButtonText: 'Yes, log out',
+        cancelButtonText: 'Cancel',
+        customClass: {
+            cancelButton: 'swal-cancel-styled'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = 'home.php?logout=' + userId;
+        }
+    });
+}
     function togglePopup() {
       var popup = document.getElementById("popupForm");
       if (popup.style.display === "none" || popup.style.display === "") {
