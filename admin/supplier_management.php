@@ -79,10 +79,19 @@ $applications = mysqli_fetch_all($apps_query, MYSQLI_ASSOC);
   <link rel="stylesheet" href="./styles/supplier_management.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<style>
-
+ <style>
+  .swal-admin-cancel {
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        color: rgba(247,243,238,0.6) !important;
+        background-color: transparent !important;
+    }
+    .swal-admin-cancel:hover {
+        background-color: rgba(255,255,255,0.07) !important;
+        color: #F7F3EE !important;
+    }
 </style>
+</head>
+
 <body>
   <?php include 'dashboard_header.php'; ?>    
   
@@ -114,13 +123,13 @@ $applications = mysqli_fetch_all($apps_query, MYSQLI_ASSOC);
           
           <div class="app-actions">
             <?php if ($app['status'] == 'pending'): ?>
-            <form method="post" style="display:inline;" onsubmit="return confirm('Approve this seller?')">
+            <form method="post" style="display:inline;" id="approveForm_<?= $app['application_id'] ?>">
                 <input type="hidden" name="app_id" value="<?= $app['application_id'] ?>">
-                <button type="submit" name="approve" class="btn-approve">✅ Approve</button>
+                <button type="button" name="approve" class="btn-approve" onclick="confirmApprove(<?= $app['application_id'] ?>)">✅ Approve</button>
             </form>
-            <form method="post" style="display:inline;" onsubmit="return confirm('Reject this seller?')">
+            <form method="post" style="display:inline;" id="rejectForm_<?= $app['application_id'] ?>">
                 <input type="hidden" name="app_id" value="<?= $app['application_id'] ?>">
-                <button type="submit" name="reject" class="btn-reject">⊘ Reject</button>
+                <button type="button" name="reject" class="btn-reject" onclick="confirmReject(<?= $app['application_id'] ?>)">⊘ Reject</button>
             </form>
             <?php endif; ?>
             
@@ -135,15 +144,63 @@ $applications = mysqli_fetch_all($apps_query, MYSQLI_ASSOC);
     </div>
   </main>
 
-  <?php if ($message): ?>
-    <script>
+<script>
+        function confirmApprove(appId) {
         Swal.fire({
-            text: '<?= $message ?>',
-            icon: 'info',
-            confirmButtonColor: '#000'
+            title: 'Approve seller?',
+            text: 'Are you sure you want to approve this seller application?',
+            icon: 'warning',
+            background: '#243447',
+            color: '#F7F3EE',
+            showCancelButton: true,
+            confirmButtonColor: '#C4956A',
+            cancelButtonColor: 'transparent',
+            confirmButtonText: 'Yes, approve',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-admin-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.getElementById('approveForm_' + appId);
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'approve';
+                input.value = '1';
+                form.appendChild(input);
+                form.submit();
+            }
         });
-    </script>
-  <?php endif; ?>
+    }
+
+    function confirmReject(appId) {
+        Swal.fire({
+            title: 'Reject seller?',
+            text: 'Are you sure you want to reject this seller application?',
+            icon: 'warning',
+            background: '#243447',
+            color: '#F7F3EE',
+            showCancelButton: true,
+            confirmButtonColor: '#C4956A',
+            cancelButtonColor: 'transparent',
+            confirmButtonText: 'Yes, reject',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-admin-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.getElementById('rejectForm_' + appId);
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'reject';
+                input.value = '1';
+                form.appendChild(input);
+                form.submit();
+            }
+        });
+    }
+</script>
 
 </body>
 </html>

@@ -60,6 +60,18 @@ $current_max = $settings['max_login_attempts'] ?? 5;
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="./styles/user_management.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <style>
+    .swal-admin-cancel {
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            color: rgba(247,243,238,0.6) !important;
+            background-color: transparent !important;
+        }
+        .swal-admin-cancel:hover {
+            background-color: rgba(255,255,255,0.07) !important;
+            color: #F7F3EE !important;
+        }
+    </style>
 </head>
 <body>
     <?php include 'dashboard_header.php'; ?>
@@ -68,9 +80,20 @@ $current_max = $settings['max_login_attempts'] ?? 5;
         <p class="page-subtitle">Configure global platform parameters</p>
 
         <?php if ($message): ?>
-            <div class="settings-message">
-                <?php echo $message; ?>
-            </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Settings Updated!',
+                    text: '<?= $message ?>',
+                    icon: 'success',
+                    background: '#243447',
+                    color: '#F7F3EE',
+                    confirmButtonColor: '#C4956A',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+        </script>
         <?php endif; ?>
 
         <div class="panel" style="max-width: 600px; margin-bottom: 20px;">

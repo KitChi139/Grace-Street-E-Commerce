@@ -258,22 +258,23 @@ tbody td form button[style*="e74c3c"]:hover {
 
 /* Unlock button */
 tbody td form button[style*="2ecc71"] {
-  padding: 6px 14px !important;
-  background: transparent !important;
-  border: 1px solid rgba(247,243,238,0.2) !important;
-  color: var(--text-secondary) !important;
-  font-family: 'DM Sans', sans-serif !important;
-  font-size: 0.72rem !important;
-  letter-spacing: 0.07em !important;
-  text-transform: uppercase !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-  transition: all 0.15s !important;
+    padding: 6px 14px !important;
+    background: transparent !important;
+    border: 1px solid rgba(46,204,113,0.5) !important;
+    color: rgba(46,204,113,0.8) !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.07em !important;
+    text-transform: uppercase !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: all 0.15s !important;
 }
 
 tbody td form button[style*="2ecc71"]:hover {
-  background: rgba(247,243,238,0.08) !important;
-  color: var(--cream) !important;
+    background: rgba(46,204,113,0.12) !important;
+    color: #2ecc71 !important;
+    border-color: #2ecc71 !important;
 }
 
 /* ── MODAL ── */

@@ -81,7 +81,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_user'])) {
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="./styles/user_management.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      .swal-admin-cancel {
+          border: 1px solid rgba(255,255,255,0.08) !important;
+          color: rgba(247,243,238,0.6) !important;
+          background-color: transparent !important;
+      }
+      .swal-admin-cancel:hover {
+          background-color: rgba(255,255,255,0.07) !important;
+          color: #F7F3EE !important;
+      }
+  </style>
 </head>
 <body>
 
@@ -159,10 +171,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_user'])) {
                   <button type='button' class="edit-btn" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($user)); ?>)">Edit</button>
                   
                   <?php if ($user['is_active'] == 1): ?>
-                    <form method='post' style='display:inline;' onsubmit="return confirm('Are you sure you want to lock this account?')">
-                          <input type="hidden" name="lock_user" value="<?php echo htmlspecialchars($user['id']); ?>">
-                          <button type='submit' style="background-color: #e74c3c;">Lock</button>
-                      </form>
+                    <form method='post' style='display:inline;' id="lockForm_<?php echo $user['id']; ?>">
+                        <input type="hidden" name="lock_user" value="<?php echo htmlspecialchars($user['id']); ?>">
+                        <button type='button' style="background-color: #e74c3c;" onclick="confirmLock(<?php echo $user['id']; ?>)">Lock</button>
+                    </form>
                   <?php else: ?>
                     <form method='post' style='display:inline;'>
                           <input type="hidden" name="unlock_user" value="<?php echo htmlspecialchars($user['id']); ?>">
@@ -210,6 +222,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_user'])) {
   </div>
 
   <script>
+    function confirmLock(userId) {
+        Swal.fire({
+            title: 'Lock account?',
+            text: 'Are you sure you want to lock this account?',
+            icon: 'warning',
+            background: '#243447',
+            color: '#F7F3EE',
+            showCancelButton: true,
+            confirmButtonColor: '#C4956A',
+            cancelButtonColor: 'transparent',
+            confirmButtonText: 'Yes, lock it',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-admin-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('lockForm_' + userId).submit();
+            }
+        });
+    }
     function openEditModal(user) {
       document.getElementById('edit_user_id').value = user.id;
       document.getElementById('edit_username').value = user.name;
