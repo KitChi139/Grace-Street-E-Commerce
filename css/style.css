@@ -1206,7 +1206,7 @@ footer section {
 .view-item {
   box-shadow: 0 8px 32px rgba(44, 40, 37, 0.50);
   display: flex;
-  background-color: white;
+  background: rgba(247, 243, 238, 0.85);
   padding: 30px;
   position: relative;
   width: 100%;
