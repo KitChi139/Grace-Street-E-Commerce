@@ -107,7 +107,7 @@ if(isset($_POST['search'])) {
                 <div style="margin: 0 0 2rem 0;">
                     <form method="POST" action="" onsubmit="return false;">
                         <p style="margin:0 5px;">Search:</p>
-                        <input type="text" id="searchInput" placeholder="Type Item Name" name="search" style="padding: 10px; font-size: 13px; width: 100%; border: none; background-color: #e8e8e8; box-sizing: border-box;">
+                        <input type="text" id="searchInput" placeholder="Type Item Name" name="search" style="padding: 10px; font-size: 16px; width: 100%; border: none; background-color: #e8e8e8; box-sizing: border-box;">
                         <button type="submit" style="display: none;"></button>
                     </form>
                 </div>
@@ -159,9 +159,9 @@ if(isset($_POST['search'])) {
                                         <div class="product_images">
                                             <img src="uploads/images/<?php echo $fetch_product['image'];?>" alt="">
                                         </div>
-                                        <h1 style="margin: 0; margin-top: 10px; font-size: 15px;" class="name"><?php echo $fetch_product['name'];?></h1>
+                                        <h1 style="margin: 0; margin-top: 10px; font-size: 20px;" class="name"><?php echo $fetch_product['name'];?></h1>
                                         <div class="discount_price">
-                                            <p style="margin: 0; font-size: 13px;">
+                                            <p style="margin: 0; font-size: 16px;">
                                                 <?php
                                                 if ($fetch_product['product_stock_s'] > 0) {
                                                     echo $fetch_product['product_stock_s'] . '<span> in stock</span>';
@@ -176,7 +176,7 @@ if(isset($_POST['search'])) {
                                         </div>
                                         <div class="itembottom-content">
                                             <a href="quick_view.php?pid=<?= $fetch_product['proID']; ?>" class="add-btn" style="text-decoration: none; text-align: center; display: block; width: 100%;" <?php echo ($fetch_product['product_stock_s'] > 0) ? '' : 'style="pointer-events: none; opacity: 0.5;"'; ?> onclick="event.stopPropagation();">Select Size</a>
-                                            <span style="margin: 0; color:#8c8989; font-size: 12px;">PHP
+                                            <span style="margin: 0; color:#8c8989; font-size: 15px;">PHP
                                                 <?php if ($fetch_product['discount'] > 0): ?>
                                                     <p class="product-price" style="color: green; font-size: 16px; margin: 0; text-decoration: line-through;">
                                                         <?php echo $original_price; ?>.00
@@ -185,7 +185,7 @@ if(isset($_POST['search'])) {
                                                         <?php echo number_format($discounted_price, 2); ?>
                                                     </p>
                                                 <?php else: ?>
-                                                    <p class="product-price" style="color: black; font-size: 18px; margin: 0;">
+                                                    <p class="product-price" style="color: black; font-size: 20px; margin: 0;">
                                                         <?php echo $original_price; ?>.00
                                                     </p>
                                                 <?php endif; ?>

@@ -64,17 +64,17 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
     }
     .review-form h2 {
         font-family: 'Cormorant Garamond', serif;
-        font-weight: 400;
+        font-weight: 600;
         font-size: 2rem;
         color: #2C2825;
         margin-bottom: 20px;
     }
     .review-form label {
         font-family: 'Jost', sans-serif;
-        font-size: 0.75rem;
+        font-size: 0.95rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #A09486;
+        color: #6B5B50;
         display: block;
         margin-bottom: 6px;
     }
@@ -86,7 +86,7 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
         border-radius: 6px;
         background-color: rgba(232, 220, 210, 0.3);
         font-family: 'Jost', sans-serif;
-        font-size: 0.85rem;
+        font-size: 1rem;
         color: #2C2825;
         outline: none;
     }
@@ -136,19 +136,19 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
     .review-username {
         font-family: 'Jost', sans-serif;
         font-weight: 500;
-        font-size: 0.95rem;
+        font-size: 1.1rem;
         color: #2C2825;
     }
     .review-rating { color: #C4956A; }
     .review-date {
-        font-size: 0.75rem;
-        color: #A09486;
+        font-size: 0.85rem;
+        color: #6B5B50;
         margin-bottom: 12px;
         font-family: 'Jost', sans-serif;
     }
     .review-comment {
     line-height: 1.6;
-    font-size: 0.88rem;
+    font-size: 1rem;
     color: #2C2825;
     font-family: 'Jost', sans-serif;
     overflow-y: auto;

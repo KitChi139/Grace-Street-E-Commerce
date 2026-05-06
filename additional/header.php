@@ -83,7 +83,7 @@ if(isset($_GET['logout'])){
                 <?php endif; ?>
                 <div class="header-icons">
                     <?php if ($fetch_user): ?>
-                    <span class="user-display-name" style="font-size: 18px; font-weight: 600; margin-right: 15px; color: #333;">
+                    <span class="user-display-name" style="font-size: 22px; font-weight: 600; margin-right: 15px; color: #333;">
                         Hello, <?= htmlspecialchars(!empty($fetch_user['first_name']) ? $fetch_user['first_name'] : $fetch_user['username']); ?>
                     </span>
                     <?php endif; ?>
@@ -93,7 +93,7 @@ if(isset($_GET['logout'])){
                     <a href="./cart.php" class="icon-badge-wrap"><i class="fa-solid fa-cart-shopping"></i><?php if (isset($user_id) && getCartItemCount($user_id, $con) > 0): ?><span class="icon-badge"><?php echo getCartItemCount($user_id, $con); ?></span><?php endif; ?></a>
                     <?php endif; ?>
                     
-                    <i class="fa-solid fa-user" onclick="togglePopup()" style="cursor: pointer; font-size: 20px; margin-left: 12px;"></i>
+                    <i class="fa-solid fa-user" onclick="togglePopup()" style="cursor: pointer; font-size: 24px; margin-left: 12px;"></i>
 
                     <!-- Pop up -->
                     <div id="popupForm" class="pop-container">

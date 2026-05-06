@@ -75,9 +75,9 @@
 
                 echo '<form action="" method="post">
                     <h1 style="text-align: center;font-weight: 600">Get in touch</h1>
-                    <label for="email">Your Email:</label>
+                    <label for="email" style="font-size: 1rem;">Your Email:</label>
                     <input type="email" name="email" value="' . $user_email . '" class="box" readonly>
-                    <label for="msg">Message:</label>
+                    <label for="msg" style="font-size: 1rem;">Message:</label>
                     <textarea name="msg" class="box" placeholder="Enter your message" cols="30" rows="10" required></textarea>
                     <input type="submit" value="Send message" name="send" class="btn">
                 </form>';
@@ -89,22 +89,26 @@
     
     <script>
         <?php if (!empty($successMessage)): ?>
+        document.addEventListener('DOMContentLoaded', function() {
             Swal.fire({
                 icon: 'success',
                 title: 'Sent!',
                 text: '<?php echo $successMessage; ?>',
-                confirmButtonColor: '#000'
+                confirmButtonColor: '#2C2825'
             });
-        <?php endif; ?>
+        });
+    <?php endif; ?>
 
-        <?php if (!empty($errorMessage)): ?>
+    <?php if (!empty($errorMessage)): ?>
+        document.addEventListener('DOMContentLoaded', function() {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
                 text: '<?php echo $errorMessage; ?>',
-                confirmButtonColor: '#000'
+                confirmButtonColor: '#2C2825'
             });
-        <?php endif; ?>
+        });
+    <?php endif; ?>
     </script>
 </body>
 </html>

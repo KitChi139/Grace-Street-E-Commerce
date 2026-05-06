@@ -172,7 +172,7 @@ if (isset($_POST['submit'])) {
     .seller-reg-container label {
         margin-bottom: 5px;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 1rem;
         color: #333;
     }
     .box {
@@ -181,6 +181,8 @@ if (isset($_POST['submit'])) {
         border: 1px solid #ddd;
         border-radius: 5px;
         box-sizing: border-box;
+        font-size: 1rem; 
+        font-family: 'Jost', sans-serif; 
     }
     .btn {
         width: 100%;
@@ -286,7 +288,7 @@ if (isset($_POST['submit'])) {
                     </div>
                 </div>
 
-                <div id="password-requirements" style="font-size: 14px; margin-bottom: 20px; ">
+                <div id="password-requirements" style="font-size: 1rem; margin-bottom: 20px; ">
                     <p id="length-req" style="color: red; <?php echo ($min_length == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_length; ?> characters long</p>
                     <p id="upper-req" style="color: red; <?php echo ($min_upper == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_upper; ?> CAPITAL letter<?php echo ($min_upper > 1) ? 's' : ''; ?></p>
                     <p id="lower-req" style="color: red; <?php echo ($min_lower == 0) ? 'display:none;' : ''; ?>">❌ At least <?php echo $min_lower; ?> small letter<?php echo ($min_lower > 1) ? 's' : ''; ?></p>
@@ -296,13 +298,13 @@ if (isset($_POST['submit'])) {
 
                 <label>Upload Documents (Valid ID or Permit):</label>
                 <input type="file" name="document" required class="box" accept=".pdf,.jpg,.jpeg,.png">
-                <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Accepted formats: PDF, JPG, PNG</p>
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Accepted formats: PDF, JPG, PNG</p>
 
                 <?php if (extension_loaded('gd')): ?>
                     <label for="captcha">Captcha:</label>
                     <div class="captcha-container">
                         <img src="captcha_gen.php" id="captcha-img" alt="Captcha" style="margin-right: 10px;  border: 1px solid #ccc; border-radius: 5px; ">
-                        <button type="button" onclick="refreshCaptcha()" style="padding: 5px 10px; cursor: pointer; background: #eee; border: 1px solid #ccc; border-radius: 5px;">Refresh</button>
+                        <button type="button" onclick="refreshCaptcha()" style="padding: 8px 16px; cursor: pointer; background: transparent; border: 0.5px solid #2C2825; color: #2C2825; font-family: 'Jost', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.25s;" onmouseover="this.style.backgroundColor='#2C2825';this.style.color='#F7F3EE'" onmouseout="this.style.backgroundColor='transparent';this.style.color='#2C2825'">Refresh</button>
                     </div>
                     <input style="background-color: rgba(232, 222, 210, 0.3);" type="text" id="captcha" name="captcha" required placeholder="Enter captcha" class="box">
                 <?php else: 
@@ -317,14 +319,14 @@ if (isset($_POST['submit'])) {
                     </div>
                 <?php endif; ?>
 
-                <div class="tos-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 14px;">
+                <div class="tos-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 1rem;">
                     <input type="checkbox" id="tos_checkbox" name="tos_consent" required style="width: 18px; height: 18px; cursor: pointer;">
                     <label for="tos_checkbox" style="cursor: pointer;">
                         I agree to the <a href="privacy_policy.php" target="_blank" style="color: #8B6F56; text-decoration: underline;">Terms of Service and Privacy Policy</a>
                     </label>
                 </div>
 
-                <div class="cookie-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 14px;">
+                <div class="cookie-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 1rem;">
                     <input type="checkbox" id="cookie_checkbox" name="cookie_consent" required style="width: 18px; height: 18px; cursor: pointer;">
                     <label for="cookie_checkbox" style="cursor: pointer;">
                         I consent to the use of cookies for a better shopping experience
@@ -424,16 +426,18 @@ if (isset($_POST['submit'])) {
 
     <?php if ($message): ?>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             icon: '<?= $status ?>',
             title: '<?= $status == "success" ? "Success!" : "Oops..." ?>',
             text: '<?= $message ?>',
-            confirmButtonColor: '#000'
+            confirmButtonColor: '#2C2825'
         }).then((result) => {
             if (result.isConfirmed && '<?= $status ?>' === 'success') {
                 window.location.href = 'login.php';
             }
         });
+    });
     </script>
     <?php endif; ?>
 </body>

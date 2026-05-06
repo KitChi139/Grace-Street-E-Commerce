@@ -113,26 +113,26 @@
                     </div>
                     <div class="view-info">
                         <div class="info-header" style="text-align: left; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
-                            <p style="margin: 0; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #A09486;">Product Name</p>
-                            <h1 style="margin: 5px 0 0 0; font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #2C2825;"><?php echo $name;?></h1>
+                            <p style="margin: 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #6B5B50;">Product Name</p>
+                            <h1 style="margin: 5px 0 0 0; font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; color: #2C2825;"><?php echo $name;?></h1>
                         </div>
                         <div class="info-body" style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
                             <div class="info-content">
-                                <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #A09486; margin-bottom: 8px;">Description:</p>
-                                <p style="font-size: 0.9rem; line-height: 1.5; color: #555;"><?php echo $description;?></p>
+                                <p style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6B5B50; margin-bottom: 8px;">Description:</p>
+                                <p style="font-size: 1rem; line-height: 1.5; color: #555;"><?php echo $description;?></p>
                             </div>    
                             <div class="info-numbers" style="margin-top: auto;">
                                 <div class="info-price">
-                                    <p style="margin: 0; font-size: 0.75rem; color: #A09486;">PRICE</p>
+                                    <p style="margin: 0; font-size: 0.85rem; color: #6B5B50;">PRICE</p>
                                     <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #2C2825;"><span style="font-size: 0.9rem; font-weight: 400; margin-right: 4px;">PHP</span><?php echo number_format($price, 2);?></p>
                                 </div>
                                 <div class="info-quantity">
-                                    <p style="margin: 0; color: #A09486; font-size: 0.75rem; text-transform: uppercase;">Qty: </p>
+                                    <p style="margin: 0; color: #6B5B50; font-size: 0.85rem; text-transform: uppercase;">Qty: </p>
                                     <input type="number" name="quantity" value="1" min="1" max="999" style="width: 50px; padding: 8px; border: 1px solid #E8DED2; border-radius: 4px;" class="product-quantity">
                                 </div>
                             </div>
                             <div class="info-size">
-                                <p style="margin: 0 0 8px 0; color: #A09486; font-size: 0.75rem; text-transform: uppercase;">Select Size: </p>
+                                <p style="margin: 0 0 8px 0; color: #6B5B50; font-size: 0.85rem; text-transform: uppercase;">Select Size: </p>
                                 <select name="size" required style="width: 100%; padding: 12px; border: 1px solid #E8DED2; border-radius: 6px; font-family: 'Jost', sans-serif; background-color: #fff; cursor: pointer; font-size: 0.9rem;">
                                     <option value="" disabled selected>Choose a size</option>
                                     <?php

@@ -18,7 +18,18 @@ if (session_status() === PHP_SESSION_NONE) {
    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+    .swal-cancel-styled {
+        border: 0.5px solid #2C2825 !important;
+        color: #2C2825 !important;
+        background-color: #F7F3EE !important;
+    }
+    .swal-cancel-styled:hover {
+        background-color: #2C2825 !important;
+        color: #F7F3EE !important;
+    }
         .orders-table {
         width: 100%;
         border-collapse: collapse;
@@ -218,19 +229,19 @@ if (session_status() === PHP_SESSION_NONE) {
                             $decryptedNumber = decrypt_data($row['Number']);
                             $statusDisplay = '';
                             if ($row['Order_Status'] == 'Pending') {
-                                $statusDisplay = '<span style="color: orange;">Pending</span>';
+                                $statusDisplay = '<span style="color: #C4956A; font-weight: 500;">Pending</span>';
                             } else if ($row['Order_Status'] == 'Shipped' || $row['Order_Status'] == 'Paid') {
-                                $statusDisplay = '<span style="color: green;">Paid</span>';
+                                $statusDisplay = '<span style="color: #6B8F71; font-weight: 500;">Paid</span>';
                             } else if ($row['Order_Status'] == 'Ready') {
-                                $statusDisplay = '<span style="color: blue;">Ready for Pickup</span>';
+                                $statusDisplay = '<span style="color: #2C2825; font-weight: 500;">Ready for Pickup</span>';
                             } else if ($row['Order_Status'] == 'In Transit') {
-                                $statusDisplay = '<span style="color: #8B6F56;">On Route</span>';
+                                $statusDisplay = '<span style="color: #8B6F56; font-weight: 500;">On Route</span>';
                             } else if ($row['Order_Status'] == 'Completed') {
-                                $statusDisplay = '<span style="color: green;">Delivered</span>';
+                                $statusDisplay = '<span style="color: #6B8F71; font-weight: 500;">Delivered</span>';
                             } else if ($row['Order_Status'] == 'Canceled') {
-                                $statusDisplay = '<span style="color: red;">Canceled</span>';
+                                $statusDisplay = '<span style="color: #B85C38; font-weight: 500;">Canceled</span>';
                             } else {
-                                $statusDisplay = '<span>' . $row['Order_Status'] . '</span>';
+                                $statusDisplay = '<span style="font-weight: 500;">' . $row['Order_Status'] . '</span>';
                             }
                             ?>
                             <tr class="order-row" data-id="<?php echo $row['ID']; ?>" title="Open shipment tracking">
@@ -343,52 +354,84 @@ if (session_status() === PHP_SESSION_NONE) {
                     url: 'update_order_status.php',
                     data: { order_id: orderId, new_status: 'Received' },
                     success: function(response) {
-                        alert("Item Received by the user successfully");
-                        location.reload();
+                        Swal.fire({
+                            title: 'Order Received!',
+                            icon: 'success',
+                            confirmButtonColor: '#2C2825',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => { location.reload(); });
                     },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                    }
+                    error: function(xhr, status, error) { console.error(error); }
                 });
             });
 
             $('.cancel-btn').click(function() {
                 var orderId = $(this).data('id');
-                if (confirm("Are you sure you want to cancel this order?")) {
-                    $.ajax({
-                        type: 'POST',
-                        url: 'update_order_status.php',
-                        data: { order_id: orderId, new_status: 'Canceled' },
-                        success: function(response) {
-                            alert("Order canceled successfully");
-                            location.reload();
-                        },
-                        error: function(xhr, status, error) {
-                            console.error(error);
-                        }
-                    });
-                }
+                Swal.fire({
+                    title: 'Cancel order?',
+                    text: 'Are you sure you want to cancel this order?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#B85C38',
+                    cancelButtonColor: 'transparent',
+                    confirmButtonText: 'Yes, cancel it',
+                    cancelButtonText: 'Keep it',
+                    customClass: { cancelButton: 'swal-cancel-styled' }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: 'POST',
+                            url: 'update_order_status.php',
+                            data: { order_id: orderId, new_status: 'Canceled' },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Order Canceled',
+                                    icon: 'success',
+                                    confirmButtonColor: '#2C2825',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => { location.reload(); });
+                            },
+                            error: function(xhr, status, error) { console.error(error); }
+                        });
+                    }
+                });
             });
 
             $('.remove-order').click(function() {
-                var orderId = $(this).data('id');
-                if (confirm("Are you sure you want to remove this order?")) {
+            var orderId = $(this).data('id');
+            Swal.fire({
+                title: 'Remove order?',
+                text: 'Are you sure you want to remove this order?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#2C2825',
+                cancelButtonColor: 'transparent',
+                confirmButtonText: 'Yes, remove it',
+                cancelButtonText: 'Cancel',
+                customClass: { cancelButton: 'swal-cancel-styled' }
+            }).then((result) => {
+                if (result.isConfirmed) {
                     $.ajax({
                         type: 'POST',
                         url: 'delete_order.php',
                         data: { order_id: orderId },
                         success: function(response) {
-                            alert("Order removed successfully");
-                            location.reload();
+                            Swal.fire({
+                                title: 'Order Removed',
+                                icon: 'success',
+                                confirmButtonColor: '#2C2825',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => { location.reload(); });
                         },
-                        error: function(xhr, status, error) {
-                            console.error(error);
-                        }
+                        error: function(xhr, status, error) { console.error(error); }
                     });
                 }
             });
-
         });
+    });
     </script>
 
 </body>

@@ -118,11 +118,11 @@
                                             <div class="cart-img" style="width: 100%; height: 155px;">
                                                 <img src="uploads/images/<?php echo $row['Wishlist_Image'];?>" alt="" style="max-width: 100%; max-height: 100%;">
                                             </div>
-                                            <h2 style="font-size: 15px; margin-top: 5px;"><?php echo $row['Wishlist_Name']; ?></h2>
-                                            <p style="font-size: 14px;"><?php echo $row['Wishlist_Price']; ?></p>
+                                            <h2 style="font-size: 18px; margin-top: 5px;"><?php echo $row['Wishlist_Name']; ?></h2>
+                                            <p style="font-size: 16px;"><?php echo $row['Wishlist_Price']; ?></p>
                                             <div class="input-group" style="display: flex; align-items: center; width: 100%;">
-                                                <p style="font-size: 14px; text-align: right; margin-right:45px; color: #bababa;">Quantity:</p>
-                                                <input type="number" name="productQuantity" value="1" min="1" max="1000" style="width: 50px;">
+                                                <p style="font-size: 1rem; text-align: right; margin-right:20px; color: #6B5B50;">Quantity:</p>
+                                                <input type="number" name="productQuantity" value="1" min="1" max="1000" style="width: 60px; padding: 6px; font-size: 1rem;">
                                             </div>
                                             <div class="wishlist-btn" style="display: flex; flex-direction: column; margin-top: 10px; gap: 8px;">
                                                 <button type="submit" name="addToCart" style="cursor: pointer; padding: 12px; background-color: #2C2825; color: #F7F3EE; font-family: Jost, sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; border: none; width: 100%; transition: background-color 0.25s;" onmouseover="this.style.backgroundColor='#8B6F56'" onmouseout="this.style.backgroundColor='#2C2825'">Add To Cart</button>

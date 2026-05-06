@@ -19,7 +19,7 @@
     <!-- Slider -->
     <div class="slider-container">
       <div class="slider-text">
-        <h1>GRACE STREET<br><span style="font-weight:300;font-size:1rem;letter-spacing:0.2em;">Clothing Shop</span></h1>
+        <h1>GRACE STREET<br><span style="font-weight:300;font-size:1.5rem;letter-spacing:0.2em;">Clothing Shop</span></h1>
       </div>
       <div class="slider">
         <img src="uploads/images/1.jpg" alt="Collection 1">
