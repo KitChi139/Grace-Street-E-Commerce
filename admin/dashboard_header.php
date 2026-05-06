@@ -47,6 +47,19 @@ if(isset($_GET['logout'])){
 
 
 <header>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .swal-admin-cancel {
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        color: rgba(247,243,238,0.6) !important;
+        background-color: transparent !important;
+    }
+    .swal-admin-cancel:hover {
+        background-color: rgba(255,255,255,0.07) !important;
+        color: #F7F3EE !important;
+    }
+</style>
   <section class="flex">
           <div class="header-container">
             <div class="header-content">
@@ -82,7 +95,7 @@ if(isset($_GET['logout'])){
                               echo '<div class="pop-content" style="text-align: center;">
                                       <h2>Welcome<br><span>' . htmlspecialchars($fetch_user['username']) . '</span></h2>
                                       <a href="./update_profile.php"><button onclick="updateProfile()">Update Profile</button></a>
-                                      <a href="overview.php?logout=' . $user_id . '" onclick="return confirm(\'Are you sure you want to logout?\')"><button class="logBtn">Log out</button></a>
+                                      <a href="#" onclick="confirmLogout()"><button class="logBtn">Log out</button></a>
                                     </div>';
                           } else {
                               echo '<div class="pop-content" style="text-align: center;">
@@ -101,6 +114,27 @@ if(isset($_GET['logout'])){
         </section>
 
   <script>
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Log out?',
+            text: 'Are you sure you want to log out?',
+            icon: 'warning',
+            background: '#243447',
+            color: '#F7F3EE',
+            showCancelButton: true,
+            confirmButtonColor: '#C4956A',
+            cancelButtonColor: 'transparent',
+            confirmButtonText: 'Yes, log out',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-admin-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'overview.php?logout=<?php echo $user_id; ?>';
+            }
+        });
+    }
     function togglePopup() {
       var popup = document.getElementById("popupForm");
       if (popup.style.display === "none" || popup.style.display === "") {
