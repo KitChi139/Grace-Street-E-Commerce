@@ -68,6 +68,8 @@ $stmt->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .pagination {
             display: flex;
@@ -205,17 +207,19 @@ $stmt->close();
     display: none;
 }
 .product-card {
-    background: white;
+    background: rgba(247,243,238,0.08);
+    border: 0.5px solid rgba(196,149,106,0.25);
     border-radius: 12px;
     padding: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
 }
 .product-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    background: rgba(247,243,238,0.12);
 }
 .product-card-image {
     width: 100%;
@@ -225,60 +229,70 @@ $stmt->close();
     margin-bottom: 12px;
 }
 .product-card-name {
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: 500;
+    font-size: 0.95rem;
     margin-bottom: 8px;
-    color: #333;
+    color: #F7F3EE;
+    font-family: 'Jost', sans-serif;
 }
 .product-card-price {
-    font-size: 18px;
-    font-weight: 700;
-    color: #e74c3c;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #C4956A;
     margin-bottom: 8px;
+    font-family: 'Cormorant Garamond', serif;
 }
 .product-card-stock {
-    font-size: 12px;
-    color: #666;
+    font-size: 0.75rem;
+    color: rgba(247,243,238,0.45);
     margin-bottom: 8px;
 }
 .product-card-stock span {
     display: inline-block;
-    background: #f0f0f0;
+    background: rgba(247,243,238,0.06);
+    border: 0.5px solid rgba(196,149,106,0.2);
+    color: rgba(247,243,238,0.6);
     padding: 2px 6px;
-    border-radius: 4px;
     margin-right: 4px;
+    font-size: 0.7rem;
 }
 .product-card-status {
     display: inline-block;
     padding: 4px 10px;
     border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 0.68rem;
+    font-weight: 400;
     text-transform: uppercase;
+    letter-spacing: 0.08em;
     margin-bottom: 8px;
 }
 .product-card-status.available {
-    background: #d4edda;
-    color: #155724;
+    background: rgba(196,149,106,0.15);
+    color: #C4956A;
+    border: 0.5px solid rgba(196,149,106,0.3);
 }
 .product-card-status.unavailable {
-    background: #f8d7da;
-    color: #721c24;
+    background: rgba(184,92,56,0.15);
+    color: #B85C38;
+    border: 0.5px solid rgba(184,92,56,0.3);
 }
 .product-card-gender {
-    font-size: 12px;
-    color: #888;
+    font-size: 0.75rem;
+    color: rgba(247,243,238,0.4);
     margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 .product-card-description {
-    font-size: 13px;
-    color: #555;
+    font-size: 0.8rem;
+    color: rgba(247,243,238,0.5);
     margin-bottom: 12px;
     flex-grow: 1;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.5;
 }
 .product-card-actions {
     display: flex;
@@ -289,20 +303,33 @@ $stmt->close();
 .product-card-actions a {
     flex: 1;
     padding: 8px;
-    border: none;
-    border-radius: 6px;
+    border-radius: 0;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 0.7rem;
     text-align: center;
     text-decoration: none;
+    font-family: 'Jost', sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s;
 }
 .product-card-actions button {
-    background: #3498db;
-    color: white;
+    background: transparent;
+    border: 0.5px solid #C4956A;
+    color: #C4956A;
+}
+.product-card-actions button:hover {
+    background: #C4956A;
+    color: #F7F3EE;
 }
 .product-card-actions a {
-    background: #e74c3c;
-    color: white;
+    background: transparent;
+    border: 0.5px solid #B85C38;
+    color: #B85C38;
+}
+.product-card-actions a:hover {
+    background: #B85C38;
+    color: #F7F3EE;
 }
 .productname input,
 .productname select,
@@ -564,7 +591,7 @@ input[type="file"]::file-selector-button {
                                 <td><?php echo $row['gender']; ?></td>
                                 <td class='action-buttons'>
                                     <button onclick='updateItem(<?php echo $row['proID']; ?>)'>Update</button>
-                                    <a href="?delete_id=<?php echo $row['proID']; ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                                    <a class="delete-button" onclick="confirmDelete(<?php echo $row['proID']; ?>)">Delete</a>
                                 </td>
                             </tr>
                             <?php
@@ -607,7 +634,7 @@ input[type="file"]::file-selector-button {
                         <div class="product-card-description"><?php echo $row['description']; ?></div>
                         <div class="product-card-actions">
                             <button onclick='updateItem(<?php echo $row['proID']; ?>)'>Update</button>
-                            <a href="?delete_id=<?php echo $row['proID']; ?>" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                            <a onclick="confirmDelete(<?php echo $row['proID']; ?>)">Delete</a>
                         </div>
                     </div>
                 <?php } ?>
@@ -722,6 +749,39 @@ input[type="file"]::file-selector-button {
    </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
+    function confirmDelete(productId) {
+        Swal.fire({
+            title: 'Delete product?',
+            text: 'Are you sure you want to delete this product? This cannot be undone.',
+            icon: 'warning',
+            background: '#3D3530',
+            color: '#F7F3EE',
+            showCancelButton: true,
+            confirmButtonColor: '#B85C38',
+            cancelButtonColor: 'transparent',
+            confirmButtonText: 'Yes, delete it',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-seller-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '?delete_id=' + productId;
+            }
+        });
+    }
+
+    function submitForm() {
+        Swal.fire({
+            title: 'Product Added!',
+            icon: 'success',
+            background: '#3D3530',
+            color: '#F7F3EE',
+            confirmButtonColor: '#C4956A',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
 function showProductPopup() {
     var mainProductBg = document.getElementById("mainProductBg");
     mainProductBg.style.display = "block";
@@ -735,12 +795,6 @@ function updateItem(productId) {
     window.location.href = "update_product.php?id=" + productId;
 }
 
-
-        // Function to handle click event on submit button
-        function submitForm() {
-            // Show alert
-            alert("Product Added");
-        }
 
         function setView(view) {
             const tableView = document.getElementById('tableView');

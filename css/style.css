@@ -103,7 +103,7 @@ section {
 }
 .cart-product .cart-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(44, 40, 37, 0.12);
+  box-shadow: 0 6px 16px rgba(44, 40, 37, 0.50);
 }
 .cart-item .cart-img {
   width: 65px;
@@ -832,8 +832,8 @@ nav a:hover { color: #2C2825; }
 .loginuser-container form h1 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 2.5rem;
-  font-weight: 400;
-  margin-bottom: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 3.5rem;
   color: #2C2825;
 }
 

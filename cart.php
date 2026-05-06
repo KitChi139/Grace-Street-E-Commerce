@@ -49,7 +49,7 @@
                                 $subtotal = $originalprice * $product['Product_Quantity'];
                                 $totalPrice += $subtotal;
                                 ?>  
-                                <div class="cart-item" data-product-id="<?php echo $product['ID']; ?>" data-price="<?php echo $originalprice; ?>">
+                                <div class="cart-item" data-product-id="<?php echo $product['ID']; ?>" data-price="<?php echo $originalprice; ?>" style="position: relative;">
                                     <div style="position: absolute; top: 10px; left: 10px; z-index: 10;">
                                         <input type="checkbox" class="item-checkbox" checked value="<?php echo $product['ID']; ?>" style="width: 20px; height: 20px; cursor: pointer;">
                                     </div>

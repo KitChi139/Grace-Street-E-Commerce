@@ -43,6 +43,19 @@ if(isset($_GET['logout'])){
 }
 ?>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    .swal-seller-cancel {
+        border: 0.5px solid rgba(247,243,238,0.3) !important;
+        color: rgba(247,243,238,0.6) !important;
+        background-color: transparent !important;
+    }
+    .swal-seller-cancel:hover {
+        background-color: rgba(247,243,238,0.1) !important;
+        color: #F7F3EE !important;
+    }
+</style>
 
 <header>
   <section class="flex">
@@ -79,7 +92,7 @@ if(isset($_GET['logout'])){
                               echo '<div class="pop-content" style="text-align: center;">
                                       <h2>Welcome<br><span>' . $fetch_user['username'] . '</span></h2>
                                       <a href="../update_profile.php"><button onclick="updateProfile()">Update Profile</button></a>
-                                      <a href="../logout.php?logout=' . $user_id . '" onclick="return confirm(\'Are you sure you want to logout?\')"><button class="logBtn">Log out</button></a>
+                                      <a href="#" onclick="confirmLogout()"><button class="logBtn">Log out</button></a>
                                     </div>';
                           } else {
                               echo '<div class="pop-content" style="text-align: center;">
@@ -105,6 +118,27 @@ if(isset($_GET['logout'])){
       } else {
         popup.style.display = "none";
       }
+    }
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Log out?',
+            text: 'Are you sure you want to log out?',
+            icon: 'warning',
+            background: '#3D3530',
+            color: '#F7F3EE',
+            showCancelButton: true,
+            confirmButtonColor: '#C4956A',
+            cancelButtonColor: 'transparent',
+            confirmButtonText: 'Yes, log out',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                cancelButton: 'swal-seller-cancel'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '../logout.php?logout=<?php echo $user_id; ?>';
+            }
+        });
     }
   </script>
   <script src="../js/script.js"></script>

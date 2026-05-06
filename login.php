@@ -161,7 +161,8 @@ if(isset($_POST['submit'])){
     .password-container .box {
         margin-bottom: 0;
         padding-right: 40px;
-        width: 89.6%;
+        width: 100%;
+        box-sizing: border-box;
     }
     .toggle-password {
         position: absolute;

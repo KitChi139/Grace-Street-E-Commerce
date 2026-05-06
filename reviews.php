@@ -167,17 +167,33 @@ $select_reviews = mysqli_query($con, "SELECT reviews.*, grace_user.username FROM
   font-size: 3.5rem;">Customer Reviews & Feedbacks</h1>
 
         <?php if ($message): ?>
-        <script>
-            window.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Thank you!',
-                    text: '<?= $message ?>',
-                    confirmButtonColor: '#2C2825'
-                });
-            });
-        </script>
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        <?php if ($message === "Thank you for your feedback!"): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Thank you!',
+            text: '<?= $message ?>',
+            confirmButtonColor: '#2C2825'
+        });
+        <?php elseif ($message === "Please login to leave a review."): ?>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Login Required',
+            text: '<?= $message ?>',
+            confirmButtonColor: '#2C2825'
+        });
+        <?php else: ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: '<?= $message ?>',
+            confirmButtonColor: '#2C2825'
+        });
         <?php endif; ?>
+    });
+</script>
+<?php endif; ?>
 
         <div class="review-form">
             <h2>Leave a Review</h2>

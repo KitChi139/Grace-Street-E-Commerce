@@ -43,6 +43,22 @@ if(isset($_GET['logout'])){
 
 
 <header>
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    .swal-cancel-styled {
+        border: 0.5px solid #2C2825 !important;
+        color: #2C2825 !important;
+        background-color: #F7F3EE !important;
+    }
+    .swal-cancel-styled:hover {
+        background-color: #2C2825 !important;
+        color: #F7F3EE !important;
+    }
+</style>
+
   <section class="flex">
           <div class="header-container">
             <div class="header-content" style="<?= ($headerRole === 'courier') ? 'justify-content: flex-end;' : ''; ?>">
